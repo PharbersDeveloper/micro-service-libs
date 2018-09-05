@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>common_util</artifactId>
+    <version>1.0</version>
+
+
+    <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
+      the right dependencies for modules specified for each version separately -->
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- play lib -->
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play-json_${scalaBinaryVersion}</artifactId>
+                    <version>2.5.0-M2</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play_${scalaBinaryVersion}</artifactId>
+                    <version>2.6.15</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

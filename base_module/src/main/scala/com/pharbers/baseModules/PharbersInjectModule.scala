@@ -1,0 +1,3 @@
+package com.pharbers.baseModules
+
+trait PharbersInjectModule extends PharbersSingletonModule

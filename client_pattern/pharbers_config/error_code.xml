@@ -1,0 +1,66 @@
+<pharbers-modules>
+    <error_code>
+        <error reason="input error" code="-1" description="输入的参数有错误" />
+
+        <error reason="get primary key error" code="-101" description="获取主键键值失败" />
+        <error reason="primary key error" code="-102" description="主键重复创建或者主键出错" />
+        <error reason="data not exist" code="-103" description="数据不存在" />
+        <error reason="data duplicate" code="-104" description="搜索结果不唯一, 请用query multiple搜索" />
+
+        <error reason="user push error" code="-201" description="用户创建失败" />
+        <error reason="user already exist" code="-202" description="用户已经存在" />
+        <error reason="user not exist" code="-203" description="用户不存在" />
+        <error reason="profile query input error" code="-204" description="搜索用户没有提供用户ID" />
+        <error reason="profile multi query input error" code="-205" description="搜索多用户没有提供用户ID列表" />
+        <error reason="profile update input error" code="-206" description="修改用户信息修改错误" />
+        <error reason="profile update no right" code="-207" description="只有自己能修改自己的详细信息" />
+
+        <error reason="reg push error" code="-301" description="验证码发送失败" />
+        <error reason="reg phone or code error" code="-302" description="电话好吗或者验证码出错" />
+
+        <error reason="push service input error" code="-401" description="添加服务时参数错误" />
+        <error reason="search service input error" code="-402" description="搜索服务时参数错误，需要服务ID" />
+        <error reason="service result error" code="-403" description="服务信息数据出错" />
+        <error reason="only can push own service" code="-404" description="自己只能发自己的服务" />
+        <error reason="only service provider can push service" code="-405" description="只有成为服务者才能发布服务" />
+        <error reason="pop service input error" code="-406" description="删除服务时需要服务ID和发布者ID" />
+        <error reason="only can pop own service" code="-407" description="自己只能删除自己的服务" />
+        <error reason="only can update own service" code="-408" description="自己只能修改自己的服务" />
+        <error reason="service not exist" code="-409" description="服务不存在" />
+
+        <error reason="push order input error" code="-501" description="添加订单时输入参数错误" />
+        <error reason="order output error" code="-502" description="订单数据返回解析错误" />
+        <error reason="order detail condition error" code="-503" description="缺少订单ID" />
+        <error reason="query multi order condition error" code="-504" description="缺少订单ID列表" />
+        <error reason="order not exist" code="-505" description="查询订单不存在" />
+        <error reason="order notify error" code="-506" description="订单状态发送提示失败" />
+        <error reason="no right modify order" code="-507" description="没有权限修改订单相关信息" />
+
+        <error reason="tm input error" code="-601" description="添加时间管理参数错误" />
+        <error reason="tm output error" code="-602" description="时间管理数据返回解析错误" />
+
+        <error reason="collections input error" code="-701" description="收藏输入参数错误" />
+        <error reason="collections output error" code="-702" description="收藏输出参数错误" />
+
+        <error reason="dongda selected input error" code="-801" description="咚哒严选输入参数错误" />
+        <error reason="dongda selected output error" code="-802" description="咚哒严选输出参数错误" />
+
+        <error reason="category input error" code="-1001" description="咚哒分类输入参数错误" />
+        <error reason="category output error" code="-1002" description="咚哒分类输出参数错误" />
+        <error reason="search index input error" code="-1003" description="咚哒分类搜索信息输入参数错误" />
+        <error reason="search index output error" code="-1004" description="咚哒分类搜索信息输出参数错误" />
+
+        <error reason="no db connection" code="-9001" description="没有找到数据库链接" />
+        <error reason="db prase error" code="-9002" description="数据库结构发现错误" />
+        <error reason="no encrypt impl" code="-9003" description="权限加密方式不清晰或者Token不存在" />
+        <error reason="token parse error" code="-9004" description="token数据解析出现错误" />
+        <error reason="token expired" code="-9005" description="token过期" />
+        <error reason="db aggregation error " code="-9006" description="数据Map Reduce操作发生错误" />
+        <error reason="notification module not exist" code="-9007" description="用户提醒服务模块不存在" />
+        <error reason="akka module not exist" code="-9008" description="系统并发分发模块不存在" />
+        <error reason="merge result error" code="-9009" description="合并多结果失败" />
+        <error reason="actor system get error" code="-9010" description="后去系统Actor System失败" />
+
+        <error reason="unknown error" code="-9999" description="unknown error" />
+    </error_code>
+</pharbers-modules>

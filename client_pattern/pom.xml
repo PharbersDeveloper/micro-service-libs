@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>client_pattern</artifactId>
+    <version>1.0</version>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <dependencies>
+                <!-- play lib -->
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play-json_${scalaBinaryVersion}</artifactId>
+                    <version>2.5.0-M2</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play_${scalaBinaryVersion}</artifactId>
+                    <version>2.6.15</version>
+                </dependency>
+
+                <!-- pharbers lib -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>errorcode</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>jsonapi</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>macros</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>mongo_drive</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>third</artifactId>
+                    <version>1.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <args>
+                        <arg>-nobootcp</arg>
+                    </args>
+                    <compilerPlugins>
+                        <compilerPlugin>
+                            <groupId>org.scalamacros</groupId>
+                            <artifactId>paradise_2.11.8</artifactId>
+                            <version>2.1.0</version>
+                        </compilerPlugin>
+                    </compilerPlugins>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

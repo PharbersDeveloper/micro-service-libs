@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>third</artifactId>
+    <version>1.0</version>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <dependencies>
+                <!-- aliyun oss -->
+                <dependency>
+                    <groupId>com.aliyun.oss</groupId>
+                    <artifactId>aliyun-sdk-oss</artifactId>
+                    <version>2.8.2</version>
+                </dependency>
+
+                <!-- play lib -->
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play-json_${scalaBinaryVersion}</artifactId>
+                    <version>2.5.0-M2</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.typesafe.play</groupId>
+                    <artifactId>play_${scalaBinaryVersion}</artifactId>
+                    <version>2.6.15</version>
+                </dependency>
+
+                <!-- pharbers mongodb -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>base_module</artifactId>
+                    <version>1.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+</project>

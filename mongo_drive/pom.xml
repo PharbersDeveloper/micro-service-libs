@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>mongo_drive</artifactId>
+    <version>1.0</version>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <!-- pharbers module -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>base_module</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <!-- mongodb lib -->
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>casbah_${scalaBinaryVersion}</artifactId>
+                    <version>3.1.1</version>
+                    <type>pom</type>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,5 @@
+<pharbers-modules>
+    <mongodb-connect-nodes>
+        <connect-config-path name="test" value="mongo_drive/pharbers_config/test_connect.xml" />
+    </mongodb-connect-nodes>
+</pharbers-modules>

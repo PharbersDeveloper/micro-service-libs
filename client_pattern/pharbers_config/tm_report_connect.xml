@@ -1,0 +1,9 @@
+<pharbers-modules>
+    <mongodb-connect>
+        <server_host value="123.56.179.133" />
+        <server_port value="5555" />
+        <connect_name value="" />
+        <connect_pwd value="" />
+        <conn_name value="pharbers-tm-report" />
+    </mongodb-connect>
+</pharbers-modules>

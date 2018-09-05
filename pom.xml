@@ -1,0 +1,203 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.pharbers</groupId>
+    <artifactId>micro-service-libs</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    <description>Pharbers Micro Service Base libs</description>
+
+
+    <modules>
+        <module>base_module</module>
+        <module>common_util</module>
+        <module>errorcode</module>
+        <module>third</module>
+        <module>jsonapi</module>
+        <module>mongo_drive</module>
+        <module>macros</module>
+        <module>client_pattern</module>
+        <module>models</module>
+        <!--<module>testMacros</module>-->
+    </modules>
+
+    <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
+      the right dependencies for modules specified for each version separately -->
+    <repositories>
+        <repository>
+            <id>oss.sonatype.org</id>
+            <name>sonatype sapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+    </repositories>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <scalaVersion>2.11.8</scalaVersion>
+                <scalaBinaryVersion>2.11</scalaBinaryVersion>
+            </properties>
+
+            <dependencies>
+
+                <!-- scala lib -->
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                    <version>${scalaVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-compiler</artifactId>
+                    <version>${scalaVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-xml_${scalaBinaryVersion}</artifactId>
+                    <version>1.0.6</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-parser-combinators_${scalaBinaryVersion}</artifactId>
+                    <version>1.0.5</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang.modules</groupId>
+                    <artifactId>scala-swing_${scalaBinaryVersion}</artifactId>
+                    <version>1.0.2</version>
+                </dependency>
+
+                <!-- scala macro -->
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-reflect</artifactId>
+                    <version>${scalaVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.typelevel</groupId>
+                    <artifactId>macro-compat_${scalaBinaryVersion}</artifactId>
+                    <version>1.1.1</version>
+                </dependency>
+
+                <!-- akka lib-->
+                <dependency>
+                    <groupId>com.typesafe.akka</groupId>
+                    <artifactId>akka-actor_${scalaBinaryVersion}</artifactId>
+                    <version>2.4.16</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_${scalaBinaryVersion}</artifactId>
+                    <version>3.0.1</version>
+                    <scope>test</scope>
+                </dependency>
+
+                <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                    <version>1.2.17</version>
+                </dependency>
+
+                <!-- specs test -->
+                <dependency>
+                    <groupId>org.specs2</groupId>
+                    <artifactId>specs2_${scalaBinaryVersion}</artifactId>
+                    <version>3.7</version>
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_${scalaBinaryVersion}</artifactId>
+                    <version>3.0.1</version>
+                    <scope>test</scope>
+                </dependency>
+
+            </dependencies>
+
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <args>
+                        <!-- work-around for https://issues.scala-lang.org/browse/SI-8358 -->
+                        <arg>-nobootcp</arg>
+                    </args>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <junitxml>.</junitxml>
+                    <filereports>WDF TestSuite.txt</filereports>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
