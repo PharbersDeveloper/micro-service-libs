@@ -15,10 +15,14 @@
         <module>third</module>
         <module>jsonapi</module>
         <module>mongo_drive</module>
+        <module>mongo_old</module>
+        <module>security</module>
         <module>macros</module>
-        <module>client_pattern</module>
         <module>models</module>
-        <!--<module>testMacros</module>-->
+        <module>redis</module>
+
+        <module>client_pattern</module>
+        <module>testMacros</module>
     </modules>
 
     <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
