@@ -1,7 +1,8 @@
-package com.pharbers.models
+package com.pharbers.models.service
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2OneConn, ToStringMacro}
+import com.pharbers.models.entity.user
 
 @One2OneConn[user]("user")
 @ToStringMacro

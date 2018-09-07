@@ -1,4 +1,4 @@
-package com.pharbers.models
+package com.pharbers.models.entity
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
