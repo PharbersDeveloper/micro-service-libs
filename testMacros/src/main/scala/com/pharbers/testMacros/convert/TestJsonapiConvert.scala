@@ -1,7 +1,7 @@
 package com.pharbers.testMacros.convert
 
 import com.pharbers.macros.JsonapiConvert
-import com.pharbers.testMacros.model.user
+import com.pharbers.models.entity.user
 import com.pharbers.util.log.phLogTrait
 
 class TestJsonapiConvert() extends JsonapiConvert[user] with phLogTrait {

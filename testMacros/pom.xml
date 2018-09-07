@@ -25,6 +25,11 @@
                     <artifactId>client_pattern</artifactId>
                     <version>1.0</version>
                 </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>models</artifactId>
+                    <version>1.0</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>

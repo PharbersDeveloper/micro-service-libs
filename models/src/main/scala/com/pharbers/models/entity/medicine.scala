@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class goods() extends commonEntity {
+class medicine() extends commonEntity {
     var form: String = ""
     var prod_category: String = ""
     var corp_name: String = ""

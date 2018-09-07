@@ -3,10 +3,10 @@ package com.pharbers.testMacros
 import io.circe.syntax._
 import com.pharbers.jsonapi.model._
 import com.pharbers.util.log.phLogTrait
-import com.pharbers.testMacros.model.user
 import com.pharbers.macros.convert.jsonapi._
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
 import com.pharbers.jsonapi.model.RootObject.ResourceObject
+import com.pharbers.models.entity.user
 
 object test_resources_object extends App with CirceJsonapiSupport with phLogTrait {
     val test_data =

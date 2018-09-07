@@ -1,10 +1,10 @@
-package com.pharbers.testMacros.model
+package com.pharbers.models.entity
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class dest() extends commonEntity {
+class hospital() extends commonEntity {
     var form: String = ""
     var hosp_name: String = ""
     var hosp_image: String = ""

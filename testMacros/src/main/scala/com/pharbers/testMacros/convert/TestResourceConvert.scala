@@ -1,7 +1,7 @@
 package com.pharbers.testMacros.convert
 
-import com.pharbers.testMacros.model.user
 import com.pharbers.macros.convert.jsonapi.ResourceObjectReader
+import com.pharbers.models.entity.user
 
 class TestResourceConvert extends ResourceObjectReader[user] {
 

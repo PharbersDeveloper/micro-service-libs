@@ -6,6 +6,17 @@ import scala.collection.JavaConversions._
 import scala.reflect.runtime.{universe => ru}
 
 trait dbutil {
+
+    /** 判断是否为关联到实体的one属性 **/
+    private[this] def isConnOneInject(f: ru.Symbol): Boolean =
+        f.info <:< ru.typeOf[Option[_]] && f.info.typeArgs.length == 1 &&
+                f.info.typeArgs.head.baseClasses.map(_.name.toString).contains("commonEntity")
+
+    /** 判断是否为关联到实体的many属性 **/
+    private[this] def isConnManyInject(f: ru.Symbol): Boolean =
+        f.info <:< ru.typeOf[Option[List[_]]] && f.info.typeArgs.length == 1 &&
+                f.info.typeArgs.head.typeArgs.head.baseClasses.map(_.name.toString).contains("commonEntity")
+
     def attrValue(field: ru.Symbol, dbo: DBObject): Any = {
 
         def recursive(data: Any): Any = {
@@ -68,7 +79,11 @@ trait dbutil {
         val runtime_mirror = ru.runtimeMirror(getClass.getClassLoader)
         val class_symbol = runtime_mirror.classSymbol(Class.forName(className))
         val class_mirror = runtime_mirror.reflectClass(class_symbol)
-        val class_fields = class_symbol.typeSignature.members.filter(p => p.isTerm && !p.isMethod).toList
+        val class_fields = class_symbol.typeSignature.members
+                    .filter(p => p.isTerm && !p.isMethod)
+                    .filter(!isConnOneInject(_))
+                    .filter(!isConnManyInject(_))
+                    .toList
         val constructors = class_symbol.typeSignature.members.filter(_.isConstructor).toList
         val constructorMirror = class_mirror.reflectConstructor(constructors.head.asMethod)
         val model = constructorMirror()
@@ -101,20 +116,14 @@ trait dbutil {
         val inst_mirror = runtime_mirror.reflect(model)
         val inst_symbol = inst_mirror.symbol
         val class_symbol = inst_symbol.typeSignature
-        val class_fields = inst_symbol.typeSignature.members.filter(p => p.isTerm && !p.isMethod).toList
-
-        /** 判断是否为关联到实体的one属性 **/
-        def isConnOneInject(f: ru.Symbol): Boolean =
-            f.info <:< ru.typeOf[Option[_]] && f.info.typeArgs.length == 1 &&
-                    f.info.typeArgs.head.baseClasses.map(_.name.toString).contains("commonEntity")
-
-        /** 判断是否为关联到实体的many属性 **/
-        def isConnManyInject(f: ru.Symbol): Boolean =
-            f.info <:< ru.typeOf[Option[List[_]]] && f.info.typeArgs.length == 1 &&
-                    f.info.typeArgs.head.typeArgs.head.baseClasses.map(_.name.toString).contains("commonEntity")
+        val class_fields = inst_symbol.typeSignature.members
+                .filter(p => p.isTerm && !p.isMethod)
+                .filter(!isConnOneInject(_))
+                .filter(!isConnManyInject(_))
+                .toList
 
         var dbo = DBObject()
-        class_fields.filter(f => !isConnOneInject(f) && !isConnManyInject(f)).foreach { field =>
+        class_fields.foreach { field =>
             val field_name = field.name.toString.trim
             val field_symbol = class_symbol.member(ru.TermName(field_name)).asTerm
             val field_mirror = inst_mirror.reflectField(field_symbol)

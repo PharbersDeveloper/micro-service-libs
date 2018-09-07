@@ -1,6 +1,6 @@
 package com.pharbers.testMacros
 
-import com.pharbers.testMacros.model._
+import com.pharbers.models.entity._
 import com.pharbers.util.log.phLogTrait
 import com.pharbers.pattern.request.request
 import com.pharbers.jsonapi.model.RootObject
@@ -19,7 +19,7 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
     |        "type": "request",
     |        "id": "tmp_4a4e2a7f-0191-403e-8864-626320e963ca",
     |        "attributes": {
-    |            "res": "proposal"
+    |            "res": "dest"
     |        },
     |        "relationships": {
     |            "eqcond": {
@@ -37,7 +37,7 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
     |            "type": "eqcond",
     |            "id": "tmp_00ed7bdc-eea2-437f-94b7-1fa18c447e05",
     |            "attributes": {
-    |                "val": "5b763d83aa8de30fe429d6d3",
+    |                "val": "5b641342aa8de31ed8fb11e3",
     |                "key": "id"
     |            }
     |        }
@@ -49,7 +49,7 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
         val requests = formJsonapi[request](jsonapi)
         println(requests)
 
-        val result = queryObject[proposal](requests)
+        val result = queryObject[hospital](requests)
         println(result)
         println(result.get.id)
         result

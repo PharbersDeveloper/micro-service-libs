@@ -2,9 +2,9 @@ package com.pharbers.testMacros
 
 import io.circe.syntax._
 import com.pharbers.macros._
-import com.pharbers.testMacros.model.user
 import com.pharbers.util.log.phLogTrait
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
+import com.pharbers.models.entity.user
 
 object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait {
     val entity = new user()
