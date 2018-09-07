@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-case class phase() extends commonEntity {
+class phase() extends commonEntity {
     var phase: Int = 0
     var name: String = ""
     var report_id: String = ""

@@ -24,7 +24,7 @@ trait Brick {
             Some(bricks(cur_step + 1))
     }
 
-    def forwardTo(next_brick: String)
+    def forwardTo(next_brick: String): Unit = {}
 
     def goback: model.RootObject
 }

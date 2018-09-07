@@ -47,9 +47,10 @@ object ResourceObjectReader extends phLogTrait {
             implicit def convertValueToAny: JsonApiObject.Value => Any = {
                 case StringValue(str) => str
                 case NumberValue(number) if number.isValidInt => number.toInt
-                case NumberValue(number) if number.isBinaryDouble => number.toDouble
-                case NumberValue(number) if number.isBinaryFloat => number.toFloat
                 case NumberValue(number) if number.isValidLong => number.toLong
+                case NumberValue(number) if number.isBinaryFloat => number.toFloat
+                case NumberValue(number) if number.isBinaryDouble => number.toDouble
+                case NumberValue(number) => number.toDouble
                 case BooleanValue(number) => number
                 case JsObjectValue(obj) => obj.map(x => x.name -> convertValueToAny(x.value)).toMap
                 case JsArrayValue(arr) => arr.map(x => convertValueToAny(x)).toList

@@ -1,4 +1,4 @@
-package com.pharbers.models.convert
+package com.pharbers.testMacros.convert
 
 import com.pharbers.testMacros.model.user
 import com.pharbers.macros.convert.jsonapi.ResourceObjectReader
@@ -19,15 +19,16 @@ class TestResourceConvert extends ResourceObjectReader[user] {
 
     /** Jsonapi Value 转 基础类型 */
     implicit def convertValueToAny: JsonApiObject.Value => Any = {
-            case StringValue(str) => str
-            case NumberValue(number) if number.isValidInt => number.toInt
-            case NumberValue(number) if number.isBinaryDouble => number.toDouble
-            case NumberValue(number) if number.isBinaryFloat => number.toFloat
-            case NumberValue(number) if number.isValidLong => number.toLong
-            case BooleanValue(number) => number
-            case JsObjectValue(obj) => obj.map(x => x.name -> convertValueToAny(x.value)).toMap
-            case JsArrayValue(arr) => arr.map(x => convertValueToAny(x)).toList
-            case NullValue => null
+        case StringValue(str) => str
+        case NumberValue(number) if number.isValidInt => number.toInt
+        case NumberValue(number) if number.isValidLong => number.toLong
+        case NumberValue(number) if number.isBinaryFloat => number.toFloat
+        case NumberValue(number) if number.isBinaryDouble => number.toDouble
+        case NumberValue(number) => number.toDouble
+        case BooleanValue(number) => number
+        case JsObjectValue(obj) => obj.map(x => x.name -> convertValueToAny(x.value)).toMap
+        case JsArrayValue(arr) => arr.map(x => convertValueToAny(x)).toList
+        case NullValue => null
     }
 
     override def fromResourceObject(resource: ResourceObject, included: Option[Included]): user = {

@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-case class dest() extends commonEntity {
+class dest() extends commonEntity {
     var form: String = ""
     var hosp_name: String = ""
     var hosp_image: String = ""

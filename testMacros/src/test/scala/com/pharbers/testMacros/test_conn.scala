@@ -4,11 +4,11 @@ import com.pharbers.testMacros.model.{company, user}
 
 object test_conn extends App {
 
-    val c0 = company()
-    val c1 = company()
-    val u0 = user()
-    val u1 = user()
-    val u2 = user()
+    val c0 = new company()
+    val c1 = new company()
+    val u0 = new user()
+    val u1 = new user()
+    val u2 = new user()
 
     u0.email = "test_email"
     u0.password = "test_password"

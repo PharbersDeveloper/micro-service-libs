@@ -14,42 +14,42 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
 
     def findOne: Option[AnyRef] = {
         val jsonData = """
-        {
-            "data": {
-                "id": "1",
-                "type": "request",
-                "attributes": {
-                    "res": "scenario"
-                },
-                    "relationships": {
-                    "eqcond": {
-                        "data": [
-                            {
-                                "id": "2",
-                                "type": "eqcond"
-                            }
-                        ]
-                    }
-                }
-            },
-            "included": [
-                {
-                    "id": "2",
-                    "type": "eqcond",
-                    "attributes": {
-                        "key": "id",
-                        "val": "5b765e5bbadd060001567e7c"
-                    }
-                }
-            ]
-        }""".stripMargin
+    |{
+    |    "data": {
+    |        "type": "request",
+    |        "id": "tmp_4a4e2a7f-0191-403e-8864-626320e963ca",
+    |        "attributes": {
+    |            "res": "proposal"
+    |        },
+    |        "relationships": {
+    |            "eqcond": {
+    |                "data": [
+    |                    {
+    |                        "type": "eqcond",
+    |                        "id": "tmp_00ed7bdc-eea2-437f-94b7-1fa18c447e05"
+    |                    }
+    |                ]
+    |            }
+    |        }
+    |    },
+    |    "included": [
+    |        {
+    |            "type": "eqcond",
+    |            "id": "tmp_00ed7bdc-eea2-437f-94b7-1fa18c447e05",
+    |            "attributes": {
+    |                "val": "5b763d83aa8de30fe429d6d3",
+    |                "key": "id"
+    |            }
+    |        }
+    |    ]
+    |}""".stripMargin
         val json_data = parseJson(jsonData)
         val jsonapi = decodeJson[RootObject](json_data)
 
         val requests = formJsonapi[request](jsonapi)
         println(requests)
 
-        val result = queryObject[scenario](requests)
+        val result = queryObject[proposal](requests)
         println(result)
         println(result.get.id)
         result

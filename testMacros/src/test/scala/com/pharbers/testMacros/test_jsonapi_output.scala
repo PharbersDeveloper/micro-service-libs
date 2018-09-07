@@ -7,7 +7,7 @@ import com.pharbers.util.log.phLogTrait
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
 
 object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait {
-    val entity = user()
+    val entity = new user()
     entity.id = "5b7e454a8fb8076c3c3304c7"
 
 //    val contacter1 = contacter()
@@ -33,7 +33,6 @@ object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait 
 //    entity.guardians = Some(guardian1 :: guardian2 :: Nil)
 
     phLog(entity)
-    val entity2 = entity.copy()
 //    entity2.contacts = Some(contacter1 :: contacter2 :: Nil)
 //    entity2.guardians = Some(guardian1 :: guardian2 :: Nil)
 //    phLog(entity2)

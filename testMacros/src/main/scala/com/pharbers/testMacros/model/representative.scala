@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-case class representative() extends commonEntity {
+class representative() extends commonEntity {
     var rep_name: String = ""
     var rep_image: String = ""
     var rep_level: String = ""
