@@ -1,4 +1,4 @@
-package com.pharbers.models.entity
+package com.pharbers.models.service
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
@@ -11,5 +11,6 @@ import com.pharbers.macros.common.connecting.ToStringMacro
   */
 @ToStringMacro
 class notice extends commonEntity {
+    var title: String = ""
     var news: String = ""
 }

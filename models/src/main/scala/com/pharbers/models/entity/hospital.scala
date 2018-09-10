@@ -24,4 +24,5 @@ class hospital() extends commonEntity {
     var surgery_yearly: Int = 0
     var patients_payment_capacity: String = ""
     var drug_intake: String = ""
+    var hosp_describe: String = ""
 }

@@ -15,38 +15,7 @@ object test_jsonapi_input extends App with CirceJsonapiSupport with phLogTrait {
           |        "type": "profile",
           |        "id": "uuida9811cd0-5d7a-47ec-adf2-71eb1655ec31",
           |        "attributes": {
-          |            "name": "jeorch",
-          |            "age": 18,
-          |            "test1": [
-          |                "abc",
-          |                3,
-          |                5
-          |            ],
-          |            "test2": {
-          |                "key1": "value1",
-          |                "key2": "value2"
-          |            },
-          |            "test3": [
-          |                {
-          |                    "key1": "value1",
-          |                    "key2": "value2"
-          |                },
-          |                {
-          |                    "key3": "value3",
-          |                    "key4": "value4"
-          |                }
-          |            ],
-          |            "test4": {
-          |                "1": [
-          |                    "abc",
-          |                    3,
-          |                    5
-          |                ],
-          |                "adlkjaf": {
-          |                    "key3": "value3",
-          |                    "key4": "value4"
-          |                }
-          |            }
+          |
           |        },
           |        "relationships": {
           |            "orders": {

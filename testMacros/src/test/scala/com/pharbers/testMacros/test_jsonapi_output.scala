@@ -40,7 +40,7 @@ object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait 
 //    val result = toJsonapi(entity)(new TestJsonapiConvert())
     import com.pharbers.macros.convert.jsonapi.JsonapiMacro._
     val result = toJsonapi(entity)
-    phLog(result.asJson)
+    phLog(result)
 
 //    val entity = profile()
 //    entity.name = "jeorch"

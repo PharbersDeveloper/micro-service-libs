@@ -2,7 +2,7 @@ package com.pharbers.models.service
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2ManyConn, ToStringMacro}
-import com.pharbers.models.entity.{medicine, notice}
+import com.pharbers.models.entity.medicine
 
 /**
   * @ ProjectName models.com.pharbers.models.service.medicsnotice

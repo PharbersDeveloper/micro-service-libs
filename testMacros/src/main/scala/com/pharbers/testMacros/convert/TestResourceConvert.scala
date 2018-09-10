@@ -44,7 +44,7 @@ class TestResourceConvert extends ResourceObjectReader[user] {
         entity.`type` = resource.`type`
 
         /** 解析 attributes 到基础数据 **/
-        val attrs = resource.attributes.get.toList
+        val attrs = resource.attributes.getOrElse(Nil).toList
         val inst_mirror = runtime_mirror.reflect(entity)
         attrs.foreach { attr =>
             val field_symbol = try {

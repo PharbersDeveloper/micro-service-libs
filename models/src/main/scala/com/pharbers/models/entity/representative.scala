@@ -14,10 +14,9 @@ class representative() extends commonEntity {
     var service_year: Int = 0
     var entry_time: Int = 0
     var business_exp: String = ""
-    var advantage: String = ""
-    var weakness: String = ""
     var sales_skills_val: Int = 0
     var prod_knowledge_val: Int = 0
     var motivation_val: Int = 0
     var overall_val: Int = 0
+    var rep_describe: String = ""
 }
