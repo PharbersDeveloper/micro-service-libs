@@ -3,5 +3,3 @@
 *.iml
 *.cache
 target/
-
-!./security/src/main/resources/*/

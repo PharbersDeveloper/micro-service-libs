@@ -2,9 +2,9 @@ package com.pharbers.testMacros
 
 import com.pharbers.models.entity._
 import com.pharbers.util.log.phLogTrait
-import com.pharbers.pattern.request.request
 import com.pharbers.jsonapi.model.RootObject
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
+import com.pharbers.models.request.request
 
 object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
 

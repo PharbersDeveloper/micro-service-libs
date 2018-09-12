@@ -1,8 +1,8 @@
 package com.pharbers.pattern.mongo
 
-import com.pharbers.macros.convert.mongodb.{MongoMacro, TraitRequest}
+import com.pharbers.models.request.request
 import com.pharbers.mongodb.dbtrait.DBTrait
-import com.pharbers.pattern.request.request
+import com.pharbers.macros.convert.mongodb.{MongoMacro, TraitRequest}
 
 object mongoImpl extends MongoMacro[request]
 

@@ -1,4 +1,4 @@
-package com.pharbers.pattern.request
+package com.pharbers.models.request
 
 import com.mongodb.casbah.Imports.DBObject
 import com.pharbers.macros.api.commonEntity

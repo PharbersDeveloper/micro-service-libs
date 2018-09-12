@@ -15,8 +15,6 @@
         <module>third</module>
         <module>jsonapi</module>
         <module>mongo_drive</module>
-        <module>mongo_old</module>
-        <module>security</module>
         <module>macros</module>
         <module>models</module>
         <module>redis</module>

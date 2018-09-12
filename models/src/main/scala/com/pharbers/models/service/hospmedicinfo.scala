@@ -6,7 +6,9 @@ import com.pharbers.macros.common.connecting._
 @ToStringMacro
 class hospmedicinfo() extends commonEntity {
     var pre_target: Long = 0L
+    var total_budget: Long = 0L
     var prod_category: String = ""
+    var prod_name: String = ""
     var overview: List[Map[String, Any]] = Nil
     var history: Map[String, List[Map[String, Any]]] = Map(
         "columns" -> List(

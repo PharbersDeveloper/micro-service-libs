@@ -26,7 +26,7 @@ class Gateway(implicit request: Request[model.RootObject]) extends Actor with Ac
                     ex.printStackTrace()
                     sender ! RootObject(errors = Some(Seq(
                         Error(
-                            id = Some("-501"),
+                            id = Some("500"),
                             status = Some("error"),
                             code = Some(getErrorCodeByName(ex.getMessage).toString),
                             title = Some(ex.getMessage),
