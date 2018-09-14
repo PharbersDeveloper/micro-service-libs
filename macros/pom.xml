@@ -18,6 +18,18 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
+                <!-- scala macro -->
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-reflect</artifactId>
+                    <version>${scalaVersion}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.typelevel</groupId>
+                    <artifactId>macro-compat_${scalaBinaryVersion}</artifactId>
+                    <version>1.1.1</version>
+                </dependency>
+
                 <dependency>
                     <groupId>com.pharbers</groupId>
                     <artifactId>logs</artifactId>
