@@ -20,7 +20,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.pharbers</groupId>
-                    <artifactId>common_util</artifactId>
+                    <artifactId>logs</artifactId>
                     <version>1.0</version>
                 </dependency>
                 <dependency>
