@@ -11,4 +11,8 @@ import com.pharbers.models.entity.{hospital, representative}
 class hospitalbaseinfo() extends commonEntity {
     var major = 1
     var minor = 0
+    var target: Long = 0L
+    var budget: Long = 0L
+    var asignday: Int = 0
+    var managerwith: Int = 0
 }

@@ -1,17 +1,15 @@
 package com.pharbers.macros.common.connecting
 
 import scala.reflect.macros.whitebox
-import com.pharbers.util.log.phLogTrait
 import scala.language.experimental.macros
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
 
 @compileTimeOnly("enable macro paradis to expand macro annotations")
-class ToStringMacro extends StaticAnnotation {
+final class ToStringMacro extends StaticAnnotation {
     def macroTransform(annottees: Any*): Any = macro ToStringMacro.impl
 }
 
-
-object ToStringMacro extends phLogTrait {
+object ToStringMacro {
     def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
         import c.universe._
 
@@ -30,7 +28,6 @@ object ToStringMacro extends phLogTrait {
                     }.filter(_ != EmptyTree)
                 }
                 val total_fields = params ++ fields
-//                phLog("total_fields = " + total_fields)
 
                 val toStringDefList = total_fields.map {
                     case q"$mods val $tname: $tpt = $expr" => q"""${tname.toString} + " = " + $tname"""
@@ -49,7 +46,6 @@ object ToStringMacro extends phLogTrait {
             case _ => c.abort(c.enclosingPosition, "Annotation @One2OneConn can be used only with class")
         }
 
-//        phLog(class_tree)
         c.Expr[Any](class_tree)
     }
 }

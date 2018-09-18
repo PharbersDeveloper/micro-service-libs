@@ -6,7 +6,7 @@ import scala.language.experimental.macros
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
 
 @compileTimeOnly("enable macro paradis to expand macro annotations")
-class One2OneConn[C](param_name: String) extends StaticAnnotation {
+final class One2OneConn[C](param_name: String) extends StaticAnnotation {
     def macroTransform(annottees: Any*): Any = macro One2OneConn.impl
 }
 
