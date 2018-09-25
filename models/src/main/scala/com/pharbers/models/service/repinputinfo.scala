@@ -10,4 +10,7 @@ class repinputinfo extends commonEntity {
     val intro: String = ""
     val total_days: Int = 0
     val used_days: Int = 0
+    val team_meet: Int = 0
+    val product_train: Int = 0
+    val sales_train: Int = 0
 }
