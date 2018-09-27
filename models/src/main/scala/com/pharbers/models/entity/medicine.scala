@@ -18,4 +18,5 @@ class medicine() extends commonEntity {
     var therapeutic_field: String = ""
     var prod_features: String = ""
     var target_department: String = ""
+    var prod_describe: String = ""
 }

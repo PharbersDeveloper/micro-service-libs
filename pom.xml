@@ -16,9 +16,9 @@
         <module>jsonapi</module>
         <module>mongo_drive</module>
         <module>macros</module>
-        <module>models</module>
         <module>redis</module>
 
+        <module>models</module>
         <module>client_pattern</module>
         <module>testMacros</module>
     </modules>

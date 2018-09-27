@@ -46,11 +46,15 @@ trait dbutil {
         }
 
         field.info.typeSymbol.name.toString match {
-            case "String" =>
-                dbo.getAs[String](field.name.toString.trim).get
 
             case "Int" | "Double" | "Long" | "Float" =>
                 dbo.getAs[Number](field.name.toString.trim).get
+
+            case "Boolean" =>
+                dbo.getAs[Boolean](field.name.toString.trim).get
+
+            case "String" =>
+                dbo.getAs[String](field.name.toString.trim).get
 
             case "List" =>
                 val t = dbo.getAs[MongoDBList](field.name.toString.trim).get
