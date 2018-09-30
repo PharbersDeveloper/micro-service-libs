@@ -4,9 +4,9 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2ManyConn, One2OneConn, ToStringMacro}
 
 @One2OneConn[course]("course")
-@One2ManyConn[medicine]("medicine")
+@One2ManyConn[exam_require]("exam_require")
 @ToStringMacro
-class bind_course_goods() extends commonEntity {
+class bind_course_exam_require() extends commonEntity {
     var course_id: String = ""
-    var goods_id: String = ""
+    var exam_require_id: String = ""
 }

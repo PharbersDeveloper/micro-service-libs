@@ -31,7 +31,6 @@ class mongoDBImpl[R <: TraitRequest](override val di: ConnectionInstance) extend
     def insertObject[T: ClassTag](model: T): DBObject = {
         val coll = di.getCollection(loadJsonApiType(model))
         val dbo = Struct2DBObject(model)
-        println(s"insert dbobjet => $dbo")
         coll.insert(dbo)
         dbo
     }
@@ -46,7 +45,6 @@ class mongoDBImpl[R <: TraitRequest](override val di: ConnectionInstance) extend
         if (reVal.isDefined) {
             val find = DBObjectBindObject(reVal, className).asInstanceOf[T]
             val dbo = Struct2DBObject(find) ++ updateData
-            println(s"update dbobjet => $dbo")
             val result = coll.update(conditions, dbo)
             result.getN
         } else {
@@ -57,7 +55,6 @@ class mongoDBImpl[R <: TraitRequest](override val di: ConnectionInstance) extend
     def deleteObject(res: R): Int = {
         val coll = di.getCollection(res.res)
         val conditions = res.cond2QueryObj()
-        println(s"delete dbobjet => $conditions")
         val result = coll.remove(conditions)
         result.getN
     }

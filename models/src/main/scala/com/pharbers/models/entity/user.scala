@@ -9,4 +9,5 @@ class user() extends commonEntity {
     var user_phone: String = ""
     var email: String = ""
     var password: String = ""
+    var image: String = ""
 }
