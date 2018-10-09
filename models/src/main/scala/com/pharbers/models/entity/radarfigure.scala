@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class radar_figure() extends commonEntity {
+class radarfigure() extends commonEntity {
     var call_times_val: Int = 0
     var in_field_days_val: Int = 0
     var motivation_val: Int = 0

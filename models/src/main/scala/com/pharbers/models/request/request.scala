@@ -19,32 +19,32 @@ class request extends commonEntity with TraitRequest {
 
     override def cond2QueryObj(): DBObject = {
         var o: DBObject = DBObject()
-        eqcond.getOrElse(Nil).foreach { x =>
+        this.eqcond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
         }
-        necond.getOrElse(Nil).foreach { x =>
+        this.necond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
         }
-        gtcond.getOrElse(Nil).foreach { x =>
+        this.gtcond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
         }
-        gtecond.getOrElse(Nil).foreach { x =>
+        this.gtecond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
         }
-        ltcond.getOrElse(Nil).foreach { x =>
+        this.ltcond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
         }
-        ltecond.getOrElse(Nil).foreach { x =>
+        this.ltecond.getOrElse(Nil).foreach { x =>
             if (x.isQueryCond) {
                 o ++= x.cond2QueryDBObject()
             }
@@ -54,7 +54,7 @@ class request extends commonEntity with TraitRequest {
 
     override def cond2UpdateObj(): DBObject = {
         var o: DBObject = DBObject()
-        upcond.getOrElse(Nil).foreach { x =>
+        this.upcond.getOrElse(Nil).foreach { x =>
             if (x.isUpdateCond) {
                 o ++= x.cond2UpdateDBObectj()
             }
@@ -63,12 +63,7 @@ class request extends commonEntity with TraitRequest {
     }
 
     override def cond2fmQueryObj(): (Int, Int) = {
-        val tmp = fmcond.getOrElse {
-            val tmp = new fmcond
-            tmp.skip = 0
-            tmp.take = 20
-            tmp
-        }
+        val tmp = this.fmcond.getOrElse(new fmcond)
         (tmp.skip, tmp.take)
     }
 }

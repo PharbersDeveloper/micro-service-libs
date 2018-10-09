@@ -2,7 +2,7 @@ package com.pharbers.models.entity
 
 import com.pharbers.macros.api.commonEntity
 
-class paper_input() extends commonEntity {
+class paperInput() extends commonEntity {
     var paper_id: String = ""
     var region_id: String = ""
     var hint: String = ""

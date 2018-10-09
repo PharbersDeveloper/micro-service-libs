@@ -7,5 +7,5 @@ import com.pharbers.macros.common.connecting.{One2ManyConn, One2OneConn, ToStrin
 class bind_course_goods_quarter_report() extends commonEntity {
     var course_id: String = ""
     var goods_id: String = ""
-    var report_id: String = ""
+    var quarter_report_id: String = ""
 }
