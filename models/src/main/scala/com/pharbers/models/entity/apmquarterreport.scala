@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class apm_quarter_report() extends commonEntity {
+class apmquarterreport() extends commonEntity {
     var worst_sales: Long = 0L
     var best_sales: Long = 0L
     var pre_sales: Long = 0L

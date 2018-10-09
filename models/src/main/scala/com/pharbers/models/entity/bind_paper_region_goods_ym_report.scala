@@ -3,7 +3,7 @@ package com.pharbers.models.entity
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2OneConn, ToStringMacro}
 
-@One2OneConn[apm_report]("report")
+@One2OneConn[apmreport]("apmreport")
 @ToStringMacro
 class bind_paper_region_goods_ym_report() extends commonEntity {
     var paper_id: String = ""

@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class apm_report extends commonEntity {
+class apmreport extends commonEntity {
     var potential: Long = 0L
     var potential_growth: Double = 0.0
     var potential_contri: Double = 0.0
