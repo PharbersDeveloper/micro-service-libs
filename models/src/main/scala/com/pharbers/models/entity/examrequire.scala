@@ -5,7 +5,6 @@ import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
 class examrequire() extends commonEntity {
-    var company_target: Long = 0L
     var field_work_days: Int = 0
     var national_meeting: Int = 0
     var city_meeting: Int = 0
