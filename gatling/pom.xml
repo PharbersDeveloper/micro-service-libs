@@ -38,6 +38,19 @@
                     <version>1.0.5</version>
                 </dependency>
 
+                <!-- pharbers lib -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>macros</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>models</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+
                 <!-- Gatling Module -->
                 <dependency>
                     <groupId>io.gatling.highcharts</groupId>
