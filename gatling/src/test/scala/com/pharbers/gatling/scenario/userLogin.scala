@@ -13,5 +13,5 @@ object userLogin {
 	val login: ChainBuilder = exec(http("login")
 			.get("/api/user/login")
 			.headers(headers_json)
-			.body(StringBody("""{ "condition" :  { "email" : "nhwa", "password" : "nhwa" } }""")).asJSON)
+			.body(StringBody("""{ "condition" :  { "email" : "zyqi@pharbers.com", "password" : "zyqi@pharbers.com" } }""")).asJSON)
 }
