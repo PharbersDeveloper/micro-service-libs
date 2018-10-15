@@ -19,6 +19,6 @@ class userLogin extends Simulation {
 			userLogin.login.pause(5 seconds)
 		)
 
-	setUp(scn.inject(rampUsers(1) over (3 seconds))).protocols(httpProtocol)
+	setUp(scn.inject(rampUsers(100) over (3 seconds))).protocols(httpProtocol)
 
 }
