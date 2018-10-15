@@ -11,7 +11,7 @@ object userLogin {
 	println(feeder)
 
 	val login: ChainBuilder = exec(http("login")
-			.get("/api/user/login")
+			.post("/api/v1/login/0")
 			.headers(headers_json)
-			.body(StringBody("""{ "condition" :  { "email" : "zyqi@pharbers.com", "password" : "zyqi@pharbers.com" } }""")).asJSON)
+			.body(RawFileBody("data/login.txt")).asJSON)
 }

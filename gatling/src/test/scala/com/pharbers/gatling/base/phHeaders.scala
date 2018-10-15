@@ -10,4 +10,8 @@ object phHeaders {
         "Content-Type" -> "application/json,charset=utf-8"
     )
 
+    val headers_json_token = Map(
+        "Content-Type" -> "application/json,charset=utf-8",
+        "Authorization" -> "bearer 5bc48ce8c0e37675f8e05ff3"
+    )
 }

@@ -38,6 +38,19 @@
                     <version>1.0.5</version>
                 </dependency>
 
+                <!-- pharbers lib -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>macros</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>models</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+
                 <!-- Gatling Module -->
                 <dependency>
                     <groupId>io.gatling.highcharts</groupId>
@@ -62,7 +75,7 @@
                     <resultsFolder>target/gatling/results</resultsFolder>
                     <runMultipleSimulations>true</runMultipleSimulations>
                     <simulationsFolder>src/test/scala/com/pharbers/gatling</simulationsFolder>
-                    <simulationClass>com.pharbers.gatling.simulation.getHome</simulationClass>
+                    <simulationClass>com.pharbers.gatling.simulation.courseLst</simulationClass>
                 </configuration>
             </plugin>
         </plugins>
