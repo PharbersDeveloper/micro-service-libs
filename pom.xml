@@ -21,6 +21,7 @@
         <module>models</module>
         <module>client_pattern</module>
         <module>testMacros</module>
+        <module>gatling</module>
     </modules>
 
     <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
