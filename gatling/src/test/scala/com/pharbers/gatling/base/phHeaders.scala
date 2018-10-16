@@ -1,7 +1,6 @@
 package com.pharbers.gatling.base
 
 object phHeaders {
-
     val headers_base = Map(
         "Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         "Upgrade-Insecure-Requests" -> "1")
@@ -10,8 +9,8 @@ object phHeaders {
         "Content-Type" -> "application/json,charset=utf-8"
     )
 
-    val headers_json_token = Map(
+    def headers_json_token(implicit token: String): Map[String,String] = Map(
         "Content-Type" -> "application/json,charset=utf-8",
-        "Authorization" -> "bearer 5bc5549ec0e3764b266f5f34"
+        "Authorization" -> ("bearer " + token)
     )
 }

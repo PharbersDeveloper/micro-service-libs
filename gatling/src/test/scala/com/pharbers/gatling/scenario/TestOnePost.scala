@@ -6,7 +6,7 @@ import io.gatling.http.Predef._
 import io.gatling.core.structure.ChainBuilder
 
 object TestOnePost {
-    def run(string: String):ChainBuilder ={
+    def run(string: String)(implicit token: String):ChainBuilder ={
         println("data/" + string +".txt")
         exec(http(string)
                 .post("/api/v1/" + string +"/0")
