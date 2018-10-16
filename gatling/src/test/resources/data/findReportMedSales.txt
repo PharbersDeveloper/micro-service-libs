@@ -1,0 +1,90 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "bind_paper_region_goods_ym_report"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "paper",
+                        "type": "eqcond"
+                    },
+                    {
+                        "id": "region",
+                        "type": "eqcond"
+                    },
+                    {
+                        "id": "goods",
+                        "type": "eqcond"
+                    }
+                ]
+            },
+            "gtecond": {
+            	"data": [
+            		{
+                        "id": "5",
+                        "type": "gtecond"
+                    }
+            	]
+            },
+            "ltecond": {
+            	"data": [
+            		{
+                        "id": "6",
+                        "type": "ltecond"
+                    }
+            	]
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "paper",
+            "type": "eqcond",
+            "attributes": {
+                "key": "paper_id",
+                "val": "5bc17fdcfaf85b0001069a76",
+                "category" : null
+            }
+        },
+        {
+            "id": "region",
+            "type": "eqcond",
+            "attributes": {
+                "key": "region_id",
+                "val": "5baa11e1eeefcc05923c9418",
+                "category" : null
+            }
+        },
+        {
+            "id": "goods",
+            "type": "eqcond",
+            "attributes": {
+                "key": "goods_id",
+                "val": "5baa062eeeefcc05923c9412",
+                "category" : null
+            }
+        },
+        {
+            "id": "5",
+            "type": "gtecond",
+            "attributes": {
+                "key": "ym",
+                "val": "17-q1",
+                "category" : null
+            }
+        },
+        {
+            "id": "6",
+            "type": "ltecond",
+            "attributes": {
+                "key": "ym",
+                "val": "18-q1",
+                "category" : null
+            }
+        }
+    ]
+}

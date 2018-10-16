@@ -1,0 +1,24 @@
+{
+    "data": {
+        "id": "1",
+        "type": "paper",
+        "attributes": {
+        },
+        "relationships": {
+            "course": {
+                "data": {
+                    "id": "5baa0e58eeefcc05923c9414",
+                    "type": "course"
+                }
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "5baa0e58eeefcc05923c9414",
+            "type": "course",
+            "attributes": {
+            }
+        }
+    ]
+}

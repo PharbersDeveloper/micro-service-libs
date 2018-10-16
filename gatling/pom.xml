@@ -75,7 +75,7 @@
                     <resultsFolder>target/gatling/results</resultsFolder>
                     <runMultipleSimulations>true</runMultipleSimulations>
                     <simulationsFolder>src/test/scala/com/pharbers/gatling</simulationsFolder>
-                    <simulationClass>com.pharbers.gatling.simulation.courseLst</simulationClass>
+                    <simulationClass>com.pharbers.gatling.simulation.TestOnePost</simulationClass>
                 </configuration>
             </plugin>
         </plugins>
