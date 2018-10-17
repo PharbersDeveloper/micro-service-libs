@@ -1,7 +1,10 @@
 package com.pharbers.models.entity
 
 import com.pharbers.macros.api.commonEntity
+import com.pharbers.macros.common.connecting.One2OneConn
+import com.pharbers.models.service.paperinputstep
 
+@One2OneConn[paperinputstep]("paperinputstep")
 class paperinput() extends commonEntity {
     var paper_id: String = ""
     var region_id: String = ""

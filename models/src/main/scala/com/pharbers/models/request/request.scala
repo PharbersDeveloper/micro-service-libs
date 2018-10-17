@@ -3,7 +3,7 @@ package com.pharbers.models.request
 import com.mongodb.casbah.Imports._
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting._
-import com.pharbers.macros.convert.mongodb.TraitRequest
+import com.pharbers.macros.convert.mongodb.{TraitConditions, TraitRequest}
 
 @One2ManyConn[eqcond]("eqcond")
 @One2ManyConn[necond]("necond")
@@ -18,38 +18,34 @@ class request extends commonEntity with TraitRequest {
     override var res: String = ""
 
     override def cond2QueryObj(): DBObject = {
-        var o: DBObject = DBObject()
-        this.eqcond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
+        implicit val cond2dbo: Option[List[TraitConditions]] => DBObject = { conds =>
+            var obj: DBObject = DBObject()
+            conds.getOrElse(Nil).foreach{ cond =>
+                obj ++= cond.cond2QueryDBObject
             }
+            obj
         }
-        this.necond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
+
+        def mergeCond(obj: DBObject)(dbo: DBObject): DBObject = {
+            obj.foreach{ cur =>
+                if (dbo.contains(cur._1)){
+                    val tmp = dbo.remove(cur._1).get
+                    dbo ++= $and(DBObject(cur._1 -> tmp), DBObject(cur))
+                }
+                else
+                    dbo ++= DBObject(cur)
             }
+            dbo
         }
-        this.gtcond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
-            }
-        }
-        this.gtecond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
-            }
-        }
-        this.ltcond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
-            }
-        }
-        this.ltecond.getOrElse(Nil).foreach { x =>
-            if (x.isQueryCond) {
-                o ++= x.cond2QueryDBObject()
-            }
-        }
-        o
+
+        var obj: DBObject = DBObject()
+        obj = mergeCond(this.eqcond)(obj)
+        obj = mergeCond(this.necond)(obj)
+        obj = mergeCond(this.gtcond)(obj)
+        obj = mergeCond(this.gtecond)(obj)
+        obj = mergeCond(this.ltcond)(obj)
+        obj = mergeCond(this.ltecond)(obj)
+        obj
     }
 
     override def cond2UpdateObj(): DBObject = {

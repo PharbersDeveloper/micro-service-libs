@@ -255,10 +255,11 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
     def cond(): List[representative] = {
         val rq = new request
         rq.res = "representative"
-//        rq.eqcond = Some(eq2c("education", "本科") :: Nil)
+        rq.eqcond = Some(eq2c("education", "本科") :: eq2c("rep_name", "小白") :: Nil)
         rq.ltcond = Some(lt2c("age", 31) :: Nil)
+        rq.gtcond = Some(gt2c("age", 20) :: Nil)
         queryMultipleObject[representative](rq)
     }
-//    cond().foreach(println)
+    cond().foreach(println)
 
 }
