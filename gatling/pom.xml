@@ -1,43 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.pharbers</groupId>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
     <artifactId>gatling</artifactId>
     <version>1.0</version>
-    <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
-      the right dependencies for modules specified for each version separately -->
+
+
     <profiles>
         <profile>
             <id>scala-2.11</id>
+
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
 
             <properties>
-                <scalaVersion>2.11.8</scalaVersion>
-                <scalaBinaryVersion>2.11</scalaBinaryVersion>
                 <gatling.version>2.1.7</gatling.version>
                 <gatling-plugin.version>2.1.7</gatling-plugin.version>
             </properties>
 
             <dependencies>
-                <!-- scala lib -->
-                <dependency>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                    <version>${scalaVersion}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.scala-lang.modules</groupId>
-                    <artifactId>scala-xml_${scalaBinaryVersion}</artifactId>
-                    <version>1.0.6</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.scala-lang.modules</groupId>
-                    <artifactId>scala-parser-combinators_${scalaBinaryVersion}</artifactId>
-                    <version>1.0.5</version>
-                </dependency>
-
                 <!-- pharbers lib -->
                 <dependency>
                     <groupId>com.pharbers</groupId>

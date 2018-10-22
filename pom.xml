@@ -10,6 +10,7 @@
 
     <modules>
         <module>base_module</module>
+        <module>security</module>
         <module>logs</module>
         <module>errorcode</module>
         <module>third</module>
@@ -20,6 +21,8 @@
 
         <module>models</module>
         <module>client_pattern</module>
+
+        <module>gatling</module>
         <module>testMacros</module>
     </modules>
 
