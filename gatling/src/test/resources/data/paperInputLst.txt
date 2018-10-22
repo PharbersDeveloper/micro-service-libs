@@ -22,7 +22,7 @@
             "type": "eqcond",
             "attributes": {
                 "key": "paper_id",
-                "val": "5bc03ed0faf85b0001069a52",
+                "val": "5bc5ed463ea4f4000145405b",
                 "category" : null
             }
         }
