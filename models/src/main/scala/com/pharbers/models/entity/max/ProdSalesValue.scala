@@ -10,6 +10,7 @@ class ProdSalesValue extends commonEntity{
     var market = ""
     var market_scale = 0.0
     var market_size = 0.0
+    var market_sale = 0.0
     var market_growth = 0.0
     var sales = 0.0
     var sales_growth = 0.0

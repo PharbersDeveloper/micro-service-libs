@@ -9,5 +9,6 @@ class Ranking extends commonEntity {
     var value = 0.0
     var prod = ""
     var manu = ""
+    var province = ""
     var growth = 0
 }

@@ -4,7 +4,7 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2ManyConn, ToStringMacro}
 
 @ToStringMacro
-@One2ManyConn[Tips]("Tips")
+@One2ManyConn[TipDetail]("TipDetail")
 class ProdContValue extends commonEntity {
     var showValue = 0.0
     var showUnit = ""

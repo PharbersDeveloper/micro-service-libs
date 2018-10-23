@@ -4,8 +4,8 @@ import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2ManyConn, One2OneConn, ToStringMacro}
 
 @ToStringMacro
-@One2ManyConn[MixedGraphLine]("MixedGraphLine")
+@One2ManyConn[MultipleLine]("MultipleLine")
 @One2OneConn[ProdSalesOverview]("ProdSalesOverview")
-class ProvinceLineOverview extends commonEntity {
-    var title = "provinceLineOverview"
+class ProvinceProductTrend extends commonEntity {
+    var title = "provinceProductTrend"
 }
