@@ -64,4 +64,11 @@ package object request {
         tmp
     }
 
+    def in2c(key: String, `val`: Any): incond = {
+        val tmp = new upcond
+        tmp.key = key
+        tmp.`val` = `val`
+        tmp
+    }
+
 }
