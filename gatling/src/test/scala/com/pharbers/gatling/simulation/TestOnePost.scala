@@ -12,11 +12,10 @@ class TestOnePost extends Simulation{
     import com.pharbers.gatling.base.phHttpProtocol.{noneBlackList,noneWhiteList}
 
     implicit val token = "5bc58093c0e3766f749bf0c7"
-    val name = "findPaper"
+    val name = "findAllMedSales"
 
-    val httpProtocol = phHttpProtocol("http://123.56.179.133:7434")
-
-//    val httpProtocol = phHttpProtocol("http://127.0.0.1:9000")
+//    val httpProtocol = phHttpProtocol("http://123.56.179.133:7434")
+    val httpProtocol = phHttpProtocol("http://127.0.0.1:9000")
 
 
     val scn = scenario(name).exec(TestOnePost.run(name).pause(2 seconds))
