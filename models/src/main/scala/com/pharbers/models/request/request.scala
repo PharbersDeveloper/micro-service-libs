@@ -13,7 +13,6 @@ import com.pharbers.macros.convert.mongodb.{TraitConditions, TraitRequest}
 @One2ManyConn[ltecond]("ltecond")
 @One2ManyConn[upcond]("upcond")
 @One2OneConn[fmcond]("fmcond")
-@One2OneConn[incond]("incond")
 @ToStringMacro
 class request extends commonEntity with TraitRequest {
     override var res: String = ""
@@ -38,6 +37,7 @@ class request extends commonEntity with TraitRequest {
             }
             dbo
         }
+
 
         var obj: DBObject = DBObject()
         obj = mergeCond(this.eqcond)(obj)
