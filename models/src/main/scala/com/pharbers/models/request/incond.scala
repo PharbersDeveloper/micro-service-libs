@@ -7,13 +7,17 @@ import com.pharbers.macros.convert.mongodb.TraitConditions
 import org.bson.types.ObjectId
 
 @ToStringMacro
-// in []
+// in
 case class incond() extends commonEntity with TraitConditions {
     var key: String = ""
     var `val`: Any = null
     var category: Any = null
 
-    override def cond2QueryDBObject(): DBObject = DBObject(key -> DBObject("$in" -> `val`))
+    override def cond2QueryDBObject(): DBObject = key match {
+        case "id" => DBObject("_id" -> DBObject("$in" -> `val`))
+        case "_id" => DBObject("_id" -> DBObject("$in" -> `val`))
+        case _ => DBObject(key -> `val`)
+    }
 
     override def cond2UpdateDBObectj(): DBObject = DBObject()
 

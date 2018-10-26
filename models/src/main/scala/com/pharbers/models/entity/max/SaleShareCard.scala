@@ -5,11 +5,12 @@ import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
 class SaleShareCard extends commonEntity {
-    def this(title: String, subtitle: String, area: String, num: Double, tag: String, yearOnYear: Double, ringRatio: Double){
+    def this(title: String, subtitle: String, area: String,leaftitle: String, num: Double, tag: String, yearOnYear: Double, ringRatio: Double){
         this()
         this.title = title
         this.subtitle = subtitle
         this.area = area
+        this.leaftitle = leaftitle
         this.num = num
         this.tag = tag
         this.yearOnYear = yearOnYear
@@ -18,6 +19,7 @@ class SaleShareCard extends commonEntity {
     var title = ""
     var subtitle = ""
     var area = ""
+    var leaftitle = ""
     var num = 0.0
     var tag = ""
     var yearOnYear = 0.0

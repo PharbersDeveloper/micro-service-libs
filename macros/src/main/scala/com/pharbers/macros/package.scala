@@ -13,6 +13,9 @@ package object macros {
     def formJsonapi[T: JsonapiConvert](jsonapi: RootObject): T =
         implicitly[JsonapiConvert[T]].fromJsonapi(jsonapi)
 
+    def formJsonapiLst[T: JsonapiConvert](jsonapi: RootObject): List[T] =
+        implicitly[JsonapiConvert[T]].fromJsonapiLst(jsonapi)
+
     def toJsonapi[T: JsonapiConvert](obj: T): RootObject =
         implicitly[JsonapiConvert[T]].toJsonapi(obj)
 
