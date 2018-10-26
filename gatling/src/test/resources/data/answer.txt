@@ -1,0 +1,83 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "paperinput"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "paper",
+                        "type": "eqcond"
+                    },
+                    {
+                        "id": "region",
+                        "type": "eqcond"
+                    }
+                ]
+            },
+            "upcond": {
+                "data": [
+                    {
+                        "id": "1111",
+                        "type": "upcond"
+                    },
+                    {
+                        "id": "2222",
+                        "type": "upcond"
+                    },
+                    {
+                        "id": "3333",
+                        "type": "upcond"
+                    }
+                ]
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "paper",
+            "type": "eqcond",
+            "attributes": {
+                "key": "paper_id",
+                "val": "5bbd6f1cd35a8c00013d2c86",
+                "category" : null
+            }
+        },
+        {
+            "id": "region",
+            "type": "eqcond",
+            "attributes": {
+                "key": "region_id",
+                "val": "5baa11e1eeefcc05923c9418",
+                "category" : null
+            }
+        },
+        {
+            "id": "1111",
+            "type": "upcond",
+            "attributes": {
+                "key": "hint",
+                "val": "aaa"
+            }
+        },
+        {
+            "id": "2222",
+            "type": "upcond",
+            "attributes": {
+                "key": "depart_meeting",
+                "val": 121
+            }
+        },
+        {
+            "id": "3333",
+            "type": "upcond",
+            "attributes": {
+                "key": "action_plans",
+                "val": ["aa" ,"bb"]
+            }
+        }
+    ]
+}
