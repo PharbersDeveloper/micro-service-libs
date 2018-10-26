@@ -10,14 +10,25 @@ import org.bson.types.ObjectId
 // in
 case class incond() extends commonEntity with TraitConditions {
     var key: String = ""
-    var `val`: Any = null
+    var `val`: Iterable[Any] = null
     var category: Any = null
 
+    //old
+
+//    override def cond2QueryDBObject(): DBObject = key match {
+//        case "id" => DBObject("_id" -> DBObject("$in" -> `val`))
+//        case "_id" => DBObject("_id" -> DBObject("$in" -> `val`))
+//        case _ => DBObject(key ->  DBObject("$in" -> `val`))
+//    }
+
     override def cond2QueryDBObject(): DBObject = key match {
-        case "id" => DBObject("_id" -> DBObject("$in" -> `val`))
-        case "_id" => DBObject("_id" -> DBObject("$in" -> `val`))
+        case "id" =>
+            DBObject("_id" -> DBObject("$in" -> `val`.map(x => new ObjectId(x.toString)).toSet))
+        case "_id" =>
+            DBObject("_id" -> DBObject("$in" -> `val`.map(x => new ObjectId(x.toString)).toSet))
         case _ => DBObject(key ->  DBObject("$in" -> `val`))
     }
+
 
     override def cond2UpdateDBObectj(): DBObject = DBObject()
 
