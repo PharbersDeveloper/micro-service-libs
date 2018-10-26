@@ -1,6 +1,5 @@
 package com.pharbers.pattern.common
 
-import com.pharbers.driver.PhRedisDriver
 import com.pharbers.jsonapi.model
 import com.pharbers.models.entity.user
 import com.pharbers.models.service.auth
@@ -12,8 +11,6 @@ trait parseToken {
         val token = request.headers.get("Authorization")
                 .getOrElse(throw new Exception("token parse error"))
                 .split(" ").last
-
-        val rd = new PhRedisDriver()
 
         if(!rd.exsits(token)) throw new Exception("token expired")
 

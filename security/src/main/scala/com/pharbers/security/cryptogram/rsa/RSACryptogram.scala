@@ -1,37 +1,25 @@
 package com.pharbers.security.cryptogram.rsa
 
-import java.security.spec.{RSAPrivateKeySpec, RSAPublicKeySpec}
-import java.security.{KeyFactory, KeyPairGenerator}
-import com.pharbers.security.cryptogram.Cryptogram
 import org.apache.commons.codec.binary.Base64
+import com.pharbers.security.cryptogram.PhCryptogram
+import java.security.{KeyPairGenerator, SecureRandom}
 
-case class RSAPublicKey(base64Modulus: String = "", base64Exp: String = "")
+trait RSACryptogram extends PhCryptogram {
+    val puk: String
+    val prk: String
+    val ALGORITHM_RSA: String
+    val TRANSFORMS_RSA: String
+    val CHARSET_NAME_UTF_8: String
+    val KEY_SIZE: Int
 
-case class RSAPrivateKey(base64Modulus: String = "", base64Exp: String = "")
-
-trait RSACryptogram extends Cryptogram {
-    val puk: RSAPublicKey
-    val prk: RSAPrivateKey
-
-    def createKey(KEY_Len: Int): (RSAPublicKey, RSAPrivateKey) = {
-        val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-        keyPairGenerator.initialize(KEY_Len)
-
-        val factory = KeyFactory.getInstance("RSA")
+    def createKey(): (String, String) = {
+        val keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM_RSA)
+        keyPairGenerator.initialize(KEY_SIZE, new SecureRandom())
         val keyPair = keyPairGenerator.generateKeyPair()
 
-        val publicKey = keyPair.getPublic
-        val privateKey = keyPair.getPrivate
+        val publicKey = Base64.encodeBase64String(keyPair.getPublic.getEncoded)
+        val privateKey = Base64.encodeBase64String(keyPair.getPrivate.getEncoded)
 
-        val publicKeySpec = factory.getKeySpec(publicKey, classOf[RSAPublicKeySpec])
-        val privateKeySpec = factory.getKeySpec(privateKey, classOf[RSAPrivateKeySpec])
-
-        (RSAPublicKey(
-            Base64.encodeBase64String(publicKeySpec.getModulus.toByteArray),
-            Base64.encodeBase64String(publicKeySpec.getPublicExponent.toByteArray)
-        ), RSAPrivateKey(
-            Base64.encodeBase64String(privateKeySpec.getModulus.toByteArray),
-            Base64.encodeBase64String(privateKeySpec.getPrivateExponent.toByteArray)
-        ))
+        (publicKey, privateKey)
     }
 }

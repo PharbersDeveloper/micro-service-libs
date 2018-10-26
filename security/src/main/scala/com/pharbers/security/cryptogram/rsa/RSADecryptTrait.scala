@@ -1,26 +1,27 @@
 package com.pharbers.security.cryptogram.rsa
 
+import java.net.URLDecoder
 import javax.crypto.Cipher
 import java.security.KeyFactory
-import java.security.spec.RSAPrivateKeySpec
+import java.security.spec.PKCS8EncodedKeySpec
 import org.apache.commons.codec.binary.Base64
 
 trait RSADecryptTrait { this: RSACryptogram =>
     def decrypt(ciphertext: String): String = {
-        val cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING")
 
-        val privateKeySpec = new RSAPrivateKeySpec(
-            BigInt(1, Base64.decodeBase64(prk.base64Modulus)).bigInteger,
-            BigInt(1, Base64.decodeBase64(prk.base64Exp)).bigInteger
-        )
+        if(prk.isEmpty) throw new Exception("private key is empty")
 
-        val privateKey = KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec)
+        val originKey = Base64.decodeBase64(prk)
+        val keySpec = new PKCS8EncodedKeySpec(originKey)
+        val privateKey = KeyFactory.getInstance(ALGORITHM_RSA).generatePrivate(keySpec)
+
+        val cipher = Cipher.getInstance(TRANSFORMS_RSA)
         cipher.init(Cipher.DECRYPT_MODE, privateKey)
 
-        val MAX_DECRYPT_BLOCK = BigInt(1, Base64.decodeBase64(prk.base64Modulus)).bigInteger.bitLength() >> 3
         val inputBytes = Base64.decodeBase64(ciphertext)
         val inputLength = inputBytes.length
 
+        val MAX_DECRYPT_BLOCK = KEY_SIZE >> 3
         var offset = 0
         var cache: Array[Byte] = Array()
 
@@ -34,6 +35,6 @@ trait RSADecryptTrait { this: RSACryptogram =>
             offset += MAX_DECRYPT_BLOCK
         }
 
-        new String(cache, "utf-8")
+        URLDecoder.decode(new String(cache, CHARSET_NAME_UTF_8), CHARSET_NAME_UTF_8)
     }
 }

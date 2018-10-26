@@ -1,6 +1,6 @@
 package com.pharbers.security.cryptogram
 
-trait Cryptogram {
+trait PhCryptogram {
     /**
       * 加密
       * @param cleartext 明文
