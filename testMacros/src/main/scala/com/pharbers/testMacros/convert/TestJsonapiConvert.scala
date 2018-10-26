@@ -21,6 +21,16 @@ class TestJsonapiConvert() extends JsonapiConvert[user] with phLogTrait {
         entity
     }
 
+    override def fromJsonapiLst(jsonapi: RootObject): List[user] = {
+        val jsonapi_data = jsonapi.data.get.asInstanceOf[ResourceObjects].array
+        val included = jsonapi.included
+        var entity: List[user] = Nil
+        jsonapi_data.foreach(x => {
+            entity = entity :+ fromResourceObject[user](x, included)(ResourceReaderMaterialize)
+        })
+        entity
+    }
+
     override def toJsonapi(obj: user): RootObject = {
         val reo_includeds = toResourceObject(obj)
 
