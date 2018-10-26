@@ -39,6 +39,17 @@ object JsonapiMacro extends phLogTrait {
                 entity
             }
 
+
+            override def fromJsonapiLst(jsonapi: RootObject): List[$t_type_name] = {
+                val jsonapi_data = jsonapi.data.get.asInstanceOf[ResourceObjects].array
+                val included = jsonapi.included
+                var entity: List[$t_type_name] = Nil
+                jsonapi_data.foreach(x => {
+                    entity = entity :+ fromResourceObject[$t_type_name](x, included)(ResourceReaderMaterialize)
+                })
+                entity
+            }
+
             override def toJsonapi(obj: $t_type_name): RootObject = {
                 val reo_includeds = toResourceObject(obj)
 
