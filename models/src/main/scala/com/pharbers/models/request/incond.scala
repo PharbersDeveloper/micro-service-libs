@@ -16,7 +16,7 @@ case class incond() extends commonEntity with TraitConditions {
     override def cond2QueryDBObject(): DBObject = key match {
         case "id" => DBObject("_id" -> DBObject("$in" -> `val`))
         case "_id" => DBObject("_id" -> DBObject("$in" -> `val`))
-        case _ => DBObject(key -> `val`)
+        case _ => DBObject(key ->  DBObject("$in" -> `val`))
     }
 
     override def cond2UpdateDBObectj(): DBObject = DBObject()
