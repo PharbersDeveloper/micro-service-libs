@@ -11,4 +11,5 @@ class bind_paper_region_goods_ym_report() extends commonEntity {
     var goods_id: String = ""
     var ym: String = ""
     var report_id: String = ""
+    var course_id: String = ""
 }

@@ -1,0 +1,30 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "paperinput"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "2",
+                        "type": "eqcond"
+                    }
+                ]
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "2",
+            "type": "eqcond",
+            "attributes": {
+                "key": "paper_id",
+                "val": "5bd7cd51daae16000155eaaf",
+                "category" : null
+            }
+        }
+    ]
+}
