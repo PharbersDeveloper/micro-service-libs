@@ -64,7 +64,7 @@ package object request {
         tmp
     }
 
-    def in2c(key: String, `val`: Any): incond = {
+    def in2c(key: String, `val`: List[Any]): incond = {
         val tmp = new incond
         tmp.key = key
         tmp.`val` = `val`
