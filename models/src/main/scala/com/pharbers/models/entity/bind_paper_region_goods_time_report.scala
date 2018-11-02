@@ -5,11 +5,12 @@ import com.pharbers.macros.common.connecting.{One2OneConn, ToStringMacro}
 
 @One2OneConn[apmreport]("apmreport")
 @ToStringMacro
-class bind_paper_region_goods_ym_report() extends commonEntity {
+class bind_paper_region_goods_time_report() extends commonEntity {
     var paper_id: String = ""
     var region_id: String = ""
     var goods_id: String = ""
-    var ym: String = ""
+    var time_type: String = ""
+    var time: String = ""
     var report_id: String = ""
     var course_id: String = ""
 }

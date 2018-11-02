@@ -1,4 +1,4 @@
-package com.pharbers.models.entity
+package com.pharbers.models.entity.auth
 
 import com.pharbers.macros.api.commonEntity
 import com.pharbers.macros.common.connecting.{One2ManyConn, ToStringMacro}
