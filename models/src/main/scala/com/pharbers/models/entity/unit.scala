@@ -1,11 +1,11 @@
 package com.pharbers.models.entity
 
 import com.pharbers.macros.api.commonEntity
-import com.pharbers.macros.common.connecting.{One2ManyConn, ToStringMacro}
+import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
-class sales() extends commonEntity {
-    var sales: Double = 0.0
+class unit() extends commonEntity {
+    var unit: Double = 0.0
     var growth: Double = 0.0
     var contri: Double = 0.0
     var contri_index: Double = 0.0

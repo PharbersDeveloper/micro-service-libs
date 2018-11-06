@@ -12,4 +12,5 @@ class radarfigure() extends commonEntity {
     var sales_skills_val: Int = 0
     var target_call_freq_val: Int = 0
     var territory_manage_val: Int = 0
+    val target_occupation_val: Int = 0
 }

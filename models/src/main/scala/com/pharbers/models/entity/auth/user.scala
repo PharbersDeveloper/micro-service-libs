@@ -5,9 +5,11 @@ import com.pharbers.macros.common.connecting.ToStringMacro
 
 @ToStringMacro
 class user() extends commonEntity {
-    var user_name: String = ""
-    var user_phone: String = ""
     var email: String = ""
     var password: String = ""
     var image: String = ""
+    var user_name: String = ""
+    var user_phone: String = ""
+    val company_name: String = ""
+    val position_name: String = ""
 }
