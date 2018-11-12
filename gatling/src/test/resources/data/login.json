@@ -15,6 +15,10 @@
                     {
                         "id": "3",
                         "type": "eqcond"
+                    },
+                    {
+                        "id": "4",
+                        "type": "eqcond"
                     }
                 ]
             }
@@ -35,7 +39,16 @@
             "type": "eqcond",
             "attributes": {
                 "key": "password",
-                "val": "zyqi@pharbers.com",
+                "val": "jxV3jlecbUMYHnJ0Zmnjz0TVWlmWAWO8Qy8WdqMkryuj7cOvbj1NXNiEeK9Rv5s4v9VFl6W8tY3Z5nyX2dn1Nw==",
+                "category" : null
+            }
+        },
+        {
+            "id": "4",
+            "type": "eqcond",
+            "attributes": {
+                "key": "login_source",
+                "val": "APM",
                 "category" : null
             }
         }

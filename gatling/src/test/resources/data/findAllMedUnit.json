@@ -3,50 +3,56 @@
         "id": "1",
         "type": "request",
         "attributes": {
-            "res": "bind_paper_region_goods_ym_report"
+            "res": "bind_course_region_goods_time_unit"
         },
         "relationships": {
             "eqcond": {
                 "data": [
                     {
-                        "id": "paper",
+                        "id": "course",
                         "type": "eqcond"
-                    },
-                    {
+                    },{
                         "id": "region",
                         "type": "eqcond"
-                    },
-                    {
+                    },{
                         "id": "goods",
                         "type": "eqcond"
                     }
                 ]
             },
+            "fmcond": {
+                "data":
+                {
+                    "id": "fm",
+                    "type": "fmcond"
+                }
+
+            },
             "gtecond": {
-            	"data": [
-            		{
+                "data": [
+                    {
                         "id": "5",
                         "type": "gtecond"
                     }
-            	]
+                ]
             },
             "ltecond": {
-            	"data": [
-            		{
+                "data": [
+                    {
                         "id": "6",
                         "type": "ltecond"
                     }
-            	]
+                ]
             }
         }
     },
     "included": [
         {
-            "id": "paper",
+            "id": "course",
             "type": "eqcond",
             "attributes": {
-                "key": "paper_id",
-                "val": "5bc5e4263ea4f40001454053",
+                "key": "course_id",
+                "val": "5baa0e58eeefcc05923c9414",
                 "category" : null
             }
         },
@@ -55,7 +61,7 @@
             "type": "eqcond",
             "attributes": {
                 "key": "region_id",
-                "val": "5baa11e1eeefcc05923c9418",
+                "val": "all",
                 "category" : null
             }
         },
@@ -72,8 +78,8 @@
             "id": "5",
             "type": "gtecond",
             "attributes": {
-                "key": "ym",
-                "val": "17-q1",
+                "key": "time",
+                "val": "17-01",
                 "category" : null
             }
         },
@@ -81,9 +87,16 @@
             "id": "6",
             "type": "ltecond",
             "attributes": {
-                "key": "ym",
-                "val": "18-q1",
+                "key": "time",
+                "val": "18-03",
                 "category" : null
+            }
+        },
+        {
+            "id": "fm",
+            "type": "fmcond",
+            "attributes": {
+                "take": 200
             }
         }
     ]

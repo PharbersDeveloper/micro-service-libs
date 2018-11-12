@@ -3,21 +3,21 @@
         "id": "1",
         "type": "request",
         "attributes": {
-            "res": "bind_paper_region_goods_ym_report"
+            "res": "bind_course_region_time_rep_behavior"
         },
         "relationships": {
             "eqcond": {
                 "data": [
                     {
-                        "id": "paper",
+                        "id": "2",
                         "type": "eqcond"
                     },
                     {
-                        "id": "region",
+                        "id": "3",
                         "type": "eqcond"
                     },
                     {
-                        "id": "goods",
+                        "id": "4",
                         "type": "eqcond"
                     }
                 ]
@@ -42,16 +42,16 @@
     },
     "included": [
         {
-            "id": "paper",
+            "id": "2",
             "type": "eqcond",
             "attributes": {
-                "key": "paper_id",
-                "val": "5bc5e4263ea4f40001454053",
+                "key": "course_id",
+                "val": "5baa0e58eeefcc05923c9414",
                 "category" : null
             }
         },
         {
-            "id": "region",
+            "id": "3",
             "type": "eqcond",
             "attributes": {
                 "key": "region_id",
@@ -60,11 +60,11 @@
             }
         },
         {
-            "id": "goods",
+            "id": "4",
             "type": "eqcond",
             "attributes": {
-                "key": "goods_id",
-                "val": "5baa062eeeefcc05923c9412",
+                "key": "time_type",
+                "val": "month",
                 "category" : null
             }
         },
@@ -72,8 +72,8 @@
             "id": "5",
             "type": "gtecond",
             "attributes": {
-                "key": "ym",
-                "val": "17-q1",
+                "key": "time",
+                "val": "17-07",
                 "category" : null
             }
         },
@@ -81,8 +81,8 @@
             "id": "6",
             "type": "ltecond",
             "attributes": {
-                "key": "ym",
-                "val": "18-q1",
+                "key": "time",
+                "val": "17-12",
                 "category" : null
             }
         }

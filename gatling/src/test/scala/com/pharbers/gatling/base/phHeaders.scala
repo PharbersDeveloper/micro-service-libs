@@ -9,8 +9,10 @@ object phHeaders {
         "Content-Type" -> "application/json,charset=utf-8"
     )
 
-    def headers_json_token(implicit token: String): Map[String,String] = Map(
+    case class phToken(token: String)
+
+    def headers_json_token(implicit token: phToken): Map[String,String] = Map(
         "Content-Type" -> "application/json,charset=utf-8",
-        "Authorization" -> ("bearer " + token)
+        "Authorization" -> ("bearer " + token.token)
     )
 }

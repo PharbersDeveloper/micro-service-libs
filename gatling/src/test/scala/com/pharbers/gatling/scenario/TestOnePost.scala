@@ -1,20 +1,17 @@
 package com.pharbers.gatling.scenario
 
-import com.pharbers.gatling.base.phHeaders.headers_json_token
 import io.gatling.core.Predef._
-import io.gatling.http.Predef._
 import io.gatling.core.structure.ChainBuilder
+import io.gatling.http.Predef.{RawFileBody, http}
+import com.pharbers.gatling.base.phHeaders.{phToken, headers_json_token}
 
 object TestOnePost {
-    def run(string: String)(implicit token: String):ChainBuilder ={
-        println("data/" + string +".txt")
-        exec(http(string)
-                .post("/api/v1/" + string +"/0")
+    def run(name: String)(implicit token: phToken):ChainBuilder ={
+        val testFile = s"data/$name.json"
+        println(testFile)
+        exec(http(name)
+                .post("/api/v1/" + name +"/0")
                 .headers(headers_json_token)
-                .body(RawFileBody("data/" + string +".txt")).asJSON)
+                .body(RawFileBody(testFile)).asJSON)
     }
-//    val exam: ChainBuilder = exec(http("exam")
-//            .post("/api/v1/exam/0")
-//            .headers(headers_json_token)
-//            .body(RawFileBody("data/exam.txt")).asJSON)
 }
