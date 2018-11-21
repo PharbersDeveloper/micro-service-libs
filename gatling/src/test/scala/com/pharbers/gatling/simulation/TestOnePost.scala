@@ -15,14 +15,14 @@ class TestOnePost extends Simulation{
     import com.pharbers.gatling.base.phHttpProtocol.{noneBlackList,noneWhiteList}
 
     implicit val implToken = phToken("5bc58327c8f5e406a2b57394")
-    val name = "findAllReportMedUnit"
+    val name = "findAllMedUnit"
 
-    val httpProtocol = phHttpProtocol("http://123.56.179.133:19000")
+    val httpProtocol = phHttpProtocol("https://www.pharbers.com")
 //    val httpProtocol = phHttpProtocol("http://123.56.179.133:18024") // apmCalc
 //    val httpProtocol = phHttpProtocol("http://127.0.0.1:9000")
 
     val scn = scenario(name).exec(TestOnePost.run(name)) //.pause(10 seconds))
 
-//    setUp(scn.inject(rampUsers(200) over(20 seconds))).protocols(httpProtocol)
-    setUp(scn.inject(atOnceUsers(100))).protocols(httpProtocol)
+    setUp(scn.inject(rampUsers(200) over(5 seconds))).protocols(httpProtocol)
+//    setUp(scn.inject(atOnceUsers(200))).protocols(httpProtocol)
 }
