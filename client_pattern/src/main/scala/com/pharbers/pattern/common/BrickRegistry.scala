@@ -1,4 +1,4 @@
-package com.pharbers.pattern
+package com.pharbers.pattern.common
 
 import com.pharbers.driver.PhRedisDriver
 

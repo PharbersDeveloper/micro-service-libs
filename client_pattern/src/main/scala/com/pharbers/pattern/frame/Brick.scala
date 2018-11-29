@@ -1,7 +1,7 @@
 package com.pharbers.pattern.frame
 
 import com.pharbers.jsonapi.model
-import com.pharbers.pattern.BrickRegistry
+import com.pharbers.pattern.common.BrickRegistry
 import play.api.mvc.Request
 
 trait Brick {

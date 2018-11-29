@@ -10,10 +10,10 @@ class paperinput() extends commonEntity {
     var region_id: String = ""
     var hint: String = ""
     var sorting: String = ""
-    var predicted_target: Long = 0L
-    var field_work_days: Int = 0
-    var national_meeting: Int = 0
-    var city_meeting: Int = 0
-    var depart_meeting: Int = 0
+    var predicted_target: Long = -1L
+    var field_work_days: Int = -1
+    var national_meeting: Int = -1
+    var city_meeting: Int = -1
+    var depart_meeting: Int = -1
     var action_plans: List[String] = Nil
 }

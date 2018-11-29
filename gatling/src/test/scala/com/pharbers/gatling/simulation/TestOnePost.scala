@@ -17,7 +17,7 @@ class TestOnePost extends Simulation{
     implicit val implToken = phToken("5bc58327c8f5e406a2b57394")
     val name = "findAllMedUnit"
 
-    val httpProtocol = phHttpProtocol("https://www.pharbers.com")
+    val httpProtocol = phHttpProtocol("http://www.pharbers.com:443")
 //    val httpProtocol = phHttpProtocol("http://123.56.179.133:18024") // apmCalc
 //    val httpProtocol = phHttpProtocol("http://127.0.0.1:9000")
 

@@ -9,6 +9,9 @@
             "eqcond": {
                 "data": [
                     {
+                        "id": "timetype",
+                        "type": "eqcond"
+                    },{
                         "id": "course",
                         "type": "eqcond"
                     },{
@@ -48,6 +51,15 @@
     },
     "included": [
         {
+            "id": "timetype",
+            "type": "eqcond",
+            "attributes": {
+                "key": "time_type",
+                "val": "month",
+                "category" : null
+            }
+        },
+        {
             "id": "course",
             "type": "eqcond",
             "attributes": {
@@ -61,7 +73,7 @@
             "type": "eqcond",
             "attributes": {
                 "key": "region_id",
-                "val": "all",
+                "val": "5baa11e1eeefcc05923c9418",
                 "category" : null
             }
         },
