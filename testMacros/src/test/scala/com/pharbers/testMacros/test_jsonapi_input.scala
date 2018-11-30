@@ -5,7 +5,7 @@ import com.pharbers.macros._
 import com.pharbers.jsonapi.model._
 import com.pharbers.util.log.phLogTrait
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
-import com.pharbers.models.entity.user
+import com.pharbers.models.entity.auth.user
 
 object test_jsonapi_input extends App with CirceJsonapiSupport with phLogTrait {
     val test_data =

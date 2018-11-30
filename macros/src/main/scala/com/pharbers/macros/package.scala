@@ -32,6 +32,6 @@ package object macros {
 
     def deleteObject(res: TraitRequest)(implicit dbt: DBTrait[TraitRequest]): Int = dbt.deleteObject(res)
 
-    def queryCount(implicit dbt: DBTrait[TraitRequest]): Long = dbt.queryCount
+    def queryCount(res: TraitRequest)(implicit dbt: DBTrait[TraitRequest]): Long = dbt.queryCount(res)
 
 }

@@ -12,9 +12,10 @@ class mongoDBImpl[R <: TraitRequest](override val di: ConnectionInstance) extend
         val conditions = res.cond2QueryObj()
         val className = classTag[T].toString()
         val reVal = coll.findOne(conditions)
-        if (reVal.isEmpty) None else {
+        if (reVal.isEmpty)
+            None
+        else
             Some(DBObjectBindObject(coll.findOne(conditions), className).asInstanceOf[T])
-        }
     }
 
     def queryMultipleObject[T: ClassTag](res: R, sort: String = "date"): List[T] = {
@@ -59,6 +60,5 @@ class mongoDBImpl[R <: TraitRequest](override val di: ConnectionInstance) extend
         result.getN
     }
 
-    def queryCount: Long = ???
-
+    def queryCount(res: R): Long = di.getCollection(res.res).underlying.getCount(res.cond2QueryObj())
 }

@@ -6,12 +6,16 @@ import com.pharbers.util.log.phLogTrait
 import com.pharbers.models.entity.{hospital, representative}
 import com.pharbers.jsonapi.model.RootObject
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
+import com.pharbers.macros.convert.mongodb.{MongoMacro, TraitRequest}
+import com.pharbers.mongodb.dbtrait.DBTrait
 
 object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
 
     import com.pharbers.macros._
-    import com.pharbers.pattern.mongo.client_db_inst._
     import com.pharbers.macros.convert.jsonapi.JsonapiMacro._
+
+
+    implicit val db: DBTrait[TraitRequest] = new MongoMacro[request]{}.queryDBInstance("client").get.asInstanceOf[DBTrait[TraitRequest]]
 
     def findOne: Option[AnyRef] = {
         val jsonData =
