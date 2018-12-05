@@ -12,4 +12,18 @@ import com.pharbers.models.entity.auth.{company, product, role, user}
 class auth() extends commonEntity {
     var token: String = ""
     var token_expire: Int = 24 * 60 * 60
+
+    def hasRole(r: String): Option[role] = {
+        role match {
+            case Some(roleLst) => roleLst.find(r == _.name)
+            case None => None
+        }
+    }
+
+    def hasProduct(p: String): Option[product] = {
+        product match {
+            case Some(productLst) => productLst.find(p == _.name)
+            case None => None
+        }
+    }
 }
