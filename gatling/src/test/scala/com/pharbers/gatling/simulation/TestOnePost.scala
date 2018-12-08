@@ -23,6 +23,6 @@ class TestOnePost extends Simulation{
 
     val scn = scenario(name).exec(TestOnePost.run(name)) //.pause(10 seconds))
 
-    setUp(scn.inject(rampUsers(200) over(5 seconds))).protocols(httpProtocol)
-//    setUp(scn.inject(atOnceUsers(200))).protocols(httpProtocol)
+//    setUp(scn.inject(rampUsers(200) over(5 seconds))).protocols(httpProtocol)
+    setUp(scn.inject(atOnceUsers(300))).protocols(httpProtocol)
 }
