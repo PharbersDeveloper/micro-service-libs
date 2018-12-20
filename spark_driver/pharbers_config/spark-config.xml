@@ -1,0 +1,6 @@
+<pharbers-modules>
+    <spark-config>
+        <parallel-number value="1" />
+        <wait-seconds value="30" />
+    </spark-config>
+</pharbers-modules>

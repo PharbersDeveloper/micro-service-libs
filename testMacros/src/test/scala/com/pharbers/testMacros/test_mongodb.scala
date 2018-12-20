@@ -108,7 +108,7 @@ object test_mongodb extends App with CirceJsonapiSupport with phLogTrait {
         val jsonapi = decodeJson[RootObject](json_data)
 
         val requests = formJsonapi[request](jsonapi)
-        println(requests)
+        phLogTrait.phLog(requests)
 
         val result = queryMultipleObject[request](requests)
         println(result)

@@ -85,7 +85,7 @@ object test_jsonapi_input extends App with CirceJsonapiSupport with phLogTrait {
         """.stripMargin
     val json_data = parseJson(test_data)
     val jsonapi = decodeJson[RootObject](json_data)
-    phLog(jsonapi)
+    phLogTrait.phLog(jsonapi)
 
 //    val entity = formJsonapi(jsonapi)(new TestJsonapiConvert())
     import com.pharbers.macros.convert.jsonapi.JsonapiMacro._
