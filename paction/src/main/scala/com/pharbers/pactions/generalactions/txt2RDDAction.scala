@@ -9,7 +9,7 @@ import com.pharbers.pactions.actionbase.{RDDArgs, StringArgs, pActionArgs, pActi
 object txt2RDDAction {
     def apply(arg_path: String,
               name: String = "txt2RddJob",
-              applicationName: String = "test-dirver"): pActionTrait =
+              applicationName: String): pActionTrait =
         new txt2RDDAction(StringArgs(arg_path), name, applicationName)
 }
 

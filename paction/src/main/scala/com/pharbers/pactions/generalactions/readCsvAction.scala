@@ -8,7 +8,7 @@ object readCsvAction {
     def apply(arg_path: String,
               delimiter: String = ",",
               arg_name: String = "readCsvJob",
-              applicationName: String = "test-dirver"): pActionTrait =
+              applicationName: String): pActionTrait =
         new readCsvAction(StringArgs(arg_path), delimiter, arg_name, applicationName)
 }
 

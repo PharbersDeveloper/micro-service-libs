@@ -4,7 +4,7 @@ import com.pharbers.spark.phSparkDriver
 import com.pharbers.pactions.actionbase.{NULLArgs, pActionArgs, pActionTrait}
 
 object setLogLevelAction {
-    def apply(level: String, job_id: String = "test") : pActionTrait =
+    def apply(level: String, job_id: String) : pActionTrait =
         new setLogLevelAction(level, job_id)
 }
 
