@@ -21,7 +21,10 @@ trait phLogBase {
     }
 
     def SET_LEVEL(): String = try {
-        rd.getString(LEVEL_KEY)
+        rd.getString(LEVEL_KEY) match {
+            case str: String => str
+            case null => ""
+        }
     } catch {
         case _: Exception => ""
     }

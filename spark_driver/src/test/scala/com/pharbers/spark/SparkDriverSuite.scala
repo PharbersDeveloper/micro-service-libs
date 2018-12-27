@@ -1,4 +1,5 @@
-import com.pharbers.spark.phSparkDriver
+package com.pharbers.spark
+
 import com.pharbers.spark.util.mongo2RDD
 
 /**

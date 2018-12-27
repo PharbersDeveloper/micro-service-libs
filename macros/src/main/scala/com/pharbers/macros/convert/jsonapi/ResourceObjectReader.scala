@@ -68,14 +68,15 @@ object ResourceObjectReader {
                 val attrs = resource.attributes.get.toList
                 val inst_mirror = runtime_mirror.reflect(entity)
                 attrs.foreach { attr =>
-                    val field_symbol = try {
-                        entity_type.decl(ru.TermName(attr.name)).asTerm
+                    try {
+                        val field_symbol = entity_type.decl(ru.TermName(attr.name)).asTerm
+                        val field_mirror = inst_mirror.reflectField(field_symbol)
+                        field_mirror.set(convertValueToAny(attr.value))
                     } catch {
                         case _: scala.ScalaReflectionException =>
-                            throw new Exception("not found member \"" + attr.name + "\" in " + ${"\"" + t_name + "\""})
+                            println("not found member \"" + attr.name + "\" in " + ${"\"" + t_name + "\""})
+                            Unit
                     }
-                    val field_mirror = inst_mirror.reflectField(field_symbol)
-                    field_mirror.set(convertValueToAny(attr.value))
                 }
 
                 /** 根据relationships 找到关联的 includeds **/
@@ -102,20 +103,17 @@ object ResourceObjectReader {
 
                 /** 将展开的 relationships 赋值到实体中 **/
                 expandInfo.foreach { case (k, v) =>
-                    val field_symbol = try {
-                        entity_type.member(ru.TermName(k)).asTerm
-                    } catch {
-                        case _: scala.ScalaReflectionException =>
-                            throw new Exception("not found connected member \"" + k + "\" in " + $t_name)
-                    }
-                    val field_mirror = inst_mirror.reflectField(field_symbol)
-                    val extract_symbol = entity_type.member(ru.TermName("jsonapi_to_" + k)).asMethod
-                    val extract_mirror = inst_mirror.reflectMethod(extract_symbol)
                     try {
+                        val field_symbol = entity_type.member(ru.TermName(k)).asTerm
+                        val field_mirror = inst_mirror.reflectField(field_symbol)
+                        val extract_symbol = entity_type.member(ru.TermName("jsonapi_to_" + k)).asMethod
+                        val extract_mirror = inst_mirror.reflectMethod(extract_symbol)
                         field_mirror.set(extract_mirror(v, included))
                     } catch {
+                        case _: scala.ScalaReflectionException =>
+                            println("not found connected member \"" + k + "\" in " + $t_name)
                         case _: java.lang.reflect.InvocationTargetException =>
-                            throw new Exception("unable to parse to \"" + $t_name + "\" connected \"" + k + "\" , param = " + v)
+                            println("unable to parse to \"" + $t_name + "\" connected \"" + k + "\" , param = " + v)
                     }
                 }
 
