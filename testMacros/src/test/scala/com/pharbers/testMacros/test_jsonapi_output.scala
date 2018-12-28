@@ -5,6 +5,7 @@ import com.pharbers.macros._
 import com.pharbers.util.log.phLogTrait
 import com.pharbers.models.entity.auth.user
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
+import com.pharbers.macros.api.errorEntity
 
 object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait {
     val entity = new user()
@@ -41,6 +42,10 @@ object test_jsonapi_output extends App with CirceJsonapiSupport with phLogTrait 
     import com.pharbers.macros.convert.jsonapi.JsonapiMacro._
     val result = toJsonapi(entity)
     phLog(result)
+
+    val error = errorEntity("id", "status", "code", "title", "detail")
+    val errorresult = toJsonapi(error)
+    phLog(errorresult.asJson.noSpaces)
 
 //    val entity = profile()
 //    entity.name = "jeorch"
