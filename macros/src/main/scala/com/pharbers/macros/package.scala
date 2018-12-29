@@ -6,6 +6,7 @@ import com.pharbers.macros.api.errorEntity
 import com.pharbers.mongodb.dbtrait.DBTrait
 import com.pharbers.jsonapi.model.{Errors, RootObject}
 import com.pharbers.macros.convert.mongodb.TraitRequest
+import com.pharbers.jsonapi.model.{Error, Errors, RootObject}
 
 package object macros {
     type JsonapiConvert[T] = com.pharbers.macros.api.JsonapiConvert[T]
