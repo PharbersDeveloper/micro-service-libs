@@ -1,7 +1,5 @@
 package com.pharbers.util.log
 
-import java.io.FileNotFoundException
-
 import com.pharbers.driver.PhRedisDriver
 
 trait phLogBase {

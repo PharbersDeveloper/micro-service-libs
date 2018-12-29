@@ -19,7 +19,7 @@ class readCsvAction(override val defaultArgs: pActionArgs,
     override def perform(args: pActionArgs = NULLArgs): pActionArgs = {
         val driver = phSparkDriver(applicationName)
         import driver.conn_instance
-        DFArgs(driver.setUtil(readCsv())readCsv(defaultArgs.asInstanceOf[StringArgs].get, delimiter))
+        DFArgs(driver.setUtil(readCsv()).readCsv(defaultArgs.asInstanceOf[StringArgs].get, delimiter))
     }
 
 }

@@ -1,10 +1,10 @@
 package com.pharbers
 
 import com.mongodb.DBObject
-
 import scala.reflect.ClassTag
+import com.pharbers.macros.api.errorEntity
 import com.pharbers.mongodb.dbtrait.DBTrait
-import com.pharbers.jsonapi.model.RootObject
+import com.pharbers.jsonapi.model.{Errors, RootObject}
 import com.pharbers.macros.convert.mongodb.TraitRequest
 
 package object macros {
@@ -21,6 +21,12 @@ package object macros {
 
     def toJsonapi[T: JsonapiConvert](objLst: List[T]): RootObject =
         implicitly[JsonapiConvert[T]].toJsonapi(objLst)
+
+    def toErrorsJsonapi(error: errorEntity): RootObject =
+        RootObject(errors = Some((error.toError :: Nil).asInstanceOf[Errors]))
+
+    def toErrorsJsonapi(errors: List[errorEntity]): RootObject =
+        RootObject(errors = Some(errors.map(_.toError).asInstanceOf[Errors]))
 
     def queryObject[T: ClassTag](res: TraitRequest)(implicit dbt: DBTrait[TraitRequest]): Option[T] = dbt.queryObject[T](res)
 
