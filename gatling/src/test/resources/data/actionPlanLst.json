@@ -1,0 +1,30 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "bind_course_action_plan"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "2",
+                        "type": "eqcond"
+                    }
+                ]
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "2",
+            "type": "eqcond",
+            "attributes": {
+                "key": "course_id",
+                "val": "5baa0e58eeefcc05923c9414",
+                "category" : null
+            }
+        }
+    ]
+}

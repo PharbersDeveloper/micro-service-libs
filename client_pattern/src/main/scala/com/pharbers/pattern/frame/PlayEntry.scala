@@ -19,7 +19,7 @@ object PlayEntry {
 }
 
 class PlayEntry @Inject()(implicit akkasys: ActorSystem, cc: ControllerComponents) extends AbstractController(cc) {
-    implicit val t: Timeout = Timeout(60 second)
+    implicit val t: Timeout = Timeout(600 second)
 
     def excution(brick: Brick)(implicit request: Request[model.RootObject]): RootObject = {
         val act = akkasys.actorOf(Gateway.prop)

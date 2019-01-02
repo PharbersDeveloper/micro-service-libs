@@ -17,5 +17,5 @@ trait DBTrait[R] {
 
     def deleteObject(res: R): Int
 
-    def queryCount: Long
+    def queryCount(res: R): Long
 }

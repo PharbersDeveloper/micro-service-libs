@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": "sign0",
+    "type": "user",
+    "attributes": {
+      "user_name": "安琪",
+      "user_phone": "",
+      "password": "11111111",
+      "email": "aqchen3@qq.com",
+      "image": ""
+    }
+  }
+}

@@ -1,7 +1,6 @@
 package com.pharbers.macros.common.connecting
 
 import scala.reflect.macros.whitebox
-import com.pharbers.util.log.phLogTrait
 import scala.language.experimental.macros
 import scala.annotation.{StaticAnnotation, compileTimeOnly}
 
@@ -10,29 +9,18 @@ class One2ManyConn[C](param_name: String) extends StaticAnnotation {
     def macroTransform(annottees: Any*): Any = macro One2ManyConn.impl
 }
 
-object One2ManyConn extends phLogTrait {
+object One2ManyConn {
     def impl(c: whitebox.Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
         import c.universe._
 
         val class_tree = annottees.map(_.tree).toList match {
             case q"$mods class $tpname[..$tparams] $ctorMods(...$paramss) extends commonEntity[..$ptpname] with ..$parents { $self => ..$stats }" :: Nil =>
-//                phLog("mods = " + mods)
-//                phLog("tpname = " + tpname)
-//                phLog("tparams = " + tparams)
-//                phLog("ctorMods = " + ctorMods)
-//                phLog("paramss = " + paramss)
-//                phLog("parents = " + parents)
-//                phLog("self = " + self)
-//                phLog("stats = " + stats)
 
                 val (conn_type, conn_name) = c.prefix.tree match {
                     case q"new One2ManyConn[$conn_type]($conn_name)" =>
                         (conn_type.toString, conn_name.toString.replace("\"", ""))
                     case _ => c.abort(c.enclosingPosition, "Annotation @One2ManyConn must provide conn_type and conn_name !")
                 }
-//                phLog("conn_name = " + conn_name)
-//                phLog("conn_type = " + conn_type)
-
 
                 val params = paramss.flatMap { params =>
                     val q"..$trees" = q"..$params"
@@ -56,7 +44,6 @@ object One2ManyConn extends phLogTrait {
                 }
                 val conn_many_var = q"var ${TermName(conn_name)}: Option[List[${TypeName(conn_type)}]] = None"
                 val conn_fields = params ++ fields ++ Seq(conn_many_var)
-//                phLog("conn_fields = " + conn_fields)
 
                 val conn_many_def = q"""
                     private[this] def ${TermName("jsonapi_to_" + conn_name)}(rd: Option[RootObject.Data], included: Option[Included]): Option[List[${TypeName(conn_type)}]] = {
@@ -77,7 +64,6 @@ object One2ManyConn extends phLogTrait {
                         }
                     }
                 """
-//                phLog("conn_many_def = " + conn_many_def)
 
                 q"""{
                     $mods class $tpname[..$tparams] $ctorMods() extends commonEntity[..$ptpname] with ..$parents { $self =>

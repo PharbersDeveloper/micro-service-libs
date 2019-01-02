@@ -1,0 +1,45 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "bind_course_goods"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "2",
+                        "type": "eqcond"
+                    }
+                ]
+            },
+            "fmcond": {
+                "data": {
+                        "id": "3",
+                        "type": "fmcond"
+                    }
+
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "2",
+            "type": "eqcond",
+            "attributes": {
+                "key": "course_id",
+                "val": "5baa0e58eeefcc05923c9414",
+                "category" : null
+            }
+        },
+        {
+            "id": "3",
+            "type": "fmcond",
+            "attributes": {
+                "skip": 0,
+                "take": 20
+            }
+        }
+    ]
+}

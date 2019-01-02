@@ -6,7 +6,7 @@ import com.pharbers.util.log.phLogTrait
 import com.pharbers.macros.convert.jsonapi._
 import com.pharbers.jsonapi.json.circe.CirceJsonapiSupport
 import com.pharbers.jsonapi.model.RootObject.ResourceObject
-import com.pharbers.models.entity.user
+import com.pharbers.models.entity.auth.user
 
 object test_resources_object extends App with CirceJsonapiSupport with phLogTrait {
     val test_data =

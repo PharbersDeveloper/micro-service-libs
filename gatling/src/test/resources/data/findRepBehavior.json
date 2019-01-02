@@ -1,0 +1,90 @@
+{
+    "data": {
+        "id": "1",
+        "type": "request",
+        "attributes": {
+            "res": "bind_course_region_time_rep_behavior"
+        },
+        "relationships": {
+            "eqcond": {
+                "data": [
+                    {
+                        "id": "2",
+                        "type": "eqcond"
+                    },
+                    {
+                        "id": "3",
+                        "type": "eqcond"
+                    },
+                    {
+                        "id": "4",
+                        "type": "eqcond"
+                    }
+                ]
+            },
+            "gtecond": {
+            	"data": [
+            		{
+                        "id": "5",
+                        "type": "gtecond"
+                    }
+            	]
+            },
+            "ltecond": {
+            	"data": [
+            		{
+                        "id": "6",
+                        "type": "ltecond"
+                    }
+            	]
+            }
+        }
+    },
+    "included": [
+        {
+            "id": "2",
+            "type": "eqcond",
+            "attributes": {
+                "key": "course_id",
+                "val": "5baa0e58eeefcc05923c9414",
+                "category" : null
+            }
+        },
+        {
+            "id": "3",
+            "type": "eqcond",
+            "attributes": {
+                "key": "region_id",
+                "val": "5baa11e1eeefcc05923c9418",
+                "category" : null
+            }
+        },
+        {
+            "id": "4",
+            "type": "eqcond",
+            "attributes": {
+                "key": "time_type",
+                "val": "month",
+                "category" : null
+            }
+        },
+        {
+            "id": "5",
+            "type": "gtecond",
+            "attributes": {
+                "key": "time",
+                "val": "17-07",
+                "category" : null
+            }
+        },
+        {
+            "id": "6",
+            "type": "ltecond",
+            "attributes": {
+                "key": "time",
+                "val": "17-12",
+                "category" : null
+            }
+        }
+    ]
+}

@@ -1,8 +1,8 @@
 package com.pharbers.testMacros.convert
 
-import com.pharbers.macros.JsonapiConvert
-import com.pharbers.models.entity.user
 import com.pharbers.util.log.phLogTrait
+import com.pharbers.macros.JsonapiConvert
+import com.pharbers.models.entity.auth.user
 
 class TestJsonapiConvert() extends JsonapiConvert[user] with phLogTrait {
 
@@ -18,6 +18,16 @@ class TestJsonapiConvert() extends JsonapiConvert[user] with phLogTrait {
         val entity = fromResourceObject[user](jsonapi_data, included)(ResourceReaderMaterialize)
 //        phLog("entity in fromJsonapi is ===> " + entity)
 
+        entity
+    }
+
+    override def fromJsonapiLst(jsonapi: RootObject): List[user] = {
+        val jsonapi_data = jsonapi.data.get.asInstanceOf[ResourceObjects].array
+        val included = jsonapi.included
+        var entity: List[user] = Nil
+        jsonapi_data.foreach(x => {
+            entity = entity :+ fromResourceObject[user](x, included)(ResourceReaderMaterialize)
+        })
         entity
     }
 

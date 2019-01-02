@@ -20,16 +20,11 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                <!-- play lib -->
+                <!-- pharbers module -->
                 <dependency>
-                    <groupId>com.typesafe.play</groupId>
-                    <artifactId>play-json_${scalaBinaryVersion}</artifactId>
-                    <version>2.5.0-M2</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.typesafe.play</groupId>
-                    <artifactId>play_${scalaBinaryVersion}</artifactId>
-                    <version>2.6.15</version>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>redis</artifactId>
+                    <version>1.0</version>
                 </dependency>
             </dependencies>
         </profile>

@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>paction</artifactId>
+    <version>1.0</version>
+
+    <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
+      the right dependencies for modules specified for each version separately -->
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <poi.version>3.13</poi.version>
+            </properties>
+
+            <dependencies>
+                <!-- pharbers-modules -->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>spark_driver</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <!-- spark lib -->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-sql_${scalaBinaryVersion}</artifactId>
+                    <version>2.3.0</version>
+                </dependency>
+
+                <!-- poi -->
+                <dependency>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                    <version>${poi.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                    <version>${poi.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                    <version>2.11.0</version>
+                </dependency>
+                <!-- poi stream reader -->
+                <dependency>
+                    <groupId>com.monitorjbl</groupId>
+                    <artifactId>xlsx-streamer</artifactId>
+                    <version>1.0.2</version>
+                </dependency>
+
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

@@ -1,11 +1,10 @@
 package com.pharbers.macros.convert.jsonapi
 
 import scala.reflect.macros.whitebox
-import com.pharbers.util.log.phLogTrait
 import scala.language.experimental.macros
 import com.pharbers.macros.api.JsonapiConvert
 
-object JsonapiMacro extends phLogTrait {
+object JsonapiMacro {
     implicit def jsonapiMacroMaterialize[T]: JsonapiConvert[T] = macro impl[T]
 
     def impl[T](c: whitebox.Context)(ttag: c.WeakTypeTag[T]): c.Expr[JsonapiConvert[T]] = {
@@ -16,13 +15,9 @@ object JsonapiMacro extends phLogTrait {
         val t_symbol = t_type match {
             case TypeRef(_, str, _) => str
         }
-//        phLog("t_symbol = " + t_symbol)
         val t_name = t_symbol.asClass.name.toString
-//        phLog("t_name = " + t_name)
         val t_type_name = TypeName(t_name)
-//        phLog("t_type_name = " + t_type_name)
         val tmp_class_name = TypeName(c.freshName("eval$"))
-//        phLog("tmp_class_name = " + tmp_class_name)
 
         val q"..$clsdef" = q"""{
         class $tmp_class_name extends JsonapiConvert[$t_type_name] {
@@ -36,6 +31,16 @@ object JsonapiMacro extends phLogTrait {
                 val jsonapi_data = jsonapi.data.get.asInstanceOf[ResourceObject]
                 val included = jsonapi.included
                 val entity = fromResourceObject[$t_type_name](jsonapi_data, included)(ResourceReaderMaterialize)
+                entity
+            }
+
+            override def fromJsonapiLst(jsonapi: RootObject): List[$t_type_name] = {
+                val jsonapi_data = jsonapi.data.get.asInstanceOf[ResourceObjects].array
+                val included = jsonapi.included
+                var entity: List[$t_type_name] = Nil
+                jsonapi_data.foreach(x => {
+                    entity = entity :+ fromResourceObject[$t_type_name](x, included)(ResourceReaderMaterialize)
+                })
                 entity
             }
 
