@@ -6,7 +6,7 @@ import com.pharbers.spark.util.readParquet
 
 object readParquetAction {
         def apply(arg_path: String,
-                  arg_name: String = "readCsvJob",
+                  arg_name: String = "readParquetJob",
                   applicationName: String): pActionTrait =
             new readParquetAction(StringArgs(arg_path), arg_name, applicationName)
 }
