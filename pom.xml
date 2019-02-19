@@ -25,6 +25,7 @@
         <module>paction</module>
 
         <module>gatling</module>
+        <module>tools</module>
         <module>testMacros</module>
     </modules>
 
