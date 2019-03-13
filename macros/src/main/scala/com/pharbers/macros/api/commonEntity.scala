@@ -1,6 +1,6 @@
 package com.pharbers.macros.api
 
-trait commonEntity {
+class commonEntity {
     var id: String = ""
     var `type`: String = ""
 }

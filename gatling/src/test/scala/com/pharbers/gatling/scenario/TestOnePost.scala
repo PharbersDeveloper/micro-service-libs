@@ -7,11 +7,11 @@ import com.pharbers.gatling.base.phHeaders.{phToken, headers_json_token}
 
 object TestOnePost {
     def run(name: String)(implicit token: phToken):ChainBuilder ={
-        val testFile = s"data/$name.json"
-        println(testFile)
-        exec(http(name)
-                .post("/api/v1/" + name +"/0")
-                .headers(headers_json_token)
-                .body(RawFileBody(testFile)).asJSON)
+//        val testFile = s"data/$name.json"
+//        println(testFile)
+        exec(http(name).get("/v0/representativeConfigs/5c7e3e05eeefcc1c9ec104d1/representative"))
+//                .post("/api/v1/" + name +"/0")
+//                .headers(headers_json_token)
+//                .body(RawFileBody(testFile)).asJSON)
     }
 }
