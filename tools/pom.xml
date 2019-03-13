@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>tools</artifactId>
+    <version>1.0</version>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <dependencies>
+                <!-- poi -->
+                <dependency>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                    <version>3.8</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                    <version>3.8</version>
+                </dependency>
+                <dependency>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                    <version>2.11.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+</project>
