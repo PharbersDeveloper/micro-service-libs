@@ -50,7 +50,7 @@
                     <resultsFolder>target/gatling/results</resultsFolder>
                     <runMultipleSimulations>true</runMultipleSimulations>
                     <simulationsFolder>src/test/scala/com/pharbers/gatling</simulationsFolder>
-                    <simulationClass>com.pharbers.gatling.simulation.TestOnePost</simulationClass>
+                    <simulationClass>com.pharbers.gatling.simulation.OAuthTest</simulationClass>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,5 +1,7 @@
 package com.pharbers.gatling.base
 
+case class phToken(token: String, tokenType: String = "Bearer")
+
 object phHeaders {
     val headers_base = Map(
         "Accept" -> "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -9,10 +11,8 @@ object phHeaders {
         "Content-Type" -> "application/json,charset=utf-8"
     )
 
-    case class phToken(token: String)
-
     def headers_json_token(implicit token: phToken): Map[String,String] = Map(
         "Content-Type" -> "application/json,charset=utf-8",
-        "Authorization" -> ("bearer " + token.token)
+        "Authorization" -> (token.tokenType + " " + token.token)
     )
 }
