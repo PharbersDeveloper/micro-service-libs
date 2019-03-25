@@ -1,16 +1,16 @@
-package com.pharbers.gatling.scenario
+package gatling.scenario
 
+import gatling.base.phHeaders._
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import io.gatling.core.structure.ChainBuilder
-import com.pharbers.gatling.base.phHeaders.headers_base
 
 /**
   * @description:
   * @author: clock
   * @date: 2019-03-22 17:57
   */
-object OAuthTest {
+object OAuthScenario {
     val getLoginPage: ChainBuilder = exec(http("loginPage")
             .get("/v0/Login")
             .headers(headers_base)
@@ -60,6 +60,7 @@ object OAuthTest {
                 .post("/v0/TokenValidation")
                 .headers(headers_base)
                 .header("Authorization", "Bearer " + token)
+                .check(jsonPath("$.error").notExists)
         )
     }
 

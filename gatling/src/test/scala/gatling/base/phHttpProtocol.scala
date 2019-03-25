@@ -1,8 +1,8 @@
-package com.pharbers.gatling.base
+package gatling.base
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
-import io.gatling.http.config.HttpProtocolBuilder
+import io.gatling.http.protocol.HttpProtocolBuilder
 
 object phHttpProtocol {
     implicit val noneWhiteList: io.gatling.core.filter.WhiteList = WhiteList()
@@ -11,8 +11,8 @@ object phHttpProtocol {
     implicit val staticWhiteList: io.gatling.core.filter.WhiteList = WhiteList(""".*\.js""", """.*\.css""", """.*\.gif""", """.*\.jpeg""", """.*\.jpg""", """.*\.ico""", """.*\.woff""", """.*\.(t|o)tf""", """.*\.png""")
 
     def apply(host: String)
-             (implicit blackLst: io.gatling.core.filter.BlackList, whiteLst: io.gatling.core.filter.WhiteList): HttpProtocolBuilder = { http
-                .baseURL(host)
+             (implicit blackLst: io.gatling.core.filter.BlackList, whiteLst: io.gatling.core.filter.WhiteList): HttpProtocolBuilder = {http
+                .baseUrl(host)
                 .inferHtmlResources(blackLst, whiteLst)
                 .acceptHeader("application/json, text/javascript, */*; q=0.01")
                 .acceptEncodingHeader("gzip, deflate")

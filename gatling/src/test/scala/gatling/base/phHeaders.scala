@@ -1,4 +1,4 @@
-package com.pharbers.gatling.base
+package gatling.base
 
 case class phToken(token: String, tokenType: String = "Bearer")
 
