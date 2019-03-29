@@ -1,6 +1,6 @@
 package com.pharbers.spark
 
-import com.pharbers.spark.util.mongo2RDD
+import com.pharbers.spark.util.{mongo2DF, mongo2RDD}
 
 /**
   * Created by clock on 18-2-26.
@@ -13,11 +13,25 @@ object SparkDriverSuite extends App {
 
         val mongodbHost = "192.168.100.174"
         val mongodbPort = "27017"
-        def users = driver.setUtil(mongo2RDD()).mongo2RDD(mongodbHost, mongodbPort, "baby_time_test", "users")
+        val users = driver.setUtil(mongo2RDD()).mongo2RDD(mongodbHost, mongodbPort, "baby_time_test", "users")
 
         println(users)
     }
-    testMongo2Rdd()
+//    testMongo2Rdd()
+
+    def testMongo2DF(): Unit = {
+        val driver = phSparkDriver("test_driver")
+        import driver._
+
+        val mongodbHost = "192.168.100.176"
+        val mongodbPort = "27017"
+        val conn_name = "pharbers-max-repository"
+        val coll_name = "atcTable"
+        val atcTable = driver.setUtil(mongo2DF()).mongo2DF(mongodbHost, mongodbPort, conn_name, coll_name)
+
+        atcTable.show(true)
+    }
+    testMongo2DF()
 
 //    test("Test read csv") {
 //        val driver = phSparkDriver("test_driver")
