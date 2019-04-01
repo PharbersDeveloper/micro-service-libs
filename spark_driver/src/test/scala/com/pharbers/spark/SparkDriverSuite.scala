@@ -23,8 +23,8 @@ object SparkDriverSuite extends App {
         val driver = phSparkDriver("test_driver")
         import driver._
 
-        val mongodbHost = "192.168.100.176"
-        val mongodbPort = "27017"
+        val mongodbHost = "127.0.0.1"
+        val mongodbPort = "28102"
         val conn_name = "pharbers-max-repository"
         val coll_name = "atcTable"
         val atcTable = driver.setUtil(mongo2DF()).mongo2DF(mongodbHost, mongodbPort, conn_name, coll_name)
