@@ -1,6 +1,6 @@
 package com.pharbers.macros.api
 
-class commonEntity {
+trait commonEntity extends phEntity {
     var id: String = ""
     var `type`: String = ""
 }
