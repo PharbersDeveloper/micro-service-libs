@@ -6,6 +6,7 @@ import org.apache.spark.sql.DataFrame
 trait pActionArgs extends java.io.Serializable {
     type t
     def get : t
+    def getBy[T <: pActionArgs]: T#t = this.asInstanceOf[T].get
 }
 
 case class RDDArgs[T](rdd: RDD[T]) extends pActionArgs {
@@ -31,6 +32,7 @@ case class ListArgs(lst: List[pActionArgs]) extends pActionArgs {
 case class MapArgs(map: Map[String, pActionArgs]) extends pActionArgs {
     type t = Map[String, pActionArgs]
     override def get: Map[String, pActionArgs] = map
+    def getAs[T <: pActionArgs](index: String): T#t = map(index).asInstanceOf[T].get
 }
 
 case class BooleanArgs(b: Boolean) extends pActionArgs {
