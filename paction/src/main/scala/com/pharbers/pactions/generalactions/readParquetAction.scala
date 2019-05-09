@@ -16,7 +16,6 @@ class readParquetAction(override val defaultArgs: pActionArgs,
                     applicationName: String) extends pActionTrait {
         override def perform(args: pActionArgs = NULLArgs): pActionArgs = {
             val driver = phSparkDriver(applicationName)
-            import driver.conn_instance
-            DFArgs(driver.setUtil(readParquet()).readParquet(defaultArgs.asInstanceOf[StringArgs].get))
+            DFArgs(driver.setUtil(readParquet()(driver.conn_instance)).readParquet(defaultArgs.asInstanceOf[StringArgs].get))
         }
 }
