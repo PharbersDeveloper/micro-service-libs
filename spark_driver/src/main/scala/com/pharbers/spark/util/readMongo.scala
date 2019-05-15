@@ -6,8 +6,8 @@ import com.pharbers.spark.session.spark_conn_instance
 /**
   * Created by clock on 19-3-29.
   */
-case class mongo2DF(implicit val conn_instance: spark_conn_instance) extends spark_manager_trait {
-    def mongo2DF(mongodbHost: String,
+case class readMongo(implicit val conn_instance: spark_conn_instance) extends spark_manager_trait {
+    def readMongo(mongodbHost: String,
                  mongodbPort: String,
                  databaseName: String,
                  collName: String,

@@ -1,25 +1,24 @@
 package com.pharbers.pactions.generalactions
 
-import com.pharbers.pactions.actionbase._
-import com.pharbers.spark.phSparkDriver
 import com.pharbers.spark.util.readCsv
+import com.pharbers.spark.phSparkDriver
+import com.pharbers.pactions.actionbase._
 
 object readCsvAction {
     def apply(arg_path: String,
-              delimiter: String = ",",
-              arg_name: String = "readCsvJob",
-              applicationName: String): pActionTrait =
-        new readCsvAction(StringArgs(arg_path), delimiter, arg_name, applicationName)
+              delimiter: String = 31.toChar.toString,
+              arg_name: String = "csv2DFAction")(implicit sparkDriver: phSparkDriver): pActionTrait =
+        new readCsvAction(StringArgs(arg_path), arg_name, delimiter)
 }
 
 class readCsvAction(override val defaultArgs: pActionArgs,
-                    delimiter: String,
                     override val name: String,
-                    applicationName: String) extends pActionTrait {
+                    delimiter: String)(implicit sparkDriver: phSparkDriver) extends pActionTrait {
     override def perform(args: pActionArgs = NULLArgs): pActionArgs = {
-        val driver = phSparkDriver(applicationName)
-        import driver.conn_instance
-        DFArgs(driver.setUtil(readCsv()).readCsv(defaultArgs.asInstanceOf[StringArgs].get, delimiter))
+        DFArgs(
+            sparkDriver
+                    .setUtil(readCsv()(sparkDriver.conn_instance))
+                    .readCsv(defaultArgs.asInstanceOf[StringArgs].get, delimiter)
+        )
     }
-
 }

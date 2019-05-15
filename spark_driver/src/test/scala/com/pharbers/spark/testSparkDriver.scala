@@ -1,6 +1,9 @@
 package com.pharbers.spark
 
+
 object testSparkDriver extends App {
-    phSparkDriver("abc").sc
-    phSparkDriver("bcd").ss
+//    spark_conn_obj("test-app", Array())
+
+    phSparkDriver("test-app")
+    phSparkDriver("test-app2")
 }

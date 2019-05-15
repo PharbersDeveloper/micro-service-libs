@@ -1,6 +1,14 @@
 <pharbers-modules>
     <spark-config>
-        <parallel-number value="2" />
-        <wait-seconds value="30" />
+        <yarn-jars value="hdfs://spark.master:9000/jars/sparkJars"/>
+        <yarn-resource-hostname value="spark.master"/>
+        <yarn-resource-address value="spark.master:8032"/>
+        <yarn-dist-files value="hdfs://spark.master:9000/config"/>
+        <executor-memory value="2g"/>
     </spark-config>
+    <spark-run-config>
+        <jars-path value="hdfs:///jars/maxJars/" />
+        <parallel-number value="2"/>
+        <wait-seconds value="30"/>
+    </spark-run-config>
 </pharbers-modules>

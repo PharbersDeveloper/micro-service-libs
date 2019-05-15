@@ -16,7 +16,7 @@ class saveMapResultAction[T](key: String, path: String) extends pActionTrait {
     override val name: String = "saveMapResultAction"
     override val defaultArgs: pActionArgs = NULLArgs
 
-    override def perform(prMap: pActionArgs): pActionArgs = {
+    override def perform(prMap: pActionArgs = NULLArgs): pActionArgs = {
         val rdd = prMap.asInstanceOf[MapArgs].get.get(key) match {
             case Some(r) => r.asInstanceOf[RDDArgs[T]].get
             case None => throw new Exception(s"not found key=$key in saveMapResultAction.class")

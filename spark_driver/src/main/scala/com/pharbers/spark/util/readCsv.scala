@@ -7,9 +7,11 @@ import org.apache.spark.sql.DataFrame
   * Created by clock on 18-2-27.
   */
 case class readCsv(implicit val conn_instance: spark_conn_instance) extends spark_manager_trait {
-    def readCsv(file_path: String, delimiter: String = ","): DataFrame = {
+    def readCsv(file_path: String
+                , delimiter: String = ","
+                , header: Boolean = true): DataFrame = {
         ss.read.format("com.databricks.spark.csv")
-                .option("header", "true")
+                .option("header", header)
                 .option("delimiter", delimiter)
                 .load(file_path)
     }
