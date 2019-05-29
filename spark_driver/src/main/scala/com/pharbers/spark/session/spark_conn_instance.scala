@@ -10,11 +10,13 @@ trait spark_conn_instance {
 //    System.setProperty("HADOOP_USER_NAME","spark")
     val applicationName: String
     //max相关jar包
-    val jars = Array("pharbers-max-0.1.jar",
-        "pharbers-pattern-0.1.jar",
-        "pharbers-errorcode-0.1.jar",
-        "pharbers-another-pattern-0.1.jar",
+    val jars = Array(
+//        "pharbers-max-0.1.jar",
+//        "pharbers-pattern-0.1.jar",
+//        "pharbers-errorcode-0.1.jar",
+//        "pharbers-another-pattern-0.1.jar",
         "pharbers-unitTest-0.1.jar"
+
     )
     //jar包的hdfs路径
     val path = "hdfs:///jars/maxJars/"
