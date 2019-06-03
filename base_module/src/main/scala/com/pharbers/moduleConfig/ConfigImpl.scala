@@ -4,4 +4,4 @@ trait ConfigDefines {
     val md : List[String]
 }
 
-case class ConfigImpl(val mc : List[(String, AnyRef)])
+case class ConfigImpl(mc : List[(String, AnyRef)])

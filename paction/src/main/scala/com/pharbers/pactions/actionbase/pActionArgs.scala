@@ -34,7 +34,6 @@ case class ListArgs(lst: List[pActionArgs]) extends pActionArgs {
 case class MapArgs(map: Map[String, pActionArgs]) extends pActionArgs {
     type t = Map[String, pActionArgs]
     override def get: Map[String, pActionArgs] = map
-    override def getAs[T <: pActionArgs](index: String): T#t = map(index).asInstanceOf[T].get
 }
 
 case class BooleanArgs(b: Boolean) extends pActionArgs {

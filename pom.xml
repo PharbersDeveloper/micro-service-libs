@@ -20,13 +20,13 @@
         <module>redis</module>
         <module>spark_driver</module>
 
-        <module>models</module>
-        <module>client_pattern</module>
         <module>paction</module>
-
         <module>gatling</module>
         <module>tools</module>
-        <module>testMacros</module>
+
+        <!--<module>models</module>-->
+        <!--<module>client_pattern</module>-->
+        <!--<module>testMacros</module>-->
     </modules>
 
     <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
