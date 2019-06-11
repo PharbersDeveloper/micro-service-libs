@@ -1,8 +1,5 @@
 package consumer
 
-import java.net.InetAddress
-import java.util.Properties
-
 import com.pharbers.kafka.common.kafka_config_obj
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -17,7 +14,8 @@ import org.scalatest.FunSuite
 class PharbersConsumerTests extends FunSuite {
 
     test("PharbersKafkaConsumer") {
-        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, 3)
+//        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, Int.MaxValue)
+        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, Int.MaxValue, myProcess)
         val t = new Thread(pkc)
         t.start()
         Thread.sleep(50000)
@@ -25,8 +23,8 @@ class PharbersConsumerTests extends FunSuite {
         println("DOWN")
     }
 
-    def process[K, V](record: ConsumerRecord[K, V]): Unit = {
-        println("===process>>>" + record.key() + ":" + record.value())
+    def myProcess[K, V](record: ConsumerRecord[K, V]): Unit = {
+        println("===myProcess>>>" + record.key() + ":" + new String(record.value().asInstanceOf[Array[Byte]]))
     }
 
 }

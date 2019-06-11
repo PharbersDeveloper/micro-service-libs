@@ -30,6 +30,12 @@ class PharbersKafkaProducer[K, V] {
     config.put("acks", kafka_config_obj.acks)
     config.put("key.serializer", kafka_config_obj.keyDefaultSerializer)
     config.put("value.serializer", kafka_config_obj.valueDefaultSerializer)
+    config.put("security.protocol", kafka_config_obj.securityProtocol)
+    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
+    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
+    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
+    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
+    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
     lazy val producer = new KafkaProducer[K, V](config)
 
     def produce(topic: String, key: K, value: V): Future[RecordMetadata] = {
