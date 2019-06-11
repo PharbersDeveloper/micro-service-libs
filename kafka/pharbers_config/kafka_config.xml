@@ -1,0 +1,12 @@
+<pharbers-modules>
+    <kafka-config>
+        <broker value="localhost:9092" />
+        <group value="test20190611" />
+        <topics value="test" />
+        <acks value="all" />
+        <keyDefaultSerializer value="org.apache.kafka.common.serialization.StringSerializer" />
+        <valueDefaultSerializer value="org.apache.kafka.common.serialization.ByteArraySerializer" />
+        <keyDefaultDeserializer value="org.apache.kafka.common.serialization.StringDeserializer" />
+        <valueDefaultDeserializer value="org.apache.kafka.common.serialization.ByteArrayDeserializer" />
+    </kafka-config>
+</pharbers-modules>

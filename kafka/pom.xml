@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.pharbers</groupId>
+        <artifactId>micro-service-libs</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>kafka</artifactId>
+    <version>1.0</version>
+
+    <profiles>
+        <profile>
+            <id>scala-2.11</id>
+
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <repositories>
+
+                <repository>
+                    <id>confluent</id>
+                    <url>https://packages.confluent.io/maven/</url>
+                </repository>
+
+                <!-- further repository entries here -->
+
+            </repositories>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>base_module</artifactId>
+                    <version>1.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka_2.12</artifactId>
+                    <version>2.2.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>io.confluent</groupId>
+                    <artifactId>kafka-avro-serializer</artifactId>
+                    <!-- For Confluent Platform 5.2.1 -->
+                    <version>5.2.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
