@@ -7,8 +7,17 @@
         <artifactId>micro-service-libs</artifactId>
         <version>1.0</version>
     </parent>
-    <artifactId>pharbers-kafka</artifactId>
+    <artifactId>pharbers-kafka-connect</artifactId>
     <version>1.0</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <kafka.version>0.10.1.0</kafka.version>
+        <confluent.version>3.1.1</confluent.version>
+        <hadoop.version>2.9.0</hadoop.version>
+        <avro.version>1.8.1</avro.version>
+        <parquet.version>1.9.0</parquet.version>
+    </properties>
 
     <profiles>
         <profile>
@@ -25,8 +34,6 @@
                     <url>https://packages.confluent.io/maven/</url>
                 </repository>
 
-                <!-- further repository entries here -->
-
             </repositories>
 
             <dependencies>
@@ -38,16 +45,18 @@
 
                 <dependency>
                     <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka_2.12</artifactId>
-                    <version>2.2.0</version>
+                    <artifactId>connect-api</artifactId>
+                    <version>${kafka.version}</version>
+                    <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>io.confluent</groupId>
-                    <artifactId>kafka-avro-serializer</artifactId>
-                    <!-- For Confluent Platform 5.2.1 -->
-                    <version>5.2.1</version>
+                    <artifactId>kafka-connect-avro-converter</artifactId>
+                    <version>${confluent.version}</version>
+                    <scope>provided</scope>
                 </dependency>
+
             </dependencies>
         </profile>
     </profiles>
