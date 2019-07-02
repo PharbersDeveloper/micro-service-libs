@@ -44,8 +44,9 @@ public class OssSourceTask extends SourceTask {
     private BufferedReader reader = null;
     private String topic = null;
     private int batchSize = OssSourceConnector.DEFAULT_TASK_BATCH_SIZE;
+    private OSS client = null;
 
-    private Long streamOffset;
+    private Long streamOffset = 0L;
 
     @Override
     public String version() {
@@ -68,12 +69,11 @@ public class OssSourceTask extends SourceTask {
         // Connector
         topic = props.get(OssSourceConnector.TOPIC_CONFIG);
         batchSize = Integer.parseInt(props.get(OssSourceConnector.TASK_BATCH_SIZE_CONFIG));
+        client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
     }
 
     @Override
     public List<SourceRecord> poll() {
-
-        OSS client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
         if (stream == null) {
             try {
@@ -81,7 +81,6 @@ public class OssSourceTask extends SourceTask {
                 OSSObject object = client.getObject(bucketName, ossKey);
                 log.info("Contest-Type: " + object.getObjectMetadata().getContentType());
                 stream = object.getObjectContent();
-                streamOffset = 0L;
                 reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
                 ArrayList<SourceRecord> records = null;
 
