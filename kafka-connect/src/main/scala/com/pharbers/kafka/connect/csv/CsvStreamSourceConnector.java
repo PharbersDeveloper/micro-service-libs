@@ -42,7 +42,7 @@ public class CsvStreamSourceConnector extends SourceConnector {
             .define(CsvInputConfigKeys.SEPARATOR_CONFIG, Type.STRING, ",", Importance.MEDIUM, "csv分隔符, 默认为,")
             .define(CsvInputConfigKeys.CHARSET_CONFIG, Type.STRING, "UTF-8", Importance.MEDIUM, "编码格式,大写, 默认为UTF-8")
             .define(CsvInputConfigKeys.TITLE_CONFIG, Type.STRING, "", Importance.LOW, "csv title，使用与内容一致的分隔符分割，默认读取第一行为title")
-            .define(CsvInputConfigKeys.TITLE_CONFIG, Type.STRING, new ArrayList<Map<String, String>>(), Importance.LOW, "轻量转换");
+            .define(CsvInputConfigKeys.TRANSFORM_CONFIG, Type.STRING, "", Importance.LOW, "轻量转换");
 
     private String filename;
     private String topic;
