@@ -212,10 +212,10 @@ public class CsvStreamSourceTask extends SourceTask {
     private String transform(String line){
         Iterator<String> rows = Arrays.asList(line.split(separator)).iterator();
         Iterator<String> titles = Arrays.asList(title.split(separator)).iterator();
-        List<String[]> rowWithTitles = new ArrayList<>();
+        List<String[]> rowWithTitle = new ArrayList<>();
         while (rows.hasNext() && titles.hasNext()){
-            String[] a = {rows.next(), titles.next()};
-            rowWithTitles.add(a);
+            String[] a = {titles.next(), rows.next()};
+            rowWithTitle.add(a);
         }
 
         return line;
