@@ -1,95 +1,86 @@
-package com.pharbers.kafka.connect.oss;
+package com.pharbers.kafka.connect.csv;
 
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.OSSObject;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * @author jeorch
- * @ProjectName micro-service-libs
- * @ClassName OssSourceTask
- * @date 19-7-1下午7:46
- * @Description: TODO
+ * 功能描述
+ *
+ * @author dcs
+ * @version 0.0
+ * @tparam T 构造泛型参数
+ * @note 一些值得注意的地方
+ * @since 2019/07/02 10:35
  */
-public class OssSourceTask extends SourceTask {
-
-    private static final Logger log = LoggerFactory.getLogger(OssSourceTask.class);
-    public static final String FILENAME_FIELD = "ossKey";
-    public  static final String POSITION_FIELD = "position";
+public class CsvStreamSourceTask extends SourceTask {
+    private static final Logger log = LoggerFactory.getLogger(CsvStreamSourceConnector.class);
+    private static final String FILENAME_FIELD = "filename";
+    private static final String POSITION_FIELD = "position";
     private static final Schema VALUE_SCHEMA = Schema.STRING_SCHEMA;
 
-    private String endpoint;
-    private String accessKeyId;
-    private String accessKeySecret;
-    private String bucketName;
-    private String ossKey;
     private InputStream stream;
     private BufferedReader reader = null;
+    //TODO： 一行如果超过1024会有问题
     private char[] buffer = new char[1024];
-    private int offset = 0;
-    private String topic = null;
-    private int batchSize = OssSourceConnector.DEFAULT_TASK_BATCH_SIZE;
 
+    private int batchSize = CsvStreamSourceConnector.DEFAULT_TASK_BATCH_SIZE;
+    private String filename;
+    private String topic = null;
+    private String separator;
+    private String charset;
+    private String title;
+
+    //并发会怎么样
+    private int offset = 0;
     private Long streamOffset;
 
     @Override
     public String version() {
-        return new OssSourceConnector().version();
+        return new CsvStreamSourceConnector().version();
     }
 
     @Override
     public void start(Map<String, String> props) {
-        endpoint = props.get(OssSourceConnector.ENDPOINT_CONFIG);
-        accessKeyId = props.get(OssSourceConnector.ACCESS_KEY_ID_CONFIG);
-        accessKeySecret = props.get(OssSourceConnector.ACCESS_KEY_SECRET_CONFIG);
-        bucketName = props.get(OssSourceConnector.BUCKET_NAME_CONFIG);
-        ossKey = props.get(OssSourceConnector.KEY_CONFIG);
-        if (ossKey == null || ossKey.isEmpty()) {
+        charset = props.get(CsvInputConfigKeys.CHARSET_CONFIG);
+        filename = props.get(CsvInputConfigKeys.FILE_CONFIG);
+        if (filename == null || filename.isEmpty()) {
             stream = System.in;
             // Tracking offset for stdin doesn't make sense
             streamOffset = null;
-            reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            reader = new BufferedReader(new InputStreamReader(stream, Charset.forName(charset)));
         }
         // Missing topic or parsing error is not possible because we've parsed the config in the
         // Connector
-        topic = props.get(OssSourceConnector.TOPIC_CONFIG);
-        batchSize = Integer.parseInt(props.get(OssSourceConnector.TASK_BATCH_SIZE_CONFIG));
+        topic = props.get(CsvInputConfigKeys.TOPIC_CONFIG);
+        batchSize = Integer.parseInt(props.get(CsvInputConfigKeys.TASK_BATCH_SIZE_CONFIG));
+        separator = props.get(CsvInputConfigKeys.SEPARATOR_CONFIG);
+        title = props.get(CsvInputConfigKeys.TITLE_CONFIG);
     }
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-
-        OSS client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-
         if (stream == null) {
             try {
-                log.info("Polling object from oss");
-                OSSObject object = client.getObject(bucketName, ossKey);
-                log.info("Contest-Type: " + object.getObjectMetadata().getContentType());
-                stream = object.getObjectContent();
-
-                Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(FILENAME_FIELD, ossKey));
+                stream = Files.newInputStream(Paths.get(filename));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName(charset)));
+                Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(FILENAME_FIELD, filename));
+                // offset 按字节ship， 对于整行读取的方式可能有bug
+                //offset记录行的偏移
                 if (offset != null) {
                     Object lastRecordedOffset = offset.get(POSITION_FIELD);
                     if (lastRecordedOffset != null && !(lastRecordedOffset instanceof Long))
@@ -97,14 +88,17 @@ public class OssSourceTask extends SourceTask {
                     if (lastRecordedOffset != null) {
                         log.debug("Found previous offset, trying to skip to file offset {}", lastRecordedOffset);
                         long skipLeft = (Long) lastRecordedOffset;
-                        while (skipLeft > 0) {
-                            try {
-                                long skipped = stream.skip(skipLeft);
-                                skipLeft -= skipped;
-                            } catch (IOException e) {
-                                log.error("Error while trying to seek to previous offset in file {}: ", ossKey, e);
-                                throw new ConnectException(e);
-                            }
+//                        while (skipLeft > 0) {
+//                            try {
+//                                long skipped = stream.skip(skipLeft);
+//                                skipLeft -= skipped;
+//                            } catch (IOException e) {
+//                                log.error("Error while trying to seek to previous offset in file {}: ", filename, e);
+//                                throw new ConnectException(e);
+//                            }
+//                        }
+                        for (int i = 0; i < skipLeft; i++){
+                            bufferedReader.readLine();
                         }
                         log.debug("Skipped to offset {}", lastRecordedOffset);
                     }
@@ -112,25 +106,17 @@ public class OssSourceTask extends SourceTask {
                 } else {
                     streamOffset = 0L;
                 }
-                reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                reader = bufferedReader;
                 log.debug("Opened {} for reading", logFilename());
-            } catch (OSSException oe) {
-                System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                        + "but was rejected with an error response for some reason.");
-                System.out.println("Error Message: " + oe.getErrorCode());
-                System.out.println("Error Code:       " + oe.getErrorCode());
-                System.out.println("Request ID:      " + oe.getRequestId());
-                System.out.println("Host ID:           " + oe.getHostId());
-            } catch (ClientException ce) {
-                System.out.println("Caught an ClientException, which means the client encountered "
-                        + "a serious internal problem while trying to communicate with OSS, "
-                        + "such as not being able to access the network.");
-                System.out.println("Error Message: " + ce.getMessage());
-            } finally {
-                /*
-                 * Do not forget to shut down the client finally to release all allocated resources.
-                 */
-                client.shutdown();
+            } catch (NoSuchFileException e) {
+                log.warn("Couldn't find file {} for FileStreamSourceTask, sleeping to wait for it to be created", logFilename());
+                synchronized (this) {
+                    this.wait(1000);
+                }
+                return null;
+            } catch (IOException e) {
+                log.error("Error while trying to open file {}: ", filename, e);
+                throw new ConnectException(e);
             }
         }
 
@@ -167,8 +153,8 @@ public class OssSourceTask extends SourceTask {
                             log.trace("Read a line from {}", logFilename());
                             if (records == null)
                                 records = new ArrayList<>();
-                            records.add(new SourceRecord(offsetKey(ossKey), offsetValue(streamOffset), topic, null,
-                                    null, null, VALUE_SCHEMA, line, System.currentTimeMillis()));
+                            records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
+                                    null, null, VALUE_SCHEMA, transform(line), System.currentTimeMillis()));
 
                             if (records.size() >= batchSize) {
                                 return records;
@@ -214,11 +200,25 @@ public class OssSourceTask extends SourceTask {
             System.arraycopy(buffer, newStart, buffer, 0, buffer.length - newStart);
             offset = offset - newStart;
             if (streamOffset != null)
-                streamOffset += newStart;
+//                streamOffset += newStart;
+                //记录行偏移
+                streamOffset ++;
             return result;
         } else {
             return null;
         }
+    }
+
+    private String transform(String line){
+        Iterator<String> rows = Arrays.asList(line.split(separator)).iterator();
+        Iterator<String> titles = Arrays.asList(title.split(separator)).iterator();
+        List<String[]> rowWithTitles = new ArrayList<>();
+        while (rows.hasNext() && titles.hasNext()){
+            String[] a = {rows.next(), titles.next()};
+            rowWithTitles.add(a);
+        }
+
+        return line;
     }
 
     @Override
@@ -246,7 +246,6 @@ public class OssSourceTask extends SourceTask {
     }
 
     private String logFilename() {
-        return ossKey == null ? "stdin" : ossKey;
+        return filename == null ? "stdin" : filename;
     }
-
 }
