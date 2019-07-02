@@ -44,6 +44,7 @@ public class CsvStreamSourceTask extends SourceTask {
     private String separator;
     private String charset;
     private String title;
+    private String transforms;
 
     //并发会怎么样
     private int offset = 0;
@@ -70,6 +71,8 @@ public class CsvStreamSourceTask extends SourceTask {
         batchSize = Integer.parseInt(props.get(CsvInputConfigKeys.TASK_BATCH_SIZE_CONFIG));
         separator = props.get(CsvInputConfigKeys.SEPARATOR_CONFIG);
         title = props.get(CsvInputConfigKeys.TITLE_CONFIG);
+        transforms = props.get(CsvInputConfigKeys.TRANSFORM_CONFIG);
+        log.debug("*************transforms***************", transforms);
     }
 
     @Override

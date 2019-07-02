@@ -1,7 +1,5 @@
 package com.pharbers.kafka.connect.csv.transform;
 
-import com.sun.deploy.util.StringUtils;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +21,6 @@ public class CsvSelectColumnTransform implements CsvRowTransformInterface {
     public String transform(List<String[]> rowWithTitle, Map<String, String> pop) {
         List<String> selectTitles = Arrays.asList(pop.get(SELECT_TITLES_KEY).split(","));
         List<String> row = rowWithTitle.stream().filter(x -> selectTitles.contains(x[0])).map(x -> x[1]).collect(Collectors.toList());
-        return StringUtils.join(row, "");
+        return String.join("",row);
     }
 }

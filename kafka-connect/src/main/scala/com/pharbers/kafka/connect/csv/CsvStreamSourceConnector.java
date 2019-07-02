@@ -42,7 +42,7 @@ public class CsvStreamSourceConnector extends SourceConnector {
             .define(CsvInputConfigKeys.SEPARATOR_CONFIG, Type.STRING, ",", Importance.MEDIUM, "csv分隔符, 默认为,")
             .define(CsvInputConfigKeys.CHARSET_CONFIG, Type.STRING, "UTF-8", Importance.MEDIUM, "编码格式,大写, 默认为UTF-8")
             .define(CsvInputConfigKeys.TITLE_CONFIG, Type.STRING, "", Importance.LOW, "csv title，使用与内容一致的分隔符分割，默认读取第一行为title")
-            .define(CsvInputConfigKeys.TITLE_CONFIG, Type.CLASS, "", Importance.LOW, "csv title，使用与内容一致的分隔符分割，默认读取第一行为title");;
+            .define(CsvInputConfigKeys.TITLE_CONFIG, Type.STRING, new ArrayList<Map<String, String>>(), Importance.LOW, "轻量转换");
 
     private String filename;
     private String topic;
@@ -50,7 +50,8 @@ public class CsvStreamSourceConnector extends SourceConnector {
     private String separator;
     private String charset;
     private String title;
-
+//    private List<Map<String, String>> transforms;
+    private String transforms;
 
     @Override
     public String version() {
@@ -69,6 +70,8 @@ public class CsvStreamSourceConnector extends SourceConnector {
         batchSize = parsedConfig.getInt(CsvInputConfigKeys.TASK_BATCH_SIZE_CONFIG);
         separator = parsedConfig.getString(CsvInputConfigKeys.SEPARATOR_CONFIG);
         charset = parsedConfig.getString(CsvInputConfigKeys.CHARSET_CONFIG);
+//        transforms = parsedConfig.getConfiguredInstances(CsvInputConfigKeys.TITLE_CONFIG);
+        transforms = parsedConfig.getString(CsvInputConfigKeys.TITLE_CONFIG);
         if(parsedConfig.getString(CsvInputConfigKeys.TITLE_CONFIG).equals("")){
             try(InputStream stream = Files.newInputStream(Paths.get(filename))) {
                 title = new BufferedReader(new InputStreamReader(stream, Charset.forName(charset))).readLine();
@@ -97,6 +100,7 @@ public class CsvStreamSourceConnector extends SourceConnector {
         config.put(CsvInputConfigKeys.SEPARATOR_CONFIG, separator);
         config.put(CsvInputConfigKeys.CHARSET_CONFIG, charset);
         config.put(CsvInputConfigKeys.TITLE_CONFIG, title);
+        config.put(CsvInputConfigKeys.TRANSFORM_CONFIG, transforms);
         configs.add(config);
         return configs;
     }
