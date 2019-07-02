@@ -16,4 +16,5 @@ class CsvInputConfigKeys {
     static final String SEPARATOR_CONFIG = "separator";
     static final String CHARSET_CONFIG = "charset";
     static final String TITLE_CONFIG = "title";
+    static final String TRANSFORM_CONFIG = "transforms";
 }
