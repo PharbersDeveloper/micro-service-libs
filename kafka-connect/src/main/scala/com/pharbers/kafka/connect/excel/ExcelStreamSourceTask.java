@@ -5,10 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
@@ -43,10 +40,12 @@ public class ExcelStreamSourceTask extends SourceTask {
     private String filename;
     private InputStream stream;
     private Workbook reader = null;
+    private Iterator<Row> rowsIterator = null;
     private String topic = null;
     private int batchSize = ExcelStreamSourceConnector.DEFAULT_TASK_BATCH_SIZE;
 
     private Long streamOffset;
+    private long offsetRow = 0L;
 
     @Override
     public String version() {
@@ -72,50 +71,64 @@ public class ExcelStreamSourceTask extends SourceTask {
     public List<SourceRecord> poll() throws InterruptedException {
         log.info("begin poll" + logFilename());
         log.info("batchSize" + batchSize);
-        try {
-            stream = Files.newInputStream(Paths.get(filename));
-            log.debug("Opened {} for reading", logFilename());
-        } catch (NoSuchFileException e) {
-            log.warn("Couldn't find file {} for FileStreamSourceTask, sleeping to wait for it to be created", logFilename());
-            synchronized (this) {
-                this.wait(1000);
+        synchronized (this) {
+            if (stream == null){
+                try {
+                    stream = Files.newInputStream(Paths.get(filename));
+                    log.debug("Opened {} for reading", logFilename());
+                } catch (NoSuchFileException e) {
+                    log.warn("Couldn't find file {} for FileStreamSourceTask, sleeping to wait for it to be created", logFilename());
+                    synchronized (this) {
+                        this.wait(1000);
+                    }
+                    return null;
+                } catch (IOException e) {
+                    log.error("Error while trying to open file {}: ", filename, e);
+                    throw new ConnectException(e);
+                }
+                reader = StreamingReader.builder().open(stream);
+                Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(FILENAME_FIELD, filename));
+                if (offset != null) {
+                    Object lastRecordedOffset = offset.get(POSITION_FIELD);
+                    if (lastRecordedOffset != null && !(lastRecordedOffset instanceof Long))
+                        throw new ConnectException("Offset position is the incorrect type");
+                    streamOffset = (lastRecordedOffset != null) ? (Long) lastRecordedOffset : 0L;
+                } else {
+                    streamOffset = 0L;
+                }
+                log.info("offset:" + streamOffset);
+                //todo: 根据配置读取表
+                Sheet sheet = reader.getSheetAt(0);
+                rowsIterator =  sheet.iterator();
+                while (rowsIterator.hasNext() && streamOffset > 0){
+                    rowsIterator.next();
+                }
             }
-            return null;
-        } catch (IOException e) {
-            log.error("Error while trying to open file {}: ", filename, e);
-            throw new ConnectException(e);
         }
-        reader = StreamingReader.builder().open(stream);
-        Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(FILENAME_FIELD, filename));
-        if (offset != null) {
-            Object lastRecordedOffset = offset.get(POSITION_FIELD);
-            if (lastRecordedOffset != null && !(lastRecordedOffset instanceof Long))
-                throw new ConnectException("Offset position is the incorrect type");
-            streamOffset = (lastRecordedOffset != null) ? (Long) lastRecordedOffset : 0L;
-        } else {
-            streamOffset = 0L;
-        }
-        log.info("offset:" + streamOffset);
+
         // Unfortunately we can't just use readLine() because it blocks in an uninterruptible way.
         // Instead we have to manage splitting lines ourselves, using simple backoff when no new data
         // is available.
         try {
-            final Workbook readerCopy;
-            synchronized (this) {
-                readerCopy = reader;
-            }
-            if (readerCopy == null)
-                return null;
-
+//            final Workbook readerCopy;
+//            synchronized (this) {
+//                readerCopy = reader;
+//            }
+//            if (readerCopy == null)
+//                return null;
             ArrayList<SourceRecord> records = null;
 
-            long offsetRow = streamOffset;
-            Sheet sheet = readerCopy.getSheetAt(0);
-            for (Row r : sheet) {
-                if (offsetRow > 0) {
-                    offsetRow--;
-                    continue;
+            while (true){
+                synchronized (this) {
+                    if (!rowsIterator.hasNext()){
+                        synchronized (this) {
+                            log.info("读取完成");
+                            this.wait(1000);
+                        }
+                        break;
+                    }
                 }
+                Row r = rowsIterator.next();
                 StringBuilder res = new StringBuilder();
                 for (Cell c : r) {
                     res.append(c.getStringCellValue()).append(",");
@@ -125,7 +138,9 @@ public class ExcelStreamSourceTask extends SourceTask {
                     log.trace("Read a line from {}", logFilename());
                     if (records == null)
                         records = new ArrayList<>();
-                    streamOffset++;
+                    synchronized (this) {
+                        streamOffset++;
+                    }
                     records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
                             null, null, VALUE_SCHEMA, res, System.currentTimeMillis()));
 
@@ -139,15 +154,8 @@ public class ExcelStreamSourceTask extends SourceTask {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(baos));
             String exception = baos.toString();
-            log.error("ParseException!!!!" + exception);
+            log.error("xml读取错误，检查文件格式" + exception);
             throw e;
-        } finally {
-            try {
-                reader.close();
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -159,6 +167,7 @@ public class ExcelStreamSourceTask extends SourceTask {
             try {
                 if (stream != null && stream != System.in) {
                     stream.close();
+                    reader.close();
                     log.trace("Closed input stream");
                 }
             } catch (IOException e) {
