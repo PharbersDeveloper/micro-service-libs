@@ -72,7 +72,7 @@ public class ExcelStreamSourceTask extends SourceTask {
         log.info("begin poll" + logFilename());
         log.info("batchSize" + batchSize);
         synchronized (this) {
-            if (stream == null){
+            if (stream == null) {
                 try {
                     stream = Files.newInputStream(Paths.get(filename));
                     log.debug("Opened {} for reading", logFilename());
@@ -99,8 +99,8 @@ public class ExcelStreamSourceTask extends SourceTask {
                 log.info("offset:" + streamOffset);
                 //todo: 根据配置读取表
                 Sheet sheet = reader.getSheetAt(0);
-                rowsIterator =  sheet.iterator();
-                while (rowsIterator.hasNext() && streamOffset > 0){
+                rowsIterator = sheet.iterator();
+                while (rowsIterator.hasNext() && streamOffset > 0) {
                     rowsIterator.next();
                 }
             }
@@ -110,21 +110,13 @@ public class ExcelStreamSourceTask extends SourceTask {
         // Instead we have to manage splitting lines ourselves, using simple backoff when no new data
         // is available.
         try {
-//            final Workbook readerCopy;
-//            synchronized (this) {
-//                readerCopy = reader;
-//            }
-//            if (readerCopy == null)
-//                return null;
             ArrayList<SourceRecord> records = null;
 
-            while (true){
+            while (true) {
                 synchronized (this) {
-                    if (!rowsIterator.hasNext()){
-                        synchronized (this) {
-                            log.info("读取完成");
-                            this.wait(1000);
-                        }
+                    if (!rowsIterator.hasNext()) {
+                        log.info("读取完成");
+                        this.wait(1000);
                         break;
                     }
                 }
