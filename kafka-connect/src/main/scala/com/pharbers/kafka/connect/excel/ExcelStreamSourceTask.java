@@ -134,7 +134,7 @@ public class ExcelStreamSourceTask extends SourceTask {
                         streamOffset++;
                     }
                     records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
-                            null, null, VALUE_SCHEMA, res, System.currentTimeMillis()));
+                            null, null, VALUE_SCHEMA, res.toString(), System.currentTimeMillis()));
 
                     if (records.size() >= batchSize) {
                         return records;
