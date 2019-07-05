@@ -10,9 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -57,8 +55,8 @@ public class CsvStreamSourceTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
-        charset = props.get(CsvInputConfigKeys.CHARSET_CONFIG);
-        filename = props.get(CsvInputConfigKeys.FILE_CONFIG);
+        charset = props.get(InputConfigKeys.CHARSET_CONFIG);
+        filename = props.get(InputConfigKeys.FILE_CONFIG);
         if (filename == null || filename.isEmpty()) {
             stream = System.in;
             // Tracking offset for stdin doesn't make sense
@@ -67,11 +65,11 @@ public class CsvStreamSourceTask extends SourceTask {
         }
         // Missing topic or parsing error is not possible because we've parsed the config in the
         // Connector
-        topic = props.get(CsvInputConfigKeys.TOPIC_CONFIG);
-        batchSize = Integer.parseInt(props.get(CsvInputConfigKeys.TASK_BATCH_SIZE_CONFIG));
-        separator = props.get(CsvInputConfigKeys.SEPARATOR_CONFIG);
-        title = props.get(CsvInputConfigKeys.TITLE_CONFIG);
-        transforms = props.get(CsvInputConfigKeys.TRANSFORM_CONFIG);
+        topic = props.get(InputConfigKeys.TOPIC_CONFIG);
+        batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
+        separator = props.get(InputConfigKeys.SEPARATOR_CONFIG);
+        title = props.get(InputConfigKeys.TITLE_CONFIG);
+        transforms = props.get(InputConfigKeys.TRANSFORM_CONFIG);
         log.debug("*************transforms***************", transforms);
     }
 

@@ -8,12 +8,14 @@ import java.util.*;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
+import com.pharbers.kafka.connect.csv.InputConfigKeys;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -34,22 +36,24 @@ public class ExcelStreamSourceTask extends SourceTask {
     public static final String FILENAME_FIELD = "filename";
     public static final String POSITION_FIELD = "position";
 
-    //TODO: 改成可配置化的传参，可筛选列的形式。
-    public static final String[] LIST_TITLE = {"YEAR", "MONTH", "HOSP_ID", "MOLE_NAME", "PRODUCT_NAME",
-            "PACK_DES", "PACK_NUMBER", "VALUE", "STANDARD_UNIT", "DOSAGE", "DELIVERY_WAY", "CORP_NAME"};
+    private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct();
 
-    private SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct();
-    private Schema VALUE_SCHEMA = null;
-
+    //外部参数
     private String filename;
-    private InputStream stream;
     private Workbook reader = null;
-    private Iterator<Row> rowsIterator = null;
     private String topic = null;
     private int batchSize = ExcelStreamSourceConnector.DEFAULT_TASK_BATCH_SIZE;
+    private boolean autoTitle;
+    private List<String> titleList = new ArrayList<>();
 
+    //线程共享变量，应该只赋值一次
+    private Schema VALUE_SCHEMA;
+    private InputStream stream;
+    private Iterator<Row> rowsIterator;
+
+
+    //线程共享会多次赋值变量
     private Long streamOffset;
-    private long offsetRow = 0L;
 
     @Override
     public String version() {
@@ -58,14 +62,11 @@ public class ExcelStreamSourceTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
-        filename = props.get(ExcelStreamSourceConnector.FILE_CONFIG);
-        topic = props.get(ExcelStreamSourceConnector.TOPIC_CONFIG);
-        batchSize = Integer.parseInt(props.get(ExcelStreamSourceConnector.TASK_BATCH_SIZE_CONFIG));
-        for (int i = 0; i < LIST_TITLE.length; i++) {
-            VALUE_SCHEMA_BUILDER.field(LIST_TITLE[i], Schema.STRING_SCHEMA);
-        }
-        VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
-
+        filename = props.get(InputConfigKeys.FILE_CONFIG);
+        topic = props.get(InputConfigKeys.TOPIC_CONFIG);
+        batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
+        autoTitle = Boolean.parseBoolean(props.get(InputConfigKeys.AUTO_TITLE_CONFIG));
+        titleList = Arrays.asList(props.get(InputConfigKeys.TITLE_CONFIG).split(","));
     }
 
     @Override
@@ -99,8 +100,22 @@ public class ExcelStreamSourceTask extends SourceTask {
                 }
                 log.info("offset:" + streamOffset);
                 Sheet sheet = reader.getSheetAt(0);
-                //todo: 根据配置读取表,不要第一行.
+                //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
                 rowsIterator =  sheet.iterator();
+                if(autoTitle && rowsIterator.hasNext()){
+                    Row titleRow = rowsIterator.next();
+                    for (Cell c : titleRow) {
+                        String value = c.getStringCellValue();
+                        titleList.add(value);
+                        VALUE_SCHEMA_BUILDER.field(value, Schema.STRING_SCHEMA);
+                    }
+                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
+                } else {
+                    for(String s : titleList){
+                        VALUE_SCHEMA_BUILDER.field(s, Schema.STRING_SCHEMA);
+                    }
+                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
+                }
                 while (rowsIterator.hasNext() && streamOffset > 0){
                     rowsIterator.next();
                 }
@@ -110,7 +125,7 @@ public class ExcelStreamSourceTask extends SourceTask {
         try {
             ArrayList<SourceRecord> records = null;
 
-            while (true) {
+            do {
                 synchronized (this) {
                     if (!rowsIterator.hasNext()) {
                         log.info("读取完成");
@@ -122,9 +137,10 @@ public class ExcelStreamSourceTask extends SourceTask {
                 Row r = rowsIterator.next();
 
                 Struct value = new Struct(VALUE_SCHEMA);
-                //TODO:做异常处理
-                for (int i = 0; i < LIST_TITLE.length; i++) {
-                    value.put(LIST_TITLE[i], r.getCell(i).getStringCellValue());
+
+                for (int i = 0; i < titleList.size(); i++) {
+                    String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
+                    value.put(titleList.get(i), v);
                 }
                 log.trace("Read a line from {}", logFilename());
                 if (records == null)
@@ -135,10 +151,7 @@ public class ExcelStreamSourceTask extends SourceTask {
                 records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
                         null, null, VALUE_SCHEMA, value, System.currentTimeMillis()));
 
-                if (records.size() >= batchSize) {
-                    return records;
-                }
-//                StringBuilder res = new StringBuilder();
+                //                StringBuilder res = new StringBuilder();
 //                for (Cell c : r) {
 //                    res.append(c.getStringCellValue()).append(",");
 //                }
@@ -157,7 +170,7 @@ public class ExcelStreamSourceTask extends SourceTask {
 //                        return records;
 //                    }
 //                }
-            }
+            } while (records.size() < batchSize);
             return records;
         } catch (ParseException e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
