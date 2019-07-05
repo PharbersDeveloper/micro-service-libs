@@ -66,7 +66,7 @@ public class ExcelStreamSourceTask extends SourceTask {
         topic = props.get(InputConfigKeys.TOPIC_CONFIG);
         batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
         autoTitle = Boolean.parseBoolean(props.get(InputConfigKeys.AUTO_TITLE_CONFIG));
-        titleList = Arrays.asList(props.get(InputConfigKeys.TITLE_CONFIG).split(","));
+        titleList = new ArrayList<>(Arrays.asList(props.get(InputConfigKeys.TITLE_CONFIG).split(",")));
     }
 
     @Override
@@ -103,6 +103,7 @@ public class ExcelStreamSourceTask extends SourceTask {
                 //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
                 rowsIterator =  sheet.iterator();
                 if(autoTitle && rowsIterator.hasNext()){
+                    titleList.clear();
                     Row titleRow = rowsIterator.next();
                     for (Cell c : titleRow) {
                         String value = c.getStringCellValue();
