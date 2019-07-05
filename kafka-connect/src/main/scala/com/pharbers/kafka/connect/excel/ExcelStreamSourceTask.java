@@ -1,7 +1,6 @@
 package com.pharbers.kafka.connect.excel;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -10,17 +9,16 @@ import java.util.*;
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.xml.stream.XMLStreamException;
 
 /**
  * 功能描述
@@ -35,7 +33,13 @@ public class ExcelStreamSourceTask extends SourceTask {
     private static final Logger log = LoggerFactory.getLogger(ExcelStreamSourceTask.class);
     public static final String FILENAME_FIELD = "filename";
     public static final String POSITION_FIELD = "position";
-    private static final Schema VALUE_SCHEMA = Schema.STRING_SCHEMA;
+
+    //TODO: 改成可配置化的传参，可筛选列的形式。
+    public static final String[] LIST_TITLE = {"YEAR", "MONTH", "HOSP_ID", "MOLE_NAME", "PRODUCT_NAME",
+            "PACK_DES", "PACK_NUMBER", "VALUE", "STANDARD_UNIT", "DOSAGE", "DELIVERY_WAY", "CORP_NAME"};
+
+    private SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct();
+    private Schema VALUE_SCHEMA = null;
 
     private String filename;
     private InputStream stream;
@@ -55,16 +59,13 @@ public class ExcelStreamSourceTask extends SourceTask {
     @Override
     public void start(Map<String, String> props) {
         filename = props.get(ExcelStreamSourceConnector.FILE_CONFIG);
-//        if (filename == null || filename.isEmpty()) {
-//            stream = System.in;
-//            // Tracking offset for stdin doesn't make sense
-//            streamOffset = null;
-//            reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-//        }
-        // Missing topic or parsing error is not possible because we've parsed the config in the
-        // Connector
         topic = props.get(ExcelStreamSourceConnector.TOPIC_CONFIG);
         batchSize = Integer.parseInt(props.get(ExcelStreamSourceConnector.TASK_BATCH_SIZE_CONFIG));
+        for (int i = 0; i < LIST_TITLE.length; i++) {
+            VALUE_SCHEMA_BUILDER.field(LIST_TITLE[i], Schema.STRING_SCHEMA);
+        }
+        VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
+
     }
 
     @Override
@@ -97,18 +98,15 @@ public class ExcelStreamSourceTask extends SourceTask {
                     streamOffset = 0L;
                 }
                 log.info("offset:" + streamOffset);
-                //todo: 根据配置读取表
                 Sheet sheet = reader.getSheetAt(0);
-                rowsIterator = sheet.iterator();
-                while (rowsIterator.hasNext() && streamOffset > 0) {
+                //todo: 根据配置读取表,不要第一行.
+                rowsIterator =  sheet.iterator();
+                while (rowsIterator.hasNext() && streamOffset > 0){
                     rowsIterator.next();
                 }
             }
         }
 
-        // Unfortunately we can't just use readLine() because it blocks in an uninterruptible way.
-        // Instead we have to manage splitting lines ourselves, using simple backoff when no new data
-        // is available.
         try {
             ArrayList<SourceRecord> records = null;
 
@@ -120,26 +118,45 @@ public class ExcelStreamSourceTask extends SourceTask {
                         break;
                     }
                 }
-                Row r = rowsIterator.next();
-                StringBuilder res = new StringBuilder();
-                for (Cell c : r) {
-                    res.append(c.getStringCellValue()).append(",");
-                }
-                if (res.length() > 1) {
-                    res.delete(res.length() - 1, res.length());
-                    log.trace("Read a line from {}", logFilename());
-                    if (records == null)
-                        records = new ArrayList<>();
-                    synchronized (this) {
-                        streamOffset++;
-                    }
-                    records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
-                            null, null, VALUE_SCHEMA, res.toString(), System.currentTimeMillis()));
 
-                    if (records.size() >= batchSize) {
-                        return records;
-                    }
+                Row r = rowsIterator.next();
+
+                Struct value = new Struct(VALUE_SCHEMA);
+                //TODO:做异常处理
+                for (int i = 0; i < LIST_TITLE.length; i++) {
+                    value.put(LIST_TITLE[i], r.getCell(i).getStringCellValue());
                 }
+                log.trace("Read a line from {}", logFilename());
+                if (records == null)
+                    records = new ArrayList<>();
+                synchronized (this) {
+                    streamOffset++;
+                }
+                records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
+                        null, null, VALUE_SCHEMA, value, System.currentTimeMillis()));
+
+                if (records.size() >= batchSize) {
+                    return records;
+                }
+//                StringBuilder res = new StringBuilder();
+//                for (Cell c : r) {
+//                    res.append(c.getStringCellValue()).append(",");
+//                }
+//                if (res.length() > 1) {
+//                    res.delete(res.length() - 1, res.length());
+//                    log.trace("Read a line from {}", logFilename());
+//                    if (records == null)
+//                        records = new ArrayList<>();
+//                    synchronized (this) {
+//                        streamOffset++;
+//                    }
+//                    records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
+//                            null, null, VALUE_SCHEMA, res, System.currentTimeMillis()));
+//
+//                    if (records.size() >= batchSize) {
+//                        return records;
+//                    }
+//                }
             }
             return records;
         } catch (ParseException e) {
