@@ -39,6 +39,7 @@ public class ExcelStreamSourceTask extends SourceTask {
     private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct();
 
     //外部参数
+    private String jobId;
     private String filename;
     private Workbook reader = null;
     private String topic = null;
@@ -48,6 +49,7 @@ public class ExcelStreamSourceTask extends SourceTask {
 
     //线程共享变量，应该只赋值一次
     private Schema VALUE_SCHEMA;
+    private final Schema KEY_SCHEMA = Schema.STRING_SCHEMA;
     private InputStream stream;
     private Iterator<Row> rowsIterator;
 
@@ -62,6 +64,7 @@ public class ExcelStreamSourceTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
+        jobId = props.get(InputConfigKeys.JOB_CONFIG);
         filename = props.get(InputConfigKeys.FILE_CONFIG);
         topic = props.get(InputConfigKeys.TOPIC_CONFIG);
         batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
@@ -150,7 +153,7 @@ public class ExcelStreamSourceTask extends SourceTask {
                     streamOffset++;
                 }
                 records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
-                        null, null, VALUE_SCHEMA, value, System.currentTimeMillis()));
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis()));
 
                 //                StringBuilder res = new StringBuilder();
 //                for (Cell c : r) {

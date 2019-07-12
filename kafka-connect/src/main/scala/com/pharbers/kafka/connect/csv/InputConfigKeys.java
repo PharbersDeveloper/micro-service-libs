@@ -10,6 +10,7 @@ package com.pharbers.kafka.connect.csv;
  * @since 2019/07/02 10:33
  */
 public class InputConfigKeys {
+    public static final String JOB_CONFIG = "job";
     public static final String TOPIC_CONFIG = "topic";
     public static final String FILE_CONFIG = "file";
     public static final String TASK_BATCH_SIZE_CONFIG = "batch.size";

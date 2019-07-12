@@ -9,10 +9,8 @@ import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * 功能描述
@@ -34,8 +32,11 @@ public class ExcelStreamSourceConnector extends SourceConnector {
             .define(InputConfigKeys.TASK_BATCH_SIZE_CONFIG, Type.INT, DEFAULT_TASK_BATCH_SIZE, Importance.LOW,
                     "The maximum number of records the Source task can read from file one time")
             .define(InputConfigKeys.AUTO_TITLE_CONFIG, Type.BOOLEAN, true, Importance.LOW, "是否使用第一行为标题")
-            .define(InputConfigKeys.TITLE_CONFIG, Type.LIST, new ArrayList<String>(), Importance.LOW, "配置title， autoTitle为false才能生效");
+            .define(InputConfigKeys.TITLE_CONFIG, Type.LIST, new ArrayList<String>(), Importance.LOW, "配置title， autoTitle为false才能生效")
+            .define(InputConfigKeys.JOB_CONFIG, Type.STRING,  UUID.randomUUID().toString(), Importance.HIGH, "配置job id");
 
+
+    private String jobId;
     private String filename;
     private String topic;
     private int batchSize;
@@ -50,6 +51,7 @@ public class ExcelStreamSourceConnector extends SourceConnector {
     @Override
     public void start(Map<String, String> props) {
         AbstractConfig parsedConfig = new AbstractConfig(CONFIG_DEF, props);
+        jobId = parsedConfig.getString(InputConfigKeys.JOB_CONFIG);
         filename = parsedConfig.getString(InputConfigKeys.FILE_CONFIG);
         List<String> topics = parsedConfig.getList(InputConfigKeys.TOPIC_CONFIG);
         if (topics.size() != 1) {
@@ -71,6 +73,7 @@ public class ExcelStreamSourceConnector extends SourceConnector {
         ArrayList<Map<String, String>> configs = new ArrayList<>();
         // Only one input stream makes sense.
         Map<String, String> config = new HashMap<>();
+        config.put(InputConfigKeys.JOB_CONFIG, jobId);
         if (filename != null)
             config.put(InputConfigKeys.FILE_CONFIG, filename);
         config.put(InputConfigKeys.TOPIC_CONFIG, topic);
