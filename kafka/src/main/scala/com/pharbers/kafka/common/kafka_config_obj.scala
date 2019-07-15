@@ -14,7 +14,7 @@ object kafka_config_obj extends PharbersInjectModule {
     override val md = "broker":: "group" :: "topics" :: "acks" ::
         "keyDefaultSerializer" :: "valueDefaultSerializer" ::
         "keyDefaultDeserializer" :: "valueDefaultDeserializer" ::
-        "schemaRegistryUrl" ::
+        "schemaRegistryUrl" :: "specificAvroReader" ::
         "securityProtocol" :: "sslAlgorithm" ::
         "sslTruststoreLocation" :: "sslTruststorePassword" ::
         "sslKeystoreLocation" :: "sslKeystorePassword" ::
@@ -29,6 +29,7 @@ object kafka_config_obj extends PharbersInjectModule {
     lazy val keyDefaultDeserializer: String = config.mc.find(p => p._1 == "keyDefaultDeserializer").get._2.toString
     lazy val valueDefaultDeserializer: String = config.mc.find(p => p._1 == "valueDefaultDeserializer").get._2.toString
     lazy val schemaRegistryUrl: String = config.mc.find(p => p._1 == "schemaRegistryUrl").get._2.toString
+    lazy val specificAvroReader: String = config.mc.find(p => p._1 == "specificAvroReader").get._2.toString
     lazy val securityProtocol: String = config.mc.find(p => p._1 == "securityProtocol").get._2.toString
     lazy val sslAlgorithm: String = config.mc.find(p => p._1 == "sslAlgorithm").get._2.toString
     lazy val sslTruststoreLocation: String = config.mc.find(p => p._1 == "sslTruststoreLocation").get._2.toString

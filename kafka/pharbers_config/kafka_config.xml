@@ -9,6 +9,7 @@
         <valueDefaultSerializer value="io.confluent.kafka.serializers.KafkaAvroSerializer" />
         <valueDefaultDeserializer value="io.confluent.kafka.serializers.KafkaAvroDeserializer" />
         <schemaRegistryUrl value="http://59.110.31.50:8081" />
+        <specificAvroReader value="true" />
         <securityProtocol value="SSL" />
         <sslAlgorithm value=" " />
         <sslTruststoreLocation value="/home/jeorch/tools/kafka_2.11-1.1.0/config/secrets/kafka.broker1.truststore.jks" />
