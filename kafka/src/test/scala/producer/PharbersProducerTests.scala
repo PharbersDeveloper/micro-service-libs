@@ -39,7 +39,7 @@ class PharbersProducerTests extends FunSuite {
 
     test("PharbersKafkaProducer with avro use SpecificRecord") {
         val pkp = new PharbersKafkaProducer[String, RecordDemo]
-        val rd = new RecordDemo("004", "POLO")
+        val rd = new RecordDemo("005", "WOLO")
         val fu = pkp.produce("test6", "key", rd)
         println(fu.get(10, TimeUnit.SECONDS))
     }

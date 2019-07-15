@@ -1,10 +1,7 @@
 package consumer
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.pharbers.kafka.common.kafka_config_obj
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import com.pharbers.kafka.schema.RecordDemo
-import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.scalatest.FunSuite
 
@@ -27,8 +24,7 @@ class PharbersConsumerTests extends FunSuite {
     }
 
     test("PharbersKafkaConsumer with avro") {
-        //        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, Int.MaxValue)
-        val pkc = new PharbersKafkaConsumer[String, JsonNode](List("test6"), 1000, Int.MaxValue, myProcess)
+        val pkc = new PharbersKafkaConsumer[String, RecordDemo](List("test6"), 1000, Int.MaxValue, myProcess)
         val t = new Thread(pkc)
         t.start()
         Thread.sleep(50000)
@@ -37,7 +33,6 @@ class PharbersConsumerTests extends FunSuite {
     }
 
     def myProcess[K, V](record: ConsumerRecord[K, V]): Unit = {
-//        println("===myProcess>>>" + record.key() + ":" + new String(record.value().asInstanceOf[Array[Byte]]))
         println("===myProcess>>>" + record.key() + ":" + record.value())
     }
 

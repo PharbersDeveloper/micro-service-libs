@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "MonitorResponse",
+  "name": "MonitorRequest",
   "namespace": "com.pharbers.kafka.schema",
   "fields": [
     {
@@ -8,11 +8,7 @@
       "type": "string"
     },
     {
-      "name": "progress",
-      "type": "long"
-    },
-    {
-      "name": "error",
+      "name": "strategy",
       "type": "string"
     }
   ]
