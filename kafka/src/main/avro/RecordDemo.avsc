@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "RecordDemo",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    }
+  ]
+}

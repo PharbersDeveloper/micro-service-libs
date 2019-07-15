@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit
 import com.pharbers.kafka.producer.PharbersKafkaProducer
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericRecord}
+import com.pharbers.kafka.schema.RecordDemo
 import org.scalatest.FunSuite
 import scalaj.http.Http
 
@@ -23,7 +24,7 @@ class PharbersProducerTests extends FunSuite {
         println(fu.get(10, TimeUnit.SECONDS))
     }
 
-    test("PharbersKafkaProducer with avro") {
+    test("PharbersKafkaProducer with avro use GenericRecord") {
 
         val sche: Schema = Schema.parse(new File("pharbers_config/RecordDemo.avsc"))
         val gr: GenericRecord = new GenericData.Record(sche)
@@ -33,6 +34,13 @@ class PharbersProducerTests extends FunSuite {
         gr.put("name", "koko")
 
         val fu = pkp.produce("test6", "key", gr)
+        println(fu.get(10, TimeUnit.SECONDS))
+    }
+
+    test("PharbersKafkaProducer with avro use SpecificRecord") {
+        val pkp = new PharbersKafkaProducer[String, RecordDemo]
+        val rd = new RecordDemo("003", "LOLO")
+        val fu = pkp.produce("test6", "key", rd)
         println(fu.get(10, TimeUnit.SECONDS))
     }
 
