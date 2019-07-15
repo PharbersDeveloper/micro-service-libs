@@ -36,7 +36,7 @@ public class ExcelStreamSourceTask extends SourceTask {
     public static final String FILENAME_FIELD = "filename";
     public static final String POSITION_FIELD = "position";
 
-    private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct();
+    private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct().field("jobId", Schema.STRING_SCHEMA);
 
     //外部参数
     private String jobId;
