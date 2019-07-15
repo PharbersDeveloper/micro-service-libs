@@ -5,72 +5,14 @@
  */
 package com.pharbers.kafka.schema;
 
-import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
-import org.apache.avro.util.Utf8;
-import org.apache.avro.message.BinaryMessageEncoder;
-import org.apache.avro.message.BinaryMessageDecoder;
-import org.apache.avro.message.SchemaStore;
 
+@SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
   private static final long serialVersionUID = -2777046116480610921L;
   public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"RecordDemo\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
-
-  private static SpecificData MODEL$ = new SpecificData();
-
-  private static final BinaryMessageEncoder<RecordDemo> ENCODER =
-      new BinaryMessageEncoder<RecordDemo>(MODEL$, SCHEMA$);
-
-  private static final BinaryMessageDecoder<RecordDemo> DECODER =
-      new BinaryMessageDecoder<RecordDemo>(MODEL$, SCHEMA$);
-
-  /**
-   * Return the BinaryMessageEncoder instance used by this class.
-   * @return the message encoder used by this class
-   */
-  public static BinaryMessageEncoder<RecordDemo> getEncoder() {
-    return ENCODER;
-  }
-
-  /**
-   * Return the BinaryMessageDecoder instance used by this class.
-   * @return the message decoder used by this class
-   */
-  public static BinaryMessageDecoder<RecordDemo> getDecoder() {
-    return DECODER;
-  }
-
-  /**
-   * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
-   * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
-   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
-   */
-  public static BinaryMessageDecoder<RecordDemo> createDecoder(SchemaStore resolver) {
-    return new BinaryMessageDecoder<RecordDemo>(MODEL$, SCHEMA$, resolver);
-  }
-
-  /**
-   * Serializes this RecordDemo to a ByteBuffer.
-   * @return a buffer holding the serialized data for this instance
-   * @throws java.io.IOException if this instance could not be serialized
-   */
-  public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
-    return ENCODER.encode(this);
-  }
-
-  /**
-   * Deserializes a RecordDemo from a ByteBuffer.
-   * @param b a byte buffer holding serialized data for an instance of this class
-   * @return a RecordDemo instance decoded from the given buffer
-   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
-   */
-  public static RecordDemo fromByteBuffer(
-      java.nio.ByteBuffer b) throws java.io.IOException {
-    return DECODER.decode(b);
-  }
-
   @Deprecated public java.lang.CharSequence id;
   @Deprecated public java.lang.CharSequence name;
 
@@ -91,7 +33,6 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
     this.name = name;
   }
 
-  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
@@ -120,7 +61,6 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
     return id;
   }
 
-
   /**
    * Sets the value of the 'id' field.
    * @param value the value to set.
@@ -136,7 +76,6 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
   public java.lang.CharSequence getName() {
     return name;
   }
-
 
   /**
    * Sets the value of the 'name' field.
@@ -160,11 +99,7 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
    * @return A new RecordDemo RecordBuilder
    */
   public static com.pharbers.kafka.schema.RecordDemo.Builder newBuilder(com.pharbers.kafka.schema.RecordDemo.Builder other) {
-    if (other == null) {
-      return new com.pharbers.kafka.schema.RecordDemo.Builder();
-    } else {
-      return new com.pharbers.kafka.schema.RecordDemo.Builder(other);
-    }
+    return new com.pharbers.kafka.schema.RecordDemo.Builder(other);
   }
 
   /**
@@ -173,11 +108,7 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
    * @return A new RecordDemo RecordBuilder
    */
   public static com.pharbers.kafka.schema.RecordDemo.Builder newBuilder(com.pharbers.kafka.schema.RecordDemo other) {
-    if (other == null) {
-      return new com.pharbers.kafka.schema.RecordDemo.Builder();
-    } else {
-      return new com.pharbers.kafka.schema.RecordDemo.Builder(other);
-    }
+    return new com.pharbers.kafka.schema.RecordDemo.Builder(other);
   }
 
   /**
@@ -202,11 +133,11 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
       super(other);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
-        fieldSetFlags()[0] = other.fieldSetFlags()[0];
+        fieldSetFlags()[0] = true;
       }
       if (isValidValue(fields()[1], other.name)) {
         this.name = data().deepCopy(fields()[1].schema(), other.name);
-        fieldSetFlags()[1] = other.fieldSetFlags()[1];
+        fieldSetFlags()[1] = true;
       }
     }
 
@@ -215,7 +146,7 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
      * @param other The existing instance to copy.
      */
     private Builder(com.pharbers.kafka.schema.RecordDemo other) {
-      super(SCHEMA$);
+            super(SCHEMA$);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = true;
@@ -233,7 +164,6 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
     public java.lang.CharSequence getId() {
       return id;
     }
-
 
     /**
       * Sets the value of the 'id' field.
@@ -274,7 +204,6 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
       return name;
     }
 
-
     /**
       * Sets the value of the 'name' field.
       * @param value The value of 'name'.
@@ -307,84 +236,32 @@ public class RecordDemo extends org.apache.avro.specific.SpecificRecordBase impl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public RecordDemo build() {
       try {
         RecordDemo record = new RecordDemo();
         record.id = fieldSetFlags()[0] ? this.id : (java.lang.CharSequence) defaultValue(fields()[0]);
         record.name = fieldSetFlags()[1] ? this.name : (java.lang.CharSequence) defaultValue(fields()[1]);
         return record;
-      } catch (org.apache.avro.AvroMissingFieldException e) {
-        throw e;
-      } catch (java.lang.Exception e) {
+      } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static final org.apache.avro.io.DatumWriter<RecordDemo>
-    WRITER$ = (org.apache.avro.io.DatumWriter<RecordDemo>)MODEL$.createDatumWriter(SCHEMA$);
+  private static final org.apache.avro.io.DatumWriter
+    WRITER$ = new org.apache.avro.specific.SpecificDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
     throws java.io.IOException {
     WRITER$.write(this, SpecificData.getEncoder(out));
   }
 
-  @SuppressWarnings("unchecked")
-  private static final org.apache.avro.io.DatumReader<RecordDemo>
-    READER$ = (org.apache.avro.io.DatumReader<RecordDemo>)MODEL$.createDatumReader(SCHEMA$);
+  private static final org.apache.avro.io.DatumReader
+    READER$ = new org.apache.avro.specific.SpecificDatumReader(SCHEMA$);
 
   @Override public void readExternal(java.io.ObjectInput in)
     throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
-  @Override protected boolean hasCustomCoders() { return true; }
-
-  @Override public void customEncode(org.apache.avro.io.Encoder out)
-    throws java.io.IOException
-  {
-    out.writeString(this.id);
-
-    out.writeString(this.name);
-
-  }
-
-  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
-    throws java.io.IOException
-  {
-    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
-    if (fieldOrder == null) {
-      this.id = in.readString(this.id instanceof Utf8 ? (Utf8)this.id : null);
-
-      this.name = in.readString(this.name instanceof Utf8 ? (Utf8)this.name : null);
-
-    } else {
-      for (int i = 0; i < 2; i++) {
-        switch (fieldOrder[i].pos()) {
-        case 0:
-          this.id = in.readString(this.id instanceof Utf8 ? (Utf8)this.id : null);
-          break;
-
-        case 1:
-          this.name = in.readString(this.name instanceof Utf8 ? (Utf8)this.name : null);
-          break;
-
-        default:
-          throw new java.io.IOException("Corrupt ResolvingDecoder.");
-        }
-      }
-    }
-  }
 }
-
-
-
-
-
-
-
-
-
-
