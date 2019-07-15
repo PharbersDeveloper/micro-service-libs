@@ -141,7 +141,7 @@ public class ExcelStreamSourceTask extends SourceTask {
                 Row r = rowsIterator.next();
 
                 Struct value = new Struct(VALUE_SCHEMA);
-
+                value.put("jobId", jobId);
                 for (int i = 0; i < titleList.size(); i++) {
                     String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
                     value.put(titleList.get(i), v);
