@@ -68,6 +68,10 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
     @throws[InterruptedException]
     def shutdown(): Unit = {
         if (PERMITS.availablePermits() < 0) Log.warn("Excessive consumption! The rest of CONSUME_TIMES=" + PERMITS.availablePermits())
-        CONSUMER.close(1, TimeUnit.SECONDS)
+        CONSUMER.close()
+    }
+
+    def close(): Unit = {
+        SHUTDOWN.set(true)
     }
 }
