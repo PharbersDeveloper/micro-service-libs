@@ -13,7 +13,7 @@ import java.util.concurrent.{Semaphore, TimeUnit}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import com.pharbers.kafka.common.kafka_config_obj
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
+import io.confluent.kafka.serializers.{AbstractKafkaAvroSerDeConfig, KafkaAvroDeserializerConfig}
 
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
@@ -29,6 +29,7 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
     config.put("bootstrap.servers", kafka_config_obj.broker)
     config.put("key.deserializer", kafka_config_obj.keyDefaultDeserializer)
     config.put("value.deserializer", kafka_config_obj.valueDefaultDeserializer)
+    config.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, kafka_config_obj.specificAvroReader)
     config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl);
     config.put("security.protocol", kafka_config_obj.securityProtocol)
     config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
