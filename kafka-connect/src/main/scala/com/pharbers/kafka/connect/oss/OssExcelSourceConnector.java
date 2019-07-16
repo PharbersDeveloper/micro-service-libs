@@ -39,7 +39,7 @@ public class OssExcelSourceConnector extends SourceConnector {
             .define(KEY_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH, "Source ossKey(Aliyun OSS key)")
             .define(TOPIC_CONFIG, ConfigDef.Type.LIST, ConfigDef.Importance.HIGH, "The topic to publish data to")
             .define(JOB_ID_CONFIG, ConfigDef.Type.STRING,  UUID.randomUUID().toString(), ConfigDef.Importance.HIGH, "配置job id")
-            .define(AUTO_TITLE_CONFIG, ConfigDef.Type.BOOLEAN, true, ConfigDef.Importance.LOW, "是否使用第一行为标题")
+            .define(AUTO_TITLE_CONFIG, ConfigDef.Type.STRING, "true", ConfigDef.Importance.LOW, "是否使用第一行为标题")
             .define(TITLES_CONFIG, ConfigDef.Type.LIST, new ArrayList<String>(), ConfigDef.Importance.LOW, "配置titles， autoTitle为false才能生效")
             .define(TASK_BATCH_SIZE_CONFIG, ConfigDef.Type.INT, DEFAULT_TASK_BATCH_SIZE, ConfigDef.Importance.LOW,
                     "The maximum number of records the Source task can read from file one time");
@@ -52,7 +52,7 @@ public class OssExcelSourceConnector extends SourceConnector {
     private String topic;
     private String jobID;
     private String autoTitle;
-    private String titles;
+    private List<String> titles;
     private int batchSize;
 
     @Override
@@ -84,7 +84,7 @@ public class OssExcelSourceConnector extends SourceConnector {
         topic = topics.get(0);
         jobID = parsedConfig.getString(JOB_ID_CONFIG);
         autoTitle = parsedConfig.getString(AUTO_TITLE_CONFIG);
-        titles = parsedConfig.getString(TITLES_CONFIG);
+        titles = parsedConfig.getList(TITLES_CONFIG);
         batchSize = parsedConfig.getInt(TASK_BATCH_SIZE_CONFIG);
     }
 
@@ -106,7 +106,7 @@ public class OssExcelSourceConnector extends SourceConnector {
         config.put(TOPIC_CONFIG, topic);
         config.put(JOB_ID_CONFIG, jobID);
         config.put(AUTO_TITLE_CONFIG, autoTitle);
-        config.put(TITLES_CONFIG, titles);
+        config.put(TITLES_CONFIG, String.join(",", titles));
         config.put(TASK_BATCH_SIZE_CONFIG, String.valueOf(batchSize));
         configs.add(config);
         return configs;
