@@ -7,6 +7,7 @@ import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.OSSObject;
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
+import com.monitorjbl.xlsx.impl.TempFileUtil;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -87,7 +88,8 @@ public class OssExcelSourceTask extends SourceTask {
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-
+        log.info("begin poll" + logFilename());
+        log.info("batchSize" + batchSize);
         synchronized (this) {
             if (stream == null) {
                 try {
@@ -97,7 +99,6 @@ public class OssExcelSourceTask extends SourceTask {
                     stream = object.getObjectContent();
                     reader = StreamingReader.builder().open(stream);
                     log.info("*********************START!");
-
                 } catch (OSSException oe) {
                     System.out.println("Caught an OSSException, which means your request made it to OSS, "
                             + "but was rejected with an error response for some reason.");
@@ -150,7 +151,6 @@ public class OssExcelSourceTask extends SourceTask {
                 }
             }
         }
-
         try {
             ArrayList<SourceRecord> records = null;
 
@@ -192,11 +192,14 @@ public class OssExcelSourceTask extends SourceTask {
 
     @Override
     public void stop() {
-        log.info("Stopping");
+        log.trace("Stopping");
         synchronized (this) {
             try {
-                stream.close();
-                log.info("Closed input stream");
+                if (stream != null && stream != System.in) {
+                    stream.close();
+                    reader.close();
+                    log.trace("Closed input stream");
+                }
             } catch (IOException e) {
                 log.error("Failed to close FileStreamSourceTask stream: ", e);
             }
