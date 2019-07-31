@@ -154,26 +154,6 @@ public class ExcelStreamSourceTask extends SourceTask {
                 }
                 records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
                         KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis()));
-
-                //                StringBuilder res = new StringBuilder();
-//                for (Cell c : r) {
-//                    res.append(c.getStringCellValue()).append(",");
-//                }
-//                if (res.length() > 1) {
-//                    res.delete(res.length() - 1, res.length());
-//                    log.trace("Read a line from {}", logFilename());
-//                    if (records == null)
-//                        records = new ArrayList<>();
-//                    synchronized (this) {
-//                        streamOffset++;
-//                    }
-//                    records.add(new SourceRecord(offsetKey(filename), offsetValue(streamOffset), topic, null,
-//                            null, null, VALUE_SCHEMA, res, System.currentTimeMillis()));
-//
-//                    if (records.size() >= batchSize) {
-//                        return records;
-//                    }
-//                }
             } while (records.size() < batchSize);
             return records;
         } catch (ParseException e) {
