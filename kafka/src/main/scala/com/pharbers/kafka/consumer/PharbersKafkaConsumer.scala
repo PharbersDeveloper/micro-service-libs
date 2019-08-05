@@ -25,6 +25,7 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
 
     val config = new Properties()
     config.put("client.id", InetAddress.getLocalHost.getHostName)
+    //todo: 应该可以设置group id。
     config.put("group.id", kafka_config_obj.group)
     config.put("bootstrap.servers", kafka_config_obj.broker)
     config.put("key.deserializer", kafka_config_obj.keyDefaultDeserializer)

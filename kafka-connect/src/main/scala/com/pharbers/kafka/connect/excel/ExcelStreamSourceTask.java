@@ -8,7 +8,7 @@ import java.util.*;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
-import com.pharbers.kafka.connect.csv.InputConfigKeys;
+import com.pharbers.kafka.connect.InputConfigKeys;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -120,8 +120,10 @@ public class ExcelStreamSourceTask extends SourceTask {
                     }
                     VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 }
-                while (rowsIterator.hasNext() && streamOffset > 0){
+                long rowOffset = streamOffset;
+                while (rowsIterator.hasNext() && rowOffset > 0){
                     rowsIterator.next();
+                    rowOffset --;
                 }
             }
         }

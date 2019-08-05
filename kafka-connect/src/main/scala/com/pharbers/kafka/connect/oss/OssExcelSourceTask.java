@@ -54,7 +54,7 @@ public class OssExcelSourceTask extends SourceTask {
     private int batchSize = OssExcelSourceConnector.DEFAULT_TASK_BATCH_SIZE;
     private OSS client = null;
 
-    public static final String FILENAME_FIELD = "filename";
+    public static final String JOBID_FIELD = "jobId";
     public static final String POSITION_FIELD = "position";
     //线程共享会多次赋值变量
     private Long streamOffset;
@@ -118,7 +118,7 @@ public class OssExcelSourceTask extends SourceTask {
                     client.shutdown();
                 }
 
-                Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(FILENAME_FIELD, ossKey));
+                Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(JOBID_FIELD, jobId));
                 if (offset != null) {
                     Object lastRecordedOffset = offset.get(POSITION_FIELD);
                     if (lastRecordedOffset != null && !(lastRecordedOffset instanceof Long))
@@ -146,8 +146,10 @@ public class OssExcelSourceTask extends SourceTask {
                     }
                     VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 }
-                while (rowsIterator.hasNext() && streamOffset > 0){
+                long rowOffset = streamOffset;
+                while (rowsIterator.hasNext() && rowOffset > 0){
                     rowsIterator.next();
+                    rowOffset --;
                 }
             }
         }
@@ -208,7 +210,7 @@ public class OssExcelSourceTask extends SourceTask {
     }
 
     private Map<String, String> offsetKey(String filename) {
-        return Collections.singletonMap(FILENAME_FIELD, filename);
+        return Collections.singletonMap(JOBID_FIELD, filename);
     }
 
     private Map<String, Long> offsetValue(Long pos) {

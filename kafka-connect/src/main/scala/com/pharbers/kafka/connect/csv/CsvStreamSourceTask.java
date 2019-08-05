@@ -1,5 +1,6 @@
 package com.pharbers.kafka.connect.csv;
 
+import com.pharbers.kafka.connect.InputConfigKeys;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;

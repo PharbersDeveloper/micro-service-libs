@@ -1,4 +1,4 @@
-package com.pharbers.kafka.connect.csv;
+package com.pharbers.kafka.connect;
 
 /**
  * 功能描述
@@ -19,4 +19,9 @@ public class InputConfigKeys {
     public static final String TITLE_CONFIG = "title";
     public static final String AUTO_TITLE_CONFIG = "autoTitle";
     public static final String TRANSFORM_CONFIG = "transform";
+    //mongodb
+    public static final String CONNECTION_CONFIG = "connection";
+    public static final String DATABASE_CONFIG = "database";
+    public static final String COLLECTION_CONFIG = "collection";
+    public static final String FILTER_CONFIG = "filter";
 }
