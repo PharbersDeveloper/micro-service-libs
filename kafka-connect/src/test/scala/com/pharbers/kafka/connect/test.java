@@ -1,27 +1,12 @@
-package com.pharbers.kafka.connect.mongodb;
-import com.mongodb.BasicDBObject;
-import com.mongodb.ConnectionString;
+package com.pharbers.kafka.connect;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
-import com.mongodb.ServerAddress;
-
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
-
-import org.bson.BsonBinaryReader;
 import org.bson.BsonDocument;
-import org.bson.BsonReader;
 import org.bson.Document;
-import java.util.Arrays;
-import com.mongodb.Block;
-
 import com.mongodb.client.MongoCursor;
 import static com.mongodb.client.model.Filters.*;
-import com.mongodb.client.result.DeleteResult;
-import static com.mongodb.client.model.Updates.*;
-import com.mongodb.client.result.UpdateResult;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -51,6 +36,12 @@ public class test {
         }
         Consumer<BsonDocument> printBlock = document -> System.out.println(document.toJson());
         collection.find(eq("company_id", "5afa53bded925c05c6f69c54")).forEach(printBlock);
+        MongoCursor<Document> cursor2 = database.getCollection("PhProfileProp").find( Document.parse("{'company_id':'5afa53bded925c05c6f69c54'}")).iterator();
+        Document document = cursor2.next();
+        for (String s : document.keySet()) {
+            Object obj =  document.get(s);
+            System.out.println(obj);
+        }
     }
 
 }

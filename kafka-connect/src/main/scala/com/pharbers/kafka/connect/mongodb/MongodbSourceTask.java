@@ -12,6 +12,7 @@ import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.bson.BsonDocument;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class MongodbSourceTask extends SourceTask {
     private String filter;
 
     //线程共享变量，应该只赋值一次
-    private MongoCursor<BsonDocument> documents;
+    private MongoCursor<Document> documents;
     private Schema VALUE_SCHEMA;
     private final Schema KEY_SCHEMA = Schema.STRING_SCHEMA;
 
@@ -63,7 +64,7 @@ public class MongodbSourceTask extends SourceTask {
         databaseName = props.get(InputConfigKeys.DATABASE_CONFIG);
         collectionName = props.get(InputConfigKeys.COLLECTION_CONFIG);
         batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
-        filter = props.get(InputConfigKeys.FILE_CONFIG);
+        filter = props.get(InputConfigKeys.FILTER_CONFIG);
     }
 
     @Override
@@ -71,13 +72,12 @@ public class MongodbSourceTask extends SourceTask {
         synchronized (this){
             if(documents == null){
                 MongoCollection<BsonDocument> collection = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName, BsonDocument.class);
-                //todo: 添加filter
                 try {
-                    setValueSchema(Objects.requireNonNull(collection.find().first()));
+                    setValueSchema(Objects.requireNonNull(collection.find(Document.parse(filter)).first()));
                 } catch (Exception e) {
                     throw new ConnectException(e);
                 }
-                documents = collection.find().iterator();
+                documents = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName).find(Document.parse(filter)).iterator();
                 Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(JOBID_FIELD, jobId));
                 if (offset != null) {
                     Object lastRecordedOffset = offset.get(POSITION_FIELD);
@@ -104,13 +104,12 @@ public class MongodbSourceTask extends SourceTask {
                     break;
                 }
             }
-            BsonDocument document = documents.next();
+            Document document = documents.next();
 
             Struct value = new Struct(VALUE_SCHEMA);
             value.put("jobId", jobId);
-            for (int i = 0; i < titleList.size(); i++) {
-                String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
-                value.put(titleList.get(i), v);
+            for (String s : document.keySet()) {
+               value.put(s, document.get(s).toString());
             }
             if (records == null)
                 records = new ArrayList<>();
@@ -121,8 +120,6 @@ public class MongodbSourceTask extends SourceTask {
                     KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis()));
         } while (records.size() < batchSize);
         return records;
-
-        return null;
     }
 
     @Override
@@ -139,21 +136,16 @@ public class MongodbSourceTask extends SourceTask {
     }
 
     private void setValueSchema(BsonDocument document) throws Exception {
-        SchemaBuilder schemaBuilder = SchemaBuilder.struct();
+        SchemaBuilder schemaBuilder = SchemaBuilder.struct().field("jobId", Schema.STRING_SCHEMA);
         //todo: struct嵌套会出问题
         for(String s: document.keySet()){
             Schema fieldSchema;
             switch (document.get(s).getBsonType()){
-                case STRING: fieldSchema = Schema.STRING_SCHEMA;
+                case DOCUMENT: throw new Exception("不能解析struct嵌套");
+                //todo: 暂时这样
+                case ARRAY: fieldSchema = Schema.STRING_SCHEMA;
                 break;
-                case INT32: fieldSchema = Schema.INT32_SCHEMA;
-                break;
-                case INT64: fieldSchema = Schema.INT64_SCHEMA;
-                break;
-                default: {
-                    log.error("未定义的类型", document.get(s).getBsonType());
-                    throw new Exception("未定义的类型");
-                }
+                default:  fieldSchema = Schema.STRING_SCHEMA;
             }
             schemaBuilder.field(s, fieldSchema);
         }

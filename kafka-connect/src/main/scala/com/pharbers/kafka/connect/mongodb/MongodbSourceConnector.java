@@ -60,7 +60,7 @@ public class MongodbSourceConnector extends SourceConnector {
         database = parsedConfig.getString(InputConfigKeys.DATABASE_CONFIG);
         collection = parsedConfig.getString(InputConfigKeys.COLLECTION_CONFIG);
         batchSize = parsedConfig.getInt(InputConfigKeys.TASK_BATCH_SIZE_CONFIG);
-        filter = parsedConfig.getString(InputConfigKeys.FILE_CONFIG);
+        filter = parsedConfig.getString(InputConfigKeys.FILTER_CONFIG);
     }
 
     @Override
