@@ -179,7 +179,7 @@ public class OssExcelSourceTask extends SourceTask {
                 synchronized (this) {
                     streamOffset++;
                 }
-                records.add(new SourceRecord(offsetKey(ossKey), offsetValue(streamOffset), topic, null,
+                records.add(new SourceRecord(offsetKey(jobId), offsetValue(streamOffset), topic, null,
                         KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis()));
             } while (records.size() < batchSize);
             return records;
