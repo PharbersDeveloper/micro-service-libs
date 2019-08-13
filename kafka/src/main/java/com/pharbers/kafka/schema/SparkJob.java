@@ -10,12 +10,14 @@ import org.apache.avro.specific.SpecificData;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 7664455039210424725L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"SparkJob\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"bucketName\",\"type\":\"string\"},{\"name\":\"ossKey\",\"type\":\"string\"}]}");
+  private static final long serialVersionUID = 6315313314733343846L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"SparkJob\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"bucketName\",\"type\":\"string\"},{\"name\":\"ossKey\",\"type\":\"string\"},{\"name\":\"mode\",\"type\":\"string\"},{\"name\":\"config\",\"type\":{\"type\":\"map\",\"values\":\"string\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence id;
   @Deprecated public java.lang.CharSequence bucketName;
   @Deprecated public java.lang.CharSequence ossKey;
+  @Deprecated public java.lang.CharSequence mode;
+  @Deprecated public java.util.Map<java.lang.CharSequence,java.lang.CharSequence> config;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -29,11 +31,15 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
    * @param id The new value for id
    * @param bucketName The new value for bucketName
    * @param ossKey The new value for ossKey
+   * @param mode The new value for mode
+   * @param config The new value for config
    */
-  public SparkJob(java.lang.CharSequence id, java.lang.CharSequence bucketName, java.lang.CharSequence ossKey) {
+  public SparkJob(java.lang.CharSequence id, java.lang.CharSequence bucketName, java.lang.CharSequence ossKey, java.lang.CharSequence mode, java.util.Map<java.lang.CharSequence,java.lang.CharSequence> config) {
     this.id = id;
     this.bucketName = bucketName;
     this.ossKey = ossKey;
+    this.mode = mode;
+    this.config = config;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -43,6 +49,8 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
     case 0: return id;
     case 1: return bucketName;
     case 2: return ossKey;
+    case 3: return mode;
+    case 4: return config;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -54,6 +62,8 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
     case 0: id = (java.lang.CharSequence)value$; break;
     case 1: bucketName = (java.lang.CharSequence)value$; break;
     case 2: ossKey = (java.lang.CharSequence)value$; break;
+    case 3: mode = (java.lang.CharSequence)value$; break;
+    case 4: config = (java.util.Map<java.lang.CharSequence,java.lang.CharSequence>)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -107,6 +117,38 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
   }
 
   /**
+   * Gets the value of the 'mode' field.
+   * @return The value of the 'mode' field.
+   */
+  public java.lang.CharSequence getMode() {
+    return mode;
+  }
+
+  /**
+   * Sets the value of the 'mode' field.
+   * @param value the value to set.
+   */
+  public void setMode(java.lang.CharSequence value) {
+    this.mode = value;
+  }
+
+  /**
+   * Gets the value of the 'config' field.
+   * @return The value of the 'config' field.
+   */
+  public java.util.Map<java.lang.CharSequence,java.lang.CharSequence> getConfig() {
+    return config;
+  }
+
+  /**
+   * Sets the value of the 'config' field.
+   * @param value the value to set.
+   */
+  public void setConfig(java.util.Map<java.lang.CharSequence,java.lang.CharSequence> value) {
+    this.config = value;
+  }
+
+  /**
    * Creates a new SparkJob RecordBuilder.
    * @return A new SparkJob RecordBuilder
    */
@@ -141,6 +183,8 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
     private java.lang.CharSequence id;
     private java.lang.CharSequence bucketName;
     private java.lang.CharSequence ossKey;
+    private java.lang.CharSequence mode;
+    private java.util.Map<java.lang.CharSequence,java.lang.CharSequence> config;
 
     /** Creates a new Builder */
     private Builder() {
@@ -165,6 +209,14 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
         this.ossKey = data().deepCopy(fields()[2].schema(), other.ossKey);
         fieldSetFlags()[2] = true;
       }
+      if (isValidValue(fields()[3], other.mode)) {
+        this.mode = data().deepCopy(fields()[3].schema(), other.mode);
+        fieldSetFlags()[3] = true;
+      }
+      if (isValidValue(fields()[4], other.config)) {
+        this.config = data().deepCopy(fields()[4].schema(), other.config);
+        fieldSetFlags()[4] = true;
+      }
     }
 
     /**
@@ -184,6 +236,14 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
       if (isValidValue(fields()[2], other.ossKey)) {
         this.ossKey = data().deepCopy(fields()[2].schema(), other.ossKey);
         fieldSetFlags()[2] = true;
+      }
+      if (isValidValue(fields()[3], other.mode)) {
+        this.mode = data().deepCopy(fields()[3].schema(), other.mode);
+        fieldSetFlags()[3] = true;
+      }
+      if (isValidValue(fields()[4], other.config)) {
+        this.config = data().deepCopy(fields()[4].schema(), other.config);
+        fieldSetFlags()[4] = true;
       }
     }
 
@@ -304,6 +364,84 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
       return this;
     }
 
+    /**
+      * Gets the value of the 'mode' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getMode() {
+      return mode;
+    }
+
+    /**
+      * Sets the value of the 'mode' field.
+      * @param value The value of 'mode'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.SparkJob.Builder setMode(java.lang.CharSequence value) {
+      validate(fields()[3], value);
+      this.mode = value;
+      fieldSetFlags()[3] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'mode' field has been set.
+      * @return True if the 'mode' field has been set, false otherwise.
+      */
+    public boolean hasMode() {
+      return fieldSetFlags()[3];
+    }
+
+
+    /**
+      * Clears the value of the 'mode' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.SparkJob.Builder clearMode() {
+      mode = null;
+      fieldSetFlags()[3] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'config' field.
+      * @return The value.
+      */
+    public java.util.Map<java.lang.CharSequence,java.lang.CharSequence> getConfig() {
+      return config;
+    }
+
+    /**
+      * Sets the value of the 'config' field.
+      * @param value The value of 'config'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.SparkJob.Builder setConfig(java.util.Map<java.lang.CharSequence,java.lang.CharSequence> value) {
+      validate(fields()[4], value);
+      this.config = value;
+      fieldSetFlags()[4] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'config' field has been set.
+      * @return True if the 'config' field has been set, false otherwise.
+      */
+    public boolean hasConfig() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'config' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.SparkJob.Builder clearConfig() {
+      config = null;
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
     @Override
     public SparkJob build() {
       try {
@@ -311,6 +449,8 @@ public class SparkJob extends org.apache.avro.specific.SpecificRecordBase implem
         record.id = fieldSetFlags()[0] ? this.id : (java.lang.CharSequence) defaultValue(fields()[0]);
         record.bucketName = fieldSetFlags()[1] ? this.bucketName : (java.lang.CharSequence) defaultValue(fields()[1]);
         record.ossKey = fieldSetFlags()[2] ? this.ossKey : (java.lang.CharSequence) defaultValue(fields()[2]);
+        record.mode = fieldSetFlags()[3] ? this.mode : (java.lang.CharSequence) defaultValue(fields()[3]);
+        record.config = fieldSetFlags()[4] ? this.config : (java.util.Map<java.lang.CharSequence,java.lang.CharSequence>) defaultValue(fields()[4]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

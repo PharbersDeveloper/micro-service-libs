@@ -14,6 +14,14 @@
     {
         "name": "ossKey",
         "type": "string"
+    },
+    {
+       "name": "mode",
+       "type": "string"
+    },
+    {
+       "name": "config",
+       "type": {"type": "map", "values": "string"}
     }
   ]
 }

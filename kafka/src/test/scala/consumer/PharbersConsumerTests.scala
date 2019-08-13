@@ -2,7 +2,9 @@ package consumer
 
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import com.pharbers.kafka.schema.RecordDemo
+import io.confluent.ksql.avro_schemas.KsqlDataSourceSchema
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.TopicPartition
 import org.scalatest.FunSuite
 
 /**
@@ -24,11 +26,18 @@ class PharbersConsumerTests extends FunSuite {
     }
 
     test("PharbersKafkaConsumer with avro") {
-        val pkc = new PharbersKafkaConsumer[String, RecordDemo](List("test6"), 1000, Int.MaxValue, myProcess)
+        import scala.collection.JavaConverters._
+        def testProcess[K, V](record: ConsumerRecord[String, KsqlDataSourceSchema]): Unit = {
+            println("===myProcess>>>" + record.key() + ":" + record.value().getCORPNAME.toString)
+        }
+        val pkc = new PharbersKafkaConsumer[String, KsqlDataSourceSchema](List("DCS"), 1000, Int.MaxValue, testProcess)
+        val consumer = pkc.getConsumer
+        consumer.partitionsFor("DCS")
+        consumer.endOffsets(List(new TopicPartition("DCS", 1)).asJava)
         val t = new Thread(pkc)
         t.start()
-        Thread.sleep(50000)
-        t.stop()
+        Thread.sleep(500000)
+        pkc.close()
         println("DOWN")
     }
 

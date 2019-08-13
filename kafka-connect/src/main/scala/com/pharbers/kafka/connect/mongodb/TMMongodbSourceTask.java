@@ -4,6 +4,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.pharbers.kafka.connect.InputConfigKeys;
+import com.pharbers.kafka.connect.mongodb.filter.Aggregation;
 import com.pharbers.kafka.connect.oss.OssSourceTask;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
@@ -16,7 +17,10 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
-
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import static com.pharbers.kafka.connect.mongodb.TMMongodbSourceConnector.*;
+import static com.mongodb.client.model.Filters.*;
 /**
  * 功能描述
  *
@@ -24,28 +28,31 @@ import java.util.*;
  * @version 0.0
  * @tparam T 构造泛型参数
  * @note 一些值得注意的地方
- * @since 2019/08/05 15:10
+ * @since 2019/08/13 10:38
  */
-public class MongodbSourceTask extends SourceTask {
+public class TMMongodbSourceTask extends SourceTask {
     private static final Logger log = LoggerFactory.getLogger(OssSourceTask.class);
-    public static final String JOBID_FIELD = "iobId";
-    public static final String POSITION_FIELD = "position";
+    private static final String JOBID_FIELD = "iobId";
+    private static final String POSITION_FIELD = "position";
+    private static final String COLLECTION_NAME = "col";
 
     //外部参数
     private String jobId;
     private String topic;
-    private int batchSize = MongodbSourceConnector.DEFAULT_TASK_BATCH_SIZE;
+    private int batchSize = TMMongodbSourceConnector.DEFAULT_TASK_BATCH_SIZE;
     private String connection;
     private String databaseName;
-    private String collectionName;
-    private String filter;
-    //todo: 之后应该由配置传入，现在默认不要_id
-    private List<String> blackCols = new ArrayList<>();
+    private String periodsId;
+    private String projectsId;
+    private String proposalsId;
+    //todo: 之后应该由配置传入，现在默认不要_id和job
+    private List<String> blackCols = Stream.of("_id").collect(Collectors.toList());
 
     //线程共享变量，应该只赋值一次
     private MongoCursor<Document> documents;
     private Schema VALUE_SCHEMA;
     private final Schema KEY_SCHEMA = Schema.STRING_SCHEMA;
+    private String colJob;
 
 
     //线程共享会多次赋值变量
@@ -54,7 +61,7 @@ public class MongodbSourceTask extends SourceTask {
 
     @Override
     public String version() {
-        return new MongodbSourceConnector().version();
+        return new TMMongodbSourceConnector().version();
     }
 
     @Override
@@ -63,23 +70,26 @@ public class MongodbSourceTask extends SourceTask {
         connection = props.get(InputConfigKeys.CONNECTION_CONFIG);
         topic = props.get(InputConfigKeys.TOPIC_CONFIG);
         databaseName = props.get(InputConfigKeys.DATABASE_CONFIG);
-        collectionName = props.get(InputConfigKeys.COLLECTION_CONFIG);
+        //写死了
+//        collectionName = props.get(InputConfigKeys.COLLECTION_CONFIG);
         batchSize = Integer.parseInt(props.get(InputConfigKeys.TASK_BATCH_SIZE_CONFIG));
-        filter = props.get(InputConfigKeys.FILTER_CONFIG);
-        blackCols.add("_id");
+        periodsId = props.get(PERIOD_COLL_NAME);
+        projectsId = props.get(PROJECT_COLL_NAME);
+        proposalsId = props.get(PROPOSAL_COLL_NAME);
+        colJob = Aggregation.TmInputAgg(proposalsId, projectsId, periodsId);
     }
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException  {
         synchronized (this){
             if(documents == null){
-                MongoCollection<BsonDocument> collection = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName, BsonDocument.class);
+                MongoCollection<BsonDocument> collection = MongoClients.create(connection).getDatabase(databaseName).getCollection(COLLECTION_NAME, BsonDocument.class);
                 try {
-                    setValueSchema(Objects.requireNonNull(collection.find(Document.parse(filter)).first()));
+                    setValueSchema(Objects.requireNonNull(collection.find(eq("job", colJob)).first()));
                 } catch (Exception e) {
                     throw new ConnectException(e);
                 }
-                documents = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName).find(Document.parse(filter)).iterator();
+                documents = MongoClients.create(connection).getDatabase(databaseName).getCollection(COLLECTION_NAME).find(eq("job", colJob)).iterator();
                 Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(JOBID_FIELD, jobId));
                 if (offset != null) {
                     Object lastRecordedOffset = offset.get(POSITION_FIELD);
@@ -113,7 +123,7 @@ public class MongodbSourceTask extends SourceTask {
                 if(blackCols.contains(s)){
                     continue;
                 }
-               value.put(s, document.get(s).toString());
+                value.put(s, document.get(s).toString());
             }
             if (records == null)
                 records = new ArrayList<>();
@@ -149,9 +159,9 @@ public class MongodbSourceTask extends SourceTask {
             }
             switch (document.get(s).getBsonType()){
                 case DOCUMENT: throw new Exception("不能解析struct嵌套");
-                //todo: 暂时这样
+                    //todo: 暂时这样
                 case ARRAY: fieldSchema = Schema.STRING_SCHEMA;
-                break;
+                    break;
                 default:  fieldSchema = Schema.STRING_SCHEMA;
             }
             schemaBuilder.field(s, fieldSchema);

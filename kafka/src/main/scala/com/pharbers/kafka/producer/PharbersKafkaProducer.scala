@@ -49,7 +49,6 @@ class PharbersKafkaProducer[K, V] {
                     if (e != null) Log.debug("Send failed for record {}", record, e) else Log.info("SUCCEED!")
                 }
             })
-
         return future
     }
 

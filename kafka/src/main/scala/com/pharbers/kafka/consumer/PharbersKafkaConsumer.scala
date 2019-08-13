@@ -26,7 +26,8 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
     val config = new Properties()
     config.put("client.id", InetAddress.getLocalHost.getHostName)
     //todo: 应该可以设置group id。
-    config.put("group.id", kafka_config_obj.group)
+//    config.put("group.id", kafka_config_obj.group)
+    config.put("group.id", "test")
     config.put("bootstrap.servers", kafka_config_obj.broker)
     config.put("key.deserializer", kafka_config_obj.keyDefaultDeserializer)
     config.put("value.deserializer", kafka_config_obj.valueDefaultDeserializer)
@@ -51,7 +52,7 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
                 !SHUTDOWN.get
             }) {
                 val records = CONSUMER.poll(msgFrequencyMs)
-//                Log.info("The length of records=" + records.count())
+                Log.info("The length of records=" + records.count())
                 if (records.count() > PERMITS.availablePermits()) {
                     Log.error(s"There are not enough permits[count=${PERMITS.availablePermits()}] to consume records[count=${records.count()}]")
                     SHUTDOWN.set(true)
@@ -66,8 +67,12 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
         }
     }
 
+    def getConsumer: KafkaConsumer[K, V] ={
+        CONSUMER
+    }
+
     @throws[InterruptedException]
-    def shutdown(): Unit = {
+    private def shutdown(): Unit = {
         if (PERMITS.availablePermits() < 0) Log.warn("Excessive consumption! The rest of CONSUME_TIMES=" + PERMITS.availablePermits())
         CONSUMER.close()
     }
