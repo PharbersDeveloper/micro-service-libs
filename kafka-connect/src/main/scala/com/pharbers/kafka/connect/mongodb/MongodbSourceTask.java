@@ -15,6 +15,7 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -70,9 +71,9 @@ public class MongodbSourceTask extends SourceTask {
     }
 
     @Override
-    public List<SourceRecord> poll() throws InterruptedException  {
-        synchronized (this){
-            if(documents == null){
+    public List<SourceRecord> poll() throws InterruptedException {
+        synchronized (this) {
+            if (documents == null) {
                 MongoCollection<BsonDocument> collection = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName, BsonDocument.class);
                 try {
                     setValueSchema(Objects.requireNonNull(collection.find(Document.parse(filter)).first()));
@@ -91,9 +92,9 @@ public class MongodbSourceTask extends SourceTask {
                 }
                 log.info("offset:" + streamOffset);
                 long docOffset = streamOffset;
-                while (documents.hasNext() && docOffset > 0){
+                while (documents.hasNext() && docOffset > 0) {
                     documents.next();
-                    docOffset --;
+                    docOffset--;
                 }
             }
         }
@@ -110,10 +111,10 @@ public class MongodbSourceTask extends SourceTask {
 
             Struct value = new Struct(VALUE_SCHEMA);
             for (String s : document.keySet()) {
-                if(blackCols.contains(s)){
+                if (blackCols.contains(s)) {
                     continue;
                 }
-               value.put(s, document.get(s).toString());
+                value.put(s, document.get(s) == null ? "" : document.get(s).toString());
             }
             if (records == null)
                 records = new ArrayList<>();
@@ -142,17 +143,20 @@ public class MongodbSourceTask extends SourceTask {
     private void setValueSchema(BsonDocument document) throws Exception {
         SchemaBuilder schemaBuilder = SchemaBuilder.struct();
         //todo: struct嵌套会出问题
-        for(String s: document.keySet()){
+        for (String s : document.keySet()) {
             Schema fieldSchema;
-            if(blackCols.contains(s)){
+            if (blackCols.contains(s)) {
                 continue;
             }
-            switch (document.get(s).getBsonType()){
-                case DOCUMENT: throw new Exception("不能解析struct嵌套");
+            switch (document.get(s).getBsonType()) {
+                case DOCUMENT:
+                    throw new Exception("不能解析struct嵌套");
                 //todo: 暂时这样
-                case ARRAY: fieldSchema = Schema.STRING_SCHEMA;
-                break;
-                default:  fieldSchema = Schema.STRING_SCHEMA;
+                case ARRAY:
+                    fieldSchema = Schema.STRING_SCHEMA;
+                    break;
+                default:
+                    fieldSchema = Schema.STRING_SCHEMA;
             }
             schemaBuilder.field(s, fieldSchema);
         }
