@@ -5,9 +5,8 @@ import java.util.Properties
 import java.util.concurrent.Future
 
 import com.pharbers.kafka.common.kafka_config_obj
-import io.confluent.kafka.serializers.{AbstractKafkaAvroSerDeConfig, KafkaAvroSerializer}
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import org.apache.kafka.clients.producer._
-import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.tools.jline_embedded.internal.Log
 
@@ -32,7 +31,7 @@ class PharbersKafkaProducer[K, V] {
     config.put(ProducerConfig.ACKS_CONFIG, kafka_config_obj.acks)
     config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafka_config_obj.keyDefaultSerializer)
     config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafka_config_obj.valueDefaultSerializer)
-    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl);
+    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl)
     config.put("security.protocol", kafka_config_obj.securityProtocol)
     config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
     config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)

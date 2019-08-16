@@ -27,7 +27,7 @@ import java.util.*;
  * @since 2019/08/05 15:10
  */
 public class MongodbSourceTask extends SourceTask {
-    private static final Logger log = LoggerFactory.getLogger(OssSourceTask.class);
+    private static final Logger log = LoggerFactory.getLogger(MongodbSourceTask.class);
     public static final String JOBID_FIELD = "iobId";
     public static final String POSITION_FIELD = "position";
 
