@@ -77,7 +77,12 @@ public class MongodbSourceTask extends SourceTask {
                 MongoCollection<BsonDocument> collection = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName, BsonDocument.class);
                 try {
                     setValueSchema(Objects.requireNonNull(collection.find(Document.parse(filter)).first()));
-                } catch (Exception e) {
+                }
+                catch (NullPointerException e) {
+                    //todo: 不应该用这种异常来控制流程
+                    log.info("查询结果为空");
+                }
+                catch (Exception e) {
                     throw new ConnectException(e);
                 }
                 documents = MongoClients.create(connection).getDatabase(databaseName).getCollection(collectionName).find(Document.parse(filter)).iterator();
