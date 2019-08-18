@@ -21,12 +21,11 @@ import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import scala.tools.jline_embedded.internal.Log
 
 class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: Long = Long.MaxValue, val permitsCount: Int = Int.MaxValue,
-                                  val process: ConsumerRecord[K, V] => Unit = {record: ConsumerRecord[K, V] => Log.info("===process>>>" + record.key() + ":" + new String(record.value().asInstanceOf[Array[Byte]]))},
-                                  val groupId: String = kafka_config_obj.group) extends Runnable {
+                                  val process: ConsumerRecord[K, V] => Unit = {record: ConsumerRecord[K, V] => Log.info("===process>>>" + record.key() + ":" + new String(record.value().asInstanceOf[Array[Byte]]))}) extends Runnable {
 
     val config = new Properties()
     config.put("client.id", InetAddress.getLocalHost.getHostName)
-    config.put("group.id", groupId)
+    config.put("group.id", kafka_config_obj.group)
     config.put("bootstrap.servers", kafka_config_obj.broker)
     config.put("key.deserializer", kafka_config_obj.keyDefaultDeserializer)
     config.put("value.deserializer", kafka_config_obj.valueDefaultDeserializer)
