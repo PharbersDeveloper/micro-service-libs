@@ -91,12 +91,6 @@
                     <artifactId>commons-compress</artifactId>
                     <version>1.18</version>
                 </dependency>
-                <!--tm mongodb聚合-->
-                <dependency>
-                    <groupId>pharbers.com</groupId>
-                    <artifactId>TM-Answer-Agg</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                </dependency>
             </dependencies>
 
             <build>

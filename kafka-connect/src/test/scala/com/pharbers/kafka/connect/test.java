@@ -34,25 +34,25 @@ public class test {
     public static void main(String[] args) {
         MongoClient mongoClient = MongoClients.create("mongodb://192.168.100.176:27017");
         MongoDatabase database = mongoClient.getDatabase("pharbers-ntm-client");
-        MongoCollection<BsonDocument> collection = database.getCollection("cal", BsonDocument.class);
-        try (MongoCursor<BsonDocument> cursor = collection.find(eq("company_id", "5afa53bded925c05c6f69c54")).iterator()) {
-            while (cursor.hasNext()) {
-                BsonDocument document = cursor.next();
-                for(String key: document.keySet()){
-//                    System.out.println(document.getBsonType());
-                    System.out.println(document.get(key).getBsonType());
-                }
-                System.out.println(document.toJson());
-            }
-        }
-        Consumer<BsonDocument> printBlock = document -> System.out.println(document.toJson());
-        collection.find(eq("company_id", "5afa53bded925c05c6f69c54")).forEach(printBlock);
-        MongoCursor<Document> cursor2 = database.getCollection("PhProfileProp").find( Document.parse("{'company_id':'5afa53bded925c05c6f69c54'}")).iterator();
-        Document document = cursor2.next();
-        for (String s : document.keySet()) {
-            Object obj =  document.get(s);
-            System.out.println(obj);
-        }
+        MongoCollection<BsonDocument> collection = database.getCollection("show_report", BsonDocument.class);
+//        try (MongoCursor<BsonDocument> cursor = collection.find(eq("job_id", "f52e3d89-8028-437d-8c58-9c3dbe81948c")).iterator()) {
+//            while (cursor.hasNext()) {
+//                BsonDocument document = cursor.next();
+//                for(String key: document.keySet()){
+////                    System.out.println(document.getBsonType());
+//                    System.out.println(document.get(key).getBsonType());
+//                }
+//                System.out.println(document.toJson());
+//            }
+//        }
+        Consumer<BsonDocument> printBlock = document -> System.out.println(document.get("work_motivation"));
+        collection.find(eq("job_id", "210dda8f-0c92-47c4-bdd3-81942f36eb55")).forEach(printBlock);
+//        MongoCursor<Document> cursor2 = database.getCollection("show_report").find( Document.parse("{'job_id':'f52e3d89-8028-437d-8c58-9c3dbe81948c'}")).iterator();
+//        Document document = cursor2.next();
+//        for (String s : document.keySet()) {
+//            Object obj =  document.get(s);
+//            System.out.println(obj);
+//        }
     }
 
 //    public static void main(String[] args) throws IOException, MalformedObjectNameException, IntrospectionException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {

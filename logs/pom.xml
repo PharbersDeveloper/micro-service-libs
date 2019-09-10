@@ -10,6 +10,16 @@
     <artifactId>logs</artifactId>
     <version>1.0</version>
 
+    <properties>
+        <scala.version>2.11.8</scala.version>
+        <scalaBinaryVersion>2.11</scalaBinaryVersion>
+        <spark.version>2.3.0</spark.version>
+        <hadoop.version>2.7.2</hadoop.version>
+        <scalatest.version>3.0.1</scalatest.version>
+        <log4j.version>2.11.2</log4j.version>
+        <jackson.version>2.9.8</jackson.version>
+    </properties>
+
 
     <!-- Maven profiles allow you to support both Scala 2.10, 2.11 and Scala 2.12 with
       the right dependencies for modules specified for each version separately -->
@@ -25,6 +35,17 @@
                     <groupId>com.pharbers</groupId>
                     <artifactId>redis</artifactId>
                     <version>1.0</version>
+                </dependency>
+                <!--log4j-->
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                    <version>${log4j.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                    <version>${log4j.version}</version>
                 </dependency>
             </dependencies>
         </profile>

@@ -31,7 +31,7 @@ class PharbersConsumerTests extends FunSuite {
         def testProcess[K, V](record: ConsumerRecord[String, KsqlDataSourceSchema]): Unit = {
             println("===myProcess>>>" + record.key() + ":" + record.value().getCORPNAME.toString + ":" + record.offset())
         }
-        val pkc = new PharbersKafkaConsumer[String, KsqlDataSourceSchema](List("DCS1"), 1000, Int.MaxValue, testProcess, "dcs001")
+        val pkc = new PharbersKafkaConsumer[String, KsqlDataSourceSchema](List("DCS1"), 1000, Int.MaxValue, testProcess)
         val consumer = pkc.getConsumer
         consumer.endOffsets(List(new TopicPartition("DCS1", 1)).asJava)
         consumer.beginningOffsets(List(new TopicPartition("DCS1", 1)).asJava)
