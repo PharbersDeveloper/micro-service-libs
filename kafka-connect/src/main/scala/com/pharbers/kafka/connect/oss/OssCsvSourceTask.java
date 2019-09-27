@@ -5,97 +5,89 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.OSSObject;
-import com.monitorjbl.xlsx.StreamingReader;
 import com.monitorjbl.xlsx.exceptions.ParseException;
+import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import com.pharbers.kafka.connect.oss.model.ExcelTitle;
+import com.pharbers.kafka.schema.OssTask;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.*;
 
 /**
- * @author jeorch
- * @ProjectName micro-service-libs
- * @ClassName OssSourceTask
- * @date 19-7-1下午7:46
- * @Description: TODO
+ * 功能描述
+ *
+ * @author dcs
+ * @version 0.0
+ * @tparam T 构造泛型参数
+ * @note 一些值得注意的地方
+ * @since 2019/09/25 10:36
  */
-public class OssExcelSourceTask extends SourceTask {
-
-    private static final Logger log = LoggerFactory.getLogger(OssExcelSourceTask.class);
+public class OssCsvSourceTask extends SourceTask {
+    private static final Logger log = LoggerFactory.getLogger(OssCsvSourceTask.class);
 
     private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct()
             .field("jobId", Schema.STRING_SCHEMA)
             .field("traceId", Schema.STRING_SCHEMA)
             .field("type", Schema.STRING_SCHEMA)
             .field("data", Schema.STRING_SCHEMA);
-    //线程共享变量，应该只赋值一次
+    //线程共享变量，应该一次任务只赋值一次
     private final ObjectMapper mapper = new ObjectMapper();
     private final Schema VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
     private final Schema KEY_SCHEMA = Schema.STRING_SCHEMA;
     private List<ExcelTitle> title = new ArrayList<>();
 
-    private InputStream stream;
-    private Iterator<Row> rowsIterator;
-
     private String bucketName;
-    private String ossKey;
-    private Workbook reader = null;
-    private String topic = null;
+    private String ossTaskTopic;
+    private BufferedReader bufferedReader = null;
+    private String topic;
     private String jobID;
     private String traceID;
     private boolean autoTitle;
     private List<String> titleList = new ArrayList<>();
     private int batchSize = OssExcelSourceConnector.DEFAULT_TASK_BATCH_SIZE;
     private OSS client = null;
+    private KafkaConsumer<String, OssTask> consumer;
 
     private static final String JOBID_FIELD = "jobID";
     private static final String POSITION_FIELD = "position";
     //线程共享会多次赋值变量
     private Long streamOffset;
-    private boolean end = false;
+    private Iterator<ConsumerRecord<String, OssTask>> ossTasks;
+    private String ossKey;
 
     @Override
     public String version() {
-        return new OssExcelSourceConnector().version();
+        return new OssCsvSourceConnector().version();
     }
 
     @Override
     public void start(Map<String, String> props) {
-        String endpoint = props.get(OssExcelSourceConnector.ENDPOINT_CONFIG);
-        String accessKeyId = props.get(OssExcelSourceConnector.ACCESS_KEY_ID_CONFIG);
-        String accessKeySecret = props.get(OssExcelSourceConnector.ACCESS_KEY_SECRET_CONFIG);
-        bucketName = props.get(OssExcelSourceConnector.BUCKET_NAME_CONFIG);
-        ossKey = props.get(OssExcelSourceConnector.KEY_CONFIG);
-        if (ossKey == null || ossKey.isEmpty()) {
-            stream = System.in;
-            // Tracking offset for stdin doesn't make sense
-            streamOffset = null;
-        }
-        // Missing topic or parsing error is not possible because we've parsed the config in the
-        // Connector
-        topic = props.get(OssExcelSourceConnector.TOPIC_CONFIG);
-        jobID = props.get(OssExcelSourceConnector.JOB_ID_CONFIG);
-        traceID = props.get(OssExcelSourceConnector.TRACE_ID_CONFIG);
-        autoTitle = Boolean.parseBoolean(props.get(OssExcelSourceConnector.AUTO_TITLE_CONFIG));
-        titleList = new ArrayList<>(Arrays.asList(props.get(OssExcelSourceConnector.TITLES_CONFIG).split(",")));
-        batchSize = Integer.parseInt(props.get(OssExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
+        String endpoint = props.get(OssCsvSourceConnector.ENDPOINT_CONFIG);
+        String accessKeyId = props.get(OssCsvSourceConnector.ACCESS_KEY_ID_CONFIG);
+        String accessKeySecret = props.get(OssCsvSourceConnector.ACCESS_KEY_SECRET_CONFIG);
+        bucketName = props.get(OssCsvSourceConnector.BUCKET_NAME_CONFIG);
+        ossTaskTopic = props.get(OssCsvSourceConnector.OSS_TASK_TOPIC);
+        topic = props.get(OssCsvSourceConnector.TOPIC_CONFIG);
+        autoTitle = Boolean.parseBoolean(props.get(OssCsvSourceConnector.AUTO_TITLE_CONFIG));
+        titleList = new ArrayList<>(Arrays.asList(props.get(OssCsvSourceConnector.TITLES_CONFIG).split(",")));
+        batchSize = Integer.parseInt(props.get(OssCsvSourceConnector.TASK_BATCH_SIZE_CONFIG));
         client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        end = false;
+        consumer = new ConsumerBuilder().build(ossTaskTopic);
+        ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
     }
 
     @Override
@@ -103,31 +95,33 @@ public class OssExcelSourceTask extends SourceTask {
         log.info("begin poll" + logFilename());
         log.info("batchSize" + batchSize);
         synchronized (this) {
-            if (stream == null) {
+            if (bufferedReader == null) {
+                while (!ossTasks.hasNext()) {
+                    log.info("等待任务");
+                    ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
+                }
+                OssTask task = ossTasks.next().value();
+                ossKey = task.getOssKey().toString();
+                jobID = task.getJobId().toString();
+                traceID = task.getTraceId().toString();
                 try {
                     log.info("Polling object from oss");
                     OSSObject object = client.getObject(bucketName, ossKey);
                     log.info("Contest-Type: " + object.getObjectMetadata().getContentType());
-                    stream = object.getObjectContent();
-                    reader = StreamingReader.builder().open(stream);
+                    bufferedReader = new BufferedReader(new InputStreamReader(object.getObjectContent(), Charset.forName("UTF-8")));
                     log.info("*********************START!");
                 } catch (OSSException oe) {
-                    log.error("Caught an OSSException, which means your request made it to OSS, "
+                    System.out.println("Caught an OSSException, which means your request made it to OSS, "
                             + "but was rejected with an error response for some reason.");
-                    log.error("Error Message: " + oe.getErrorCode());
-                    log.error("Error Code:       " + oe.getErrorCode());
-                    log.error("Request ID:      " + oe.getRequestId());
-                    log.error("Host ID:           " + oe.getHostId());
+                    System.out.println("Error Message: " + oe.getErrorCode());
+                    System.out.println("Error Code:       " + oe.getErrorCode());
+                    System.out.println("Request ID:      " + oe.getRequestId());
+                    System.out.println("Host ID:           " + oe.getHostId());
                 } catch (ClientException ce) {
-                    log.error("Caught an ClientException, which means the client encountered "
+                    System.out.println("Caught an ClientException, which means the client encountered "
                             + "a serious internal problem while trying to communicate with OSS, "
                             + "such as not being able to access the network.");
-                    log.error("Error Message: " + ce.getMessage());
-                } finally {
-                    /*
-                     * Do not forget to shut down the client finally to release all allocated resources.
-                     */
-                    client.shutdown();
+                    System.out.println("Error Message: " + ce.getMessage());
                 }
 
                 Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(JOBID_FIELD, jobID));
@@ -140,29 +134,32 @@ public class OssExcelSourceTask extends SourceTask {
                     streamOffset = 0L;
                 }
                 log.info("offset:" + streamOffset);
-                Sheet sheet = reader.getSheetAt(0);
                 //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
-                rowsIterator =  sheet.iterator();
-                if(autoTitle && rowsIterator.hasNext()){
+                String[] titleRow = {};
+                try {
+                    titleRow = bufferedReader.readLine().split(",");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (autoTitle) {
                     titleList.clear();
-                    Row titleRow = rowsIterator.next();
-                    for (Cell c : titleRow) {
-                        String value = c.getStringCellValue();
+                    for (String value : titleRow) {
                         titleList.add(value);
                         title.add(new ExcelTitle(value, "String"));
-//                        VALUE_SCHEMA_BUILDER.field(value, Schema.STRING_SCHEMA);
                     }
-//                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 } else {
-                    for(String s : titleList){
+                    for (String s : titleList) {
                         title.add(new ExcelTitle(s, "String"));
                     }
-//                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 }
                 long rowOffset = streamOffset;
-                while (rowsIterator.hasNext() && rowOffset > 0){
-                    rowsIterator.next();
-                    rowOffset --;
+                while (rowOffset > 0) {
+                    try {
+                        bufferedReader.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    rowOffset--;
                 }
             }
         }
@@ -170,27 +167,28 @@ public class OssExcelSourceTask extends SourceTask {
             ArrayList<SourceRecord> records = null;
 
             do {
+                String row = bufferedReader.readLine();
                 synchronized (this) {
-                    if (!rowsIterator.hasNext()) {
+                    if (row == null) {
                         log.info("读取完成");
-                        if(!end){
-                            if (records == null)
-                                records = new ArrayList<>();
-                            Struct headValue = new Struct(VALUE_SCHEMA);
-                            headValue.put("jobId", jobID);
-                            headValue.put("traceId", traceID);
-                            headValue.put("type", "SandBox-Length");
-                            headValue.put("data", "{\"length\": " + streamOffset + " }");
-                            records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
-                                    KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
-                            end = true;
-                        }
+                        log.info(streamOffset.toString());
+                        if (records == null)
+                            records = new ArrayList<>();
+                        Struct headValue = new Struct(VALUE_SCHEMA);
+                        headValue.put("jobId", jobID);
+                        headValue.put("traceId", traceID);
+                        headValue.put("type", "SandBox-Length");
+                        headValue.put("data", "{\"length\": " + streamOffset + " }");
+                        records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
+                                KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
+                        bufferedReader.close();
+                        bufferedReader = null;
                         this.wait(1000);
                         break;
                     }
                 }
 
-                Row r = rowsIterator.next();
+                String[] r = row.split(",");
 
                 Struct value = new Struct(VALUE_SCHEMA);
                 value.put("jobId", jobID);
@@ -198,14 +196,14 @@ public class OssExcelSourceTask extends SourceTask {
                 value.put("type", "SandBox");
                 Map<String, String> rowValue = new LinkedHashMap<>();
                 for (int i = 0; i < titleList.size(); i++) {
-                    String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
+                    String v = i >= r.length ? "" : r[i];
                     rowValue.put(titleList.get(i), v);
                 }
                 value.put("data", mapper.writeValueAsString(rowValue));
                 log.trace("Read a line from {}", logFilename());
                 if (records == null)
                     records = new ArrayList<>();
-                if (streamOffset.equals(0L)){
+                if (streamOffset.equals(0L)) {
                     Struct headValue = new Struct(VALUE_SCHEMA);
                     headValue.put("jobId", jobID);
                     headValue.put("traceId", traceID);
@@ -237,13 +235,12 @@ public class OssExcelSourceTask extends SourceTask {
     @Override
     public void stop() {
         log.trace("Stopping");
+        client.shutdown();
+        consumer.close();
         synchronized (this) {
             try {
-                if (stream != null && stream != System.in) {
-                    stream.close();
-                    reader.close();
-                    log.trace("Closed input stream");
-                }
+                bufferedReader.close();
+                log.trace("Closed input stream");
             } catch (IOException e) {
                 log.error("Failed to close FileStreamSourceTask stream: ", e);
             }
@@ -262,5 +259,4 @@ public class OssExcelSourceTask extends SourceTask {
     private String logFilename() {
         return ossKey == null ? "stdin" : ossKey;
     }
-
 }

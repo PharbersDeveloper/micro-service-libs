@@ -1,9 +1,12 @@
 package consumer
 
+import java.time.Duration
+
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
-import com.pharbers.kafka.schema.RecordDemo
+import com.pharbers.kafka.schema.{OssTask, RecordDemo}
 import io.confluent.ksql.avro_schemas.KsqlDataSourceSchema
 import kafka.cluster.Partition
+import org.apache.avro.generic.GenericRecord
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.TopicPartition
 import org.scalatest.FunSuite
@@ -44,6 +47,16 @@ class PharbersConsumerTests extends FunSuite {
 
     def myProcess[K, V](record: ConsumerRecord[K, V]): Unit = {
         println("===myProcess>>>" + record.key() + ":" + record.value())
+    }
+
+    test("oss task"){
+        import scala.collection.JavaConverters._
+        val consumer = new PharbersKafkaConsumer[String, OssTask](List("oss_task")).getConsumer
+        consumer.subscribe(List("oss_task").asJava)
+        val ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator()
+        val ossKey = ossTasks.next().value().get("ossKey").toString
+
+        println(ossKey)
     }
 
 }

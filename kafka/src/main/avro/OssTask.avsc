@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "OssTask",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "traceId",
+      "type": "string"
+    },
+    {
+        "name": "ossKey",
+        "type": "string"
+    }
+  ]
+}

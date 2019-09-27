@@ -25,15 +25,19 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
+        val jobId = "20190927958"
+        val traceId = "20190927958"
+        val ossKey = "patient_info_100.csv"
 
-        val sche: Schema = Schema.parse(new File("pharbers_config/RecordDemo.avsc"))
+        val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
         val gr: GenericRecord = new GenericData.Record(sche)
 
         val pkp = new PharbersKafkaProducer[String, GenericRecord]
-        gr.put("id", "002")
-        gr.put("name", "koko")
+        gr.put("jobId", jobId)
+        gr.put("traceId", traceId)
+        gr.put("ossKey", ossKey)
 
-        val fu = pkp.produce("test6", "key", gr)
+        val fu = pkp.produce("oss_task", jobId, gr)
         println(fu.get(10, TimeUnit.SECONDS))
     }
 

@@ -13,7 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kafka.version>2.2.0</kafka.version>
-        <confluent.version>3.1.1</confluent.version>
+        <confluent.version>5.2.1</confluent.version>
         <hadoop.version>2.9.0</hadoop.version>
         <avro.version>1.8.1</avro.version>
         <parquet.version>1.9.0</parquet.version>
@@ -90,6 +90,12 @@
                     <groupId>org.apache.commons</groupId>
                     <artifactId>commons-compress</artifactId>
                     <version>1.18</version>
+                </dependency>
+                <!--kafka-->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>pharbers-kafka</artifactId>
+                    <version>1.0</version>
                 </dependency>
             </dependencies>
 

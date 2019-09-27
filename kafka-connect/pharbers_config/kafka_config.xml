@@ -1,7 +1,7 @@
 <pharbers-modules>
     <kafka-config>
         <broker value="59.110.31.50:9092" />
-        <group value="test20190611" />
+        <group value="pharbersConnector" />
         <topics value="test" />
         <acks value="all" />
         <keyDefaultSerializer value="org.apache.kafka.common.serialization.StringSerializer" />
