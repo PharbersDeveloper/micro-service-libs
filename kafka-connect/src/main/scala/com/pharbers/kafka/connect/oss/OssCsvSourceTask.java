@@ -76,6 +76,7 @@ public class OssCsvSourceTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
+        log.info("start com.pharbers.kafka.connect.oss.OssCsvSourceTask");
         String endpoint = props.get(OssCsvSourceConnector.ENDPOINT_CONFIG);
         String accessKeyId = props.get(OssCsvSourceConnector.ACCESS_KEY_ID_CONFIG);
         String accessKeySecret = props.get(OssCsvSourceConnector.ACCESS_KEY_SECRET_CONFIG);
@@ -92,18 +93,22 @@ public class OssCsvSourceTask extends SourceTask {
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-        log.info("begin poll" + logFilename());
-        log.info("batchSize" + batchSize);
+//        log.info("begin poll" + logFilename());
+//        log.info("batchSize" + batchSize);
+
         synchronized (this) {
             if (bufferedReader == null) {
+                log.info("准备任务");
                 while (!ossTasks.hasNext()) {
-                    log.info("等待任务");
+                    log.info("等待kafka任务");
                     ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
                 }
                 OssTask task = ossTasks.next().value();
+                consumer.commitSync();
                 ossKey = task.getOssKey().toString();
                 jobID = task.getJobId().toString();
                 traceID = task.getTraceId().toString();
+                log.info("ossKey:" + ossKey + " jobID:" + jobID + " traceID:" + traceID);
                 try {
                     log.info("Polling object from oss");
                     OSSObject object = client.getObject(bucketName, ossKey);
@@ -143,11 +148,13 @@ public class OssCsvSourceTask extends SourceTask {
                 }
                 if (autoTitle) {
                     titleList.clear();
+                    title.clear();
                     for (String value : titleRow) {
                         titleList.add(value);
                         title.add(new ExcelTitle(value, "String"));
                     }
                 } else {
+                    title.clear();
                     for (String s : titleList) {
                         title.add(new ExcelTitle(s, "String"));
                     }
@@ -178,7 +185,7 @@ public class OssCsvSourceTask extends SourceTask {
                         headValue.put("jobId", jobID);
                         headValue.put("traceId", traceID);
                         headValue.put("type", "SandBox-Length");
-                        headValue.put("data", "{\"length\": " + streamOffset + " }");
+                        headValue.put("data", "{\"length\": " + (streamOffset) + " }");
                         records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
                                 KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
                         bufferedReader.close();
@@ -218,6 +225,8 @@ public class OssCsvSourceTask extends SourceTask {
                 records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
                         KEY_SCHEMA, jobID, VALUE_SCHEMA, value, System.currentTimeMillis()));
             } while (records.size() < batchSize);
+            log.info("add:" + records.size() + " jobId:" + jobID);
+            log.info("streamOffset:" + streamOffset);
             return records;
         } catch (ParseException e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
