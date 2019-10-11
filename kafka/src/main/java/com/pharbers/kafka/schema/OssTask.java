@@ -29,11 +29,13 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param jobId The new value for jobId
    * @param traceId The new value for traceId
    * @param ossKey The new value for ossKey
+   * @param fileType The new value for fileType
    */
-  public OssTask(java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence ossKey) {
+  public OssTask(java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence ossKey, java.lang.CharSequence fileType) {
     this.jobId = jobId;
     this.traceId = traceId;
     this.ossKey = ossKey;
+    this.fileType = fileType;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -54,6 +56,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     case 0: jobId = (java.lang.CharSequence)value$; break;
     case 1: traceId = (java.lang.CharSequence)value$; break;
     case 2: ossKey = (java.lang.CharSequence)value$; break;
+    case 3: fileType = (java.lang.CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -107,6 +110,22 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
   }
 
   /**
+   * Gets the value of the 'fileType' field.
+   * @return The value of the 'fileType' field.
+   */
+  public java.lang.CharSequence getFileType() {
+    return fileType;
+  }
+
+  /**
+   * Sets the value of the 'fileType' field.
+   * @param value the value to set.
+   */
+  public void setFileType(java.lang.CharSequence value) {
+    this.fileType = value;
+  }
+
+  /**
    * Creates a new OssTask RecordBuilder.
    * @return A new OssTask RecordBuilder
    */
@@ -141,6 +160,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     private java.lang.CharSequence jobId;
     private java.lang.CharSequence traceId;
     private java.lang.CharSequence ossKey;
+    private java.lang.CharSequence fileType;
 
     /** Creates a new Builder */
     private Builder() {
@@ -165,6 +185,10 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
         this.ossKey = data().deepCopy(fields()[2].schema(), other.ossKey);
         fieldSetFlags()[2] = true;
       }
+      if (isValidValue(fields()[3], other.fileType)) {
+        this.fileType = data().deepCopy(fields()[3].schema(), other.fileType);
+        fieldSetFlags()[3] = true;
+      }
     }
 
     /**
@@ -184,6 +208,10 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       if (isValidValue(fields()[2], other.ossKey)) {
         this.ossKey = data().deepCopy(fields()[2].schema(), other.ossKey);
         fieldSetFlags()[2] = true;
+      }
+      if (isValidValue(fields()[3], other.fileType)) {
+        this.fileType = data().deepCopy(fields()[3].schema(), other.fileType);
+        fieldSetFlags()[3] = true;
       }
     }
 
@@ -304,6 +332,45 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       return this;
     }
 
+    /**
+      * Gets the value of the 'fileType' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getFileType() {
+      return fileType;
+    }
+
+    /**
+      * Sets the value of the 'fileType' field.
+      * @param value The value of 'fileType'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder setFileType(java.lang.CharSequence value) {
+      validate(fields()[3], value);
+      this.fileType = value;
+      fieldSetFlags()[3] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'fileType' field has been set.
+      * @return True if the 'fileType' field has been set, false otherwise.
+      */
+    public boolean hasFileType() {
+      return fieldSetFlags()[3];
+    }
+
+
+    /**
+      * Clears the value of the 'fileType' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder clearFileType() {
+      fileType = null;
+      fieldSetFlags()[3] = false;
+      return this;
+    }
+
     @Override
     public OssTask build() {
       try {
@@ -311,6 +378,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
         record.jobId = fieldSetFlags()[0] ? this.jobId : (java.lang.CharSequence) defaultValue(fields()[0]);
         record.traceId = fieldSetFlags()[1] ? this.traceId : (java.lang.CharSequence) defaultValue(fields()[1]);
         record.ossKey = fieldSetFlags()[2] ? this.ossKey : (java.lang.CharSequence) defaultValue(fields()[2]);
+        record.fileType = fieldSetFlags()[3] ? this.fileType : (java.lang.CharSequence) defaultValue(fields()[3]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
