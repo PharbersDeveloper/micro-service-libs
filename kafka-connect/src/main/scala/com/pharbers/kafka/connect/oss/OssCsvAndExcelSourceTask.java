@@ -101,53 +101,54 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
     }
 
-    public List<SourceRecord> csvPoll(InputStream stream, Long streamOffset) throws InterruptedException {
-
+    public List<SourceRecord> csvPoll(InputStream stream) throws InterruptedException {
         synchronized (this) {
-            try {
-                bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
-                log.info("*********************START!");
-            } catch (OSSException oe) {
-                System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                        + "but was rejected with an error response for some reason.");
-                System.out.println("Error Message: " + oe.getErrorCode());
-                System.out.println("Error Code:       " + oe.getErrorCode());
-                System.out.println("Request ID:      " + oe.getRequestId());
-                System.out.println("Host ID:           " + oe.getHostId());
-            } catch (ClientException ce) {
-                System.out.println("Caught an ClientException, which means the client encountered "
-                        + "a serious internal problem while trying to communicate with OSS, "
-                        + "such as not being able to access the network.");
-                System.out.println("Error Message: " + ce.getMessage());
-            }
-            //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
-            String[] titleRow = {};
-            try {
-                titleRow = bufferedReader.readLine().split(",");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (autoTitle) {
-                titleList.clear();
-                title.clear();
-                for (String value : titleRow) {
-                    titleList.add(value);
-                    title.add(new ExcelTitle(value, "String"));
-                }
-            } else {
-                title.clear();
-                for (String s : titleList) {
-                    title.add(new ExcelTitle(s, "String"));
-                }
-            }
-            long rowOffset = streamOffset;
-            while (rowOffset > 0) {
+            if (bufferedReader == null) {
                 try {
-                    bufferedReader.readLine();
+                    bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
+                    log.info("*********************START!");
+                } catch (OSSException oe) {
+                    System.out.println("Caught an OSSException, which means your request made it to OSS, "
+                            + "but was rejected with an error response for some reason.");
+                    System.out.println("Error Message: " + oe.getErrorCode());
+                    System.out.println("Error Code:       " + oe.getErrorCode());
+                    System.out.println("Request ID:      " + oe.getRequestId());
+                    System.out.println("Host ID:           " + oe.getHostId());
+                } catch (ClientException ce) {
+                    System.out.println("Caught an ClientException, which means the client encountered "
+                            + "a serious internal problem while trying to communicate with OSS, "
+                            + "such as not being able to access the network.");
+                    System.out.println("Error Message: " + ce.getMessage());
+                }
+                //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
+                String[] titleRow = {};
+                try {
+                    titleRow = bufferedReader.readLine().split(",");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                rowOffset--;
+                if (autoTitle) {
+                    titleList.clear();
+                    title.clear();
+                    for (String value : titleRow) {
+                        titleList.add(value);
+                        title.add(new ExcelTitle(value, "String"));
+                    }
+                } else {
+                    title.clear();
+                    for (String s : titleList) {
+                        title.add(new ExcelTitle(s, "String"));
+                    }
+                }
+                long rowOffset = streamOffset;
+                while (rowOffset > 0) {
+                    try {
+                        bufferedReader.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    rowOffset--;
+                }
             }
         }
         try {
@@ -221,48 +222,50 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    public List<SourceRecord> excelPoll(InputStream stream, Long streamOffset) throws InterruptedException {
+    public List<SourceRecord> excelPoll(InputStream stream) throws InterruptedException {
         synchronized (this) {
-            try {
-                reader = StreamingReader.builder().open(stream);
-                log.info("*********************START!");
-            } catch (OSSException oe) {
-                System.out.println("Caught an OSSException, which means your request made it to OSS, "
-                        + "but was rejected with an error response for some reason.");
-                System.out.println("Error Message: " + oe.getErrorCode());
-                System.out.println("Error Code:       " + oe.getErrorCode());
-                System.out.println("Request ID:      " + oe.getRequestId());
-                System.out.println("Host ID:           " + oe.getHostId());
-            } catch (ClientException ce) {
-                System.out.println("Caught an ClientException, which means the client encountered "
-                        + "a serious internal problem while trying to communicate with OSS, "
-                        + "such as not being able to access the network.");
-                System.out.println("Error Message: " + ce.getMessage());
-            }
+            if (reader == null) {
+                try {
+                    reader = StreamingReader.builder().open(stream);
+                    log.info("*********************START!");
+                } catch (OSSException oe) {
+                    System.out.println("Caught an OSSException, which means your request made it to OSS, "
+                            + "but was rejected with an error response for some reason.");
+                    System.out.println("Error Message: " + oe.getErrorCode());
+                    System.out.println("Error Code:       " + oe.getErrorCode());
+                    System.out.println("Request ID:      " + oe.getRequestId());
+                    System.out.println("Host ID:           " + oe.getHostId());
+                } catch (ClientException ce) {
+                    System.out.println("Caught an ClientException, which means the client encountered "
+                            + "a serious internal problem while trying to communicate with OSS, "
+                            + "such as not being able to access the network.");
+                    System.out.println("Error Message: " + ce.getMessage());
+                }
 
-            Sheet sheet = reader.getSheetAt(0);
-            //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
-            rowsIterator =  sheet.iterator();
-            if(autoTitle && rowsIterator.hasNext()){
-                titleList.clear();
-                Row titleRow = rowsIterator.next();
-                for (Cell c : titleRow) {
-                    String value = c.getStringCellValue();
-                    titleList.add(value);
-                    title.add(new ExcelTitle(value, "String"));
+                Sheet sheet = reader.getSheetAt(0);
+                //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
+                rowsIterator =  sheet.iterator();
+                if(autoTitle && rowsIterator.hasNext()){
+                    titleList.clear();
+                    Row titleRow = rowsIterator.next();
+                    for (Cell c : titleRow) {
+                        String value = c.getStringCellValue();
+                        titleList.add(value);
+                        title.add(new ExcelTitle(value, "String"));
 //                        VALUE_SCHEMA_BUILDER.field(value, Schema.STRING_SCHEMA);
-                }
+                    }
 //                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
-            } else {
-                for(String s : titleList){
-                    title.add(new ExcelTitle(s, "String"));
-                }
+                } else {
+                    for(String s : titleList){
+                        title.add(new ExcelTitle(s, "String"));
+                    }
 //                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
-            }
-            long rowOffset = streamOffset;
-            while (rowsIterator.hasNext() && rowOffset > 0){
-                rowsIterator.next();
-                rowOffset --;
+                }
+                long rowOffset = streamOffset;
+                while (rowsIterator.hasNext() && rowOffset > 0){
+                    rowsIterator.next();
+                    rowOffset --;
+                }
             }
         }
         try {
@@ -386,16 +389,16 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 }
                 streamOffset = getStreamOffset();
             }
-            List<SourceRecord> record = null;
-            if (fileType.equals("csv")) {
-                record = csvPoll(stream, streamOffset);
-            } else if (fileType.equals("excel")) {
-                record = excelPoll(stream, streamOffset);
-            } else {
-                log.error("Error Message: fileType missMatch");
-            }
-            return record;
         }
+        List<SourceRecord> record = null;
+        if (fileType.equals("csv")) {
+            record = csvPoll(stream);
+        } else if (fileType.equals("excel")) {
+            record = excelPoll(stream);
+        } else {
+            log.error("Error Message: fileType missMatch");
+        }
+        return record;
     }
 
     @Override
