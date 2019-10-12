@@ -393,7 +393,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         List<SourceRecord> record = null;
         if (fileType.equals("csv")) {
             record = csvPoll(stream);
-        } else if (fileType.equals("excel")) {
+        } else if (fileType.equals("xlsx")) {
             record = excelPoll(stream);
         } else {
             log.error("Error Message: fileType missMatch");
