@@ -245,6 +245,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 Sheet sheet = reader.getSheetAt(0);
                 //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
                 rowsIterator =  sheet.iterator();
+                title.clear();
                 if(autoTitle && rowsIterator.hasNext()){
                     titleList.clear();
                     Row titleRow = rowsIterator.next();
