@@ -77,7 +77,6 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private Long streamOffset;
     private Iterator<ConsumerRecord<String, OssTask>> ossTasks;
     private String ossKey;
-    private boolean end = false;
 
     @Override
     public String version() {
@@ -244,9 +243,9 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
 
                 Sheet sheet = reader.getSheetAt(0);
                 //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
-                rowsIterator =  sheet.iterator();
+                rowsIterator = sheet.iterator();
                 title.clear();
-                if(autoTitle && rowsIterator.hasNext()){
+                if (autoTitle && rowsIterator.hasNext()) {
                     titleList.clear();
                     Row titleRow = rowsIterator.next();
                     for (Cell c : titleRow) {
@@ -257,15 +256,15 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     }
 //                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 } else {
-                    for(String s : titleList){
+                    for (String s : titleList) {
                         title.add(new ExcelTitle(s, "String"));
                     }
 //                    VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
                 }
                 long rowOffset = streamOffset;
-                while (rowsIterator.hasNext() && rowOffset > 0){
+                while (rowsIterator.hasNext() && rowOffset > 0) {
                     rowsIterator.next();
-                    rowOffset --;
+                    rowOffset--;
                 }
             }
         }
@@ -276,18 +275,15 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 synchronized (this) {
                     if (!rowsIterator.hasNext()) {
                         log.info("读取完成");
-                        if (!end) {
-                            if (records == null)
-                                records = new ArrayList<>();
-                            Struct headValue = new Struct(VALUE_SCHEMA);
-                            headValue.put("jobId", jobID);
-                            headValue.put("traceId", traceID);
-                            headValue.put("type", "SandBox-Length");
-                            headValue.put("data", "{\"length\": " + streamOffset + " }");
-                            records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
-                                    KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
-                            end = true;
-                        }
+                        if (records == null)
+                            records = new ArrayList<>();
+                        Struct headValue = new Struct(VALUE_SCHEMA);
+                        headValue.put("jobId", jobID);
+                        headValue.put("traceId", traceID);
+                        headValue.put("type", "SandBox-Length");
+                        headValue.put("data", "{\"length\": " + streamOffset + " }");
+                        records.add(new SourceRecord(offsetKey(jobID), offsetValue(streamOffset), topic, null,
+                                KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
                         reader.close();
                         reader = null;
                         this.wait(1000);
