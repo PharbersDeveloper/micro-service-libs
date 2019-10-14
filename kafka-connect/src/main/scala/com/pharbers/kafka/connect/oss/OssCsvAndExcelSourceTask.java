@@ -287,6 +287,8 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                                     KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
                             end = true;
                         }
+                        reader.close();
+                        reader = null;
                         this.wait(1000);
                         break;
                     }
