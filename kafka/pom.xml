@@ -9,6 +9,14 @@
     </parent>
     <artifactId>pharbers-kafka</artifactId>
     <version>1.0</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <kafka.version>2.2.1</kafka.version>
+        <confluent.version>5.2.1</confluent.version>
+        <hadoop.version>2.9.0</hadoop.version>
+        <avro.version>1.8.1</avro.version>
+        <parquet.version>1.9.0</parquet.version>
+    </properties>
 
     <repositories>
 
@@ -31,14 +39,14 @@
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_2.12</artifactId>
-            <version>2.2.0</version>
+            <version>${kafka.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <!-- For Confluent Platform 5.2.1 -->
-            <version>5.2.1</version>
+            <version>${confluent.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.scalaj/scalaj-http -->
         <dependency>
@@ -50,12 +58,12 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
-            <version>3.3.1</version>
+            <version>${confluent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.avro</groupId>
             <artifactId>avro</artifactId>
-            <version>1.8.1</version>
+            <version>${avro.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl -->
         <dependency>
