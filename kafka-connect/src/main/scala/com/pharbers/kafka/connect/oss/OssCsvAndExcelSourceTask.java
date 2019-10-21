@@ -95,7 +95,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     }
 
     @Override
-    public List<SourceRecord> poll() throws InterruptedException {
+    public List<SourceRecord> poll() {
 //        log.info("begin poll" + logFilename());
 //        log.info("batchSize" + batchSize);
 
@@ -167,7 +167,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    private List<SourceRecord> csvPoll(InputStream stream) throws InterruptedException {
+    private List<SourceRecord> csvPoll(InputStream stream) {
         String jobID = traceID + 0;
         synchronized (this) {
             if (bufferedReader == null) {
@@ -238,7 +238,6 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                                 KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis()));
                         bufferedReader.close();
                         bufferedReader = null;
-                        this.wait(1000);
                         break;
                     }
                 }
@@ -289,7 +288,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    private List<SourceRecord> excelPoll(InputStream stream) throws InterruptedException {
+    private List<SourceRecord> excelPoll(InputStream stream){
         synchronized (this) {
             if (reader == null) {
                 try {
@@ -323,7 +322,8 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                         for (Cell c : titleRow) {
                             String value = c.getStringCellValue();
                             titleList.add(value);
-                            sheetTitle.add(new ExcelTitle(value, "String"));
+                            //todo: 类型判断，现在全是string
+                            if (!value.equals("")) sheetTitle.add(new ExcelTitle(value, "String"));
                         }
                     }
                     titleMap.put(traceID + index, titleList);
@@ -331,7 +331,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     if(!streamOffset.containsKey(traceID + index)){
                         streamOffset.put(traceID + index, 0L);
                     }
-                    long rowOffset = streamOffset.get(traceID + index);
+                    long rowOffset = Long.parseLong(streamOffset.get(traceID + index).toString());
                     while (sheet.rowIterator().hasNext() && rowOffset > 0) {
                         sheet.rowIterator().next();
                         rowOffset--;
@@ -378,7 +378,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 Map<String, String> rowValue = new LinkedHashMap<>();
                 for (int i = 0; i < titleList.size(); i++) {
                     String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
-                    rowValue.put(titleList.get(i), v);
+                    if(!titleList.get(i).equals("")) rowValue.put(titleList.get(i), v);
                 }
                 value.put("data", mapper.writeValueAsString(rowValue));
                 log.trace("Read a line from {}", logFilename());
