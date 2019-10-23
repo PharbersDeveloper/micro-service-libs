@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Int;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -169,10 +170,11 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
 
     private List<SourceRecord> csvPoll(InputStream stream) {
         String jobID = traceID + 0;
+        int buffSize = 2048;
         synchronized (this) {
             if (bufferedReader == null) {
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")));
+                    bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")), buffSize);
                     log.info("*********************START!");
                 } catch (OSSException oe) {
                     System.out.println("Caught an OSSException, which means your request made it to OSS, "

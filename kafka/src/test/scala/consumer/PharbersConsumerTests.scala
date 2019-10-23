@@ -53,10 +53,13 @@ class PharbersConsumerTests extends FunSuite {
         import scala.collection.JavaConverters._
         val consumer = new PharbersKafkaConsumer[String, OssTask](List("oss_task")).getConsumer
         consumer.subscribe(List("oss_task").asJava)
-        val ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator()
-        val ossKey = ossTasks.next().value().get("ossKey").toString
-
-        println(ossKey)
+        while (true){
+            val end = consumer.endOffsets(List(new TopicPartition("oss_source_1", 0)).asJava, Duration.ofSeconds(10))
+            println(end)
+//            val ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator()
+//            val ossKey = ossTasks.next().value().get("ossKey").toString
+//            println(ossKey)
+        }
     }
 
 }
