@@ -43,6 +43,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private Iterator<ConsumerRecord<String, OssTask>> ossTasks;
     private CsvReader csvReader = null;
     private ExcelReader excelReader = null;
+    private boolean stop = false;
 
     @Override
     public String version() {
@@ -64,6 +65,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
         csvReader = new CsvReader(topic, batchSize);
         excelReader = new ExcelReader(topic, batchSize);
+        stop = false;
     }
 
     @Override
@@ -73,6 +75,10 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             if (csvReader.isEnd() && excelReader.isEnd()) {
                 log.info("准备任务," + Thread.currentThread().getName());
                 while (!ossTasks.hasNext()) {
+                    if(stop){
+                        log.info("结束任务," + Thread.currentThread().getName());
+                        return new ArrayList<>();
+                    }
                     log.info("等待kafka任务," + Thread.currentThread().getName());
                     ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
                 }
@@ -97,11 +103,13 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     @Override
     public void stop() {
         log.trace("Stopping");
+        stop = true;
         client.shutdown();
         consumer.close();
         synchronized (this) {
             try {
                 csvReader.close();
+                excelReader.close();
                 stream.close();
                 log.trace("Closed input stream");
             } catch (IOException e) {
