@@ -1,7 +1,5 @@
 package com.pharbers.kafka.connect.oss.handler;
 
-import jdk.nashorn.internal.runtime.regexp.joni.constants.EncloseType;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
