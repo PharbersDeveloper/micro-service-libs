@@ -97,6 +97,12 @@
                     <artifactId>pharbers-kafka</artifactId>
                     <version>1.0</version>
                 </dependency>
+                <!--log-->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>logs</artifactId>
+                    <version>1.0</version>
+                </dependency>
             </dependencies>
 
             <build>
