@@ -83,33 +83,15 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 fileType = task.getFileType().toString();
                 log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceID);
                 try {
-                    log.info("Polling object from oss");
                     OSSObject object = client.getObject(bucketName, ossKey);
-                    log.info("Contest-Type: " + object.getObjectMetadata().getContentType());
                     stream = object.getObjectContent();
                 } catch (OSSException | ClientException oe) {
                     log.error(ossKey, oe);
                 }
-                switch (fileType) {
-                    case "csv":
-                        csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
-                        csvReader.init(stream, traceID, getStreamOffset(traceID));
-                        break;
-                    case "xlsx":
-                        excelReader = new ExcelReader(excelReader.getTopic(), excelReader.getBatchSize());
-                        excelReader.init(stream, traceID, getStreamOffset(traceID));
-                }
+                buildReader (fileType, traceID);
             }
         }
-        List<SourceRecord> record = null;
-        if (fileType.equals("csv")) {
-            record = csvReader.read();
-        } else if (fileType.equals("xlsx")) {
-            record = excelReader.read();
-        } else {
-            log.error("Error Message: fileType missMatch");
-        }
-        return record;
+        return read(fileType);
     }
 
     @Override
@@ -136,6 +118,30 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             return offset;
         } else {
             return new HashMap<>();
+        }
+    }
+
+    private void buildReader(String fileType, String traceID){
+        switch (fileType) {
+            case "csv":
+                csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
+                csvReader.init(stream, traceID, getStreamOffset(traceID));
+                break;
+            case "xlsx":
+                excelReader = new ExcelReader(excelReader.getTopic(), excelReader.getBatchSize());
+                excelReader.init(stream, traceID, getStreamOffset(traceID));
+        }
+    }
+
+    private List<SourceRecord> read(String fileType){
+        switch (fileType) {
+            case "csv":
+                return csvReader.read();
+            case "xlsx":
+                return excelReader.read();
+            default:
+                log.error("Error Message: fileType missMatch");
+                return new ArrayList<>();
         }
     }
 }
