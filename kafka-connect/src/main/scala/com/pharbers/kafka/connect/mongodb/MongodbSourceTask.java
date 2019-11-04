@@ -4,7 +4,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.pharbers.kafka.connect.InputConfigKeys;
-import com.pharbers.kafka.connect.oss.OssSourceTask;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;

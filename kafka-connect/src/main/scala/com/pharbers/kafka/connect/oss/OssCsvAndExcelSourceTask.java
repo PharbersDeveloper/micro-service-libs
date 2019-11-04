@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author cui
@@ -39,11 +42,12 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private InputStream stream;
     private String bucketName;
     private OSS client = null;
-    private KafkaConsumer<String, OssTask> consumer;
-    private Iterator<ConsumerRecord<String, OssTask>> ossTasks;
+    private ConsumerBuilder<String, OssTask> consumer;
+    private  ExecutorService executorService = null;
     private CsvReader csvReader = null;
     private ExcelReader excelReader = null;
     private boolean stop = false;
+    private String fileType = "";
 
     @Override
     public String version() {
@@ -61,33 +65,32 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         String topic = props.get(OssCsvAndExcelSourceConnector.TOPIC_CONFIG);
         int batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
         client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        consumer = new ConsumerBuilder().build(ossTaskTopic);
-        ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
+        consumer = new ConsumerBuilder<>(ossTaskTopic);
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(consumer);
         csvReader = new CsvReader(topic, batchSize);
         excelReader = new ExcelReader(topic, batchSize);
         stop = false;
     }
 
     @Override
-    public List<SourceRecord> poll() {
-        String fileType = "";
+    public List<SourceRecord> poll() throws InterruptedException {
         synchronized (this) {
             if (csvReader.isEnd() && excelReader.isEnd()) {
                 log.info("准备任务," + Thread.currentThread().getName());
-                while (!ossTasks.hasNext()) {
+                while (!consumer.hasNext()) {
                     if(stop){
                         log.info("结束任务," + Thread.currentThread().getName());
                         return new ArrayList<>();
                     }
                     log.info("等待kafka任务," + Thread.currentThread().getName());
-                    ossTasks = consumer.poll(Duration.ofSeconds(1)).iterator();
+                    Thread.sleep(1000);
                 }
-                OssTask task = ossTasks.next().value();
-                consumer.commitSync();
+                OssTask task = consumer.next();
                 String ossKey = task.getOssKey().toString();
                 String traceID = task.getTraceId().toString();
                 fileType = task.getFileType().toString();
-                log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceID);
+                log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceID + " type:" + fileType);
                 try {
                     OSSObject object = client.getObject(bucketName, ossKey);
                     stream = object.getObjectContent();
@@ -103,9 +106,14 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     @Override
     public void stop() {
         log.trace("Stopping");
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         stop = true;
         client.shutdown();
-        consumer.close();
         synchronized (this) {
             try {
                 csvReader.close();
@@ -148,7 +156,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             case "xlsx":
                 return excelReader.read();
             default:
-                log.error("Error Message: fileType missMatch");
+                log.error(fileType + "is Error Message: fileType missMatch");
                 return new ArrayList<>();
         }
     }

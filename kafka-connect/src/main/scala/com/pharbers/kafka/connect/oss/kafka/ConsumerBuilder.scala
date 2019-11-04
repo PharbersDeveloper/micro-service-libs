@@ -1,7 +1,11 @@
 package com.pharbers.kafka.connect.oss.kafka
 
+import java.time.Duration
+import java.util
+
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
+
 import scala.collection.JavaConverters._
 /** 功能描述
   *
@@ -12,10 +16,24 @@ import scala.collection.JavaConverters._
   * @since 2019/09/26 11:06
   * @note 一些值得注意的地方
   */
-class ConsumerBuilder {
-    def build[K, V](topic: String): KafkaConsumer[K, V] = {
-        val consumer = new PharbersKafkaConsumer[K, V](List(topic)).getConsumer
-        consumer.subscribe(List(topic).asJava)
-        consumer
+class ConsumerBuilder[K, V](topic: String) extends Runnable{
+    val consumer: KafkaConsumer[K, V] =  new PharbersKafkaConsumer[K, V](List(topic)).getConsumer
+    val msgList = new util.LinkedList[V]()
+    consumer.subscribe(List(topic).asJava)
+
+    override def run(): Unit = {
+        while(!Thread.currentThread().isInterrupted){
+            consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => msgList.add(x.value()))
+        }
+        consumer.close()
     }
+
+    def hasNext: Boolean ={
+        !msgList.isEmpty
+    }
+
+    def next: V = {
+        msgList.pollFirst()
+    }
+
 }
