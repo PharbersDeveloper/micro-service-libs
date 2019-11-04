@@ -82,6 +82,7 @@ public class CsvReader implements Reader {
     public void init(InputStream stream, String traceID, Map<String, Object> streamOffset) {
         this.traceID = traceID;
         this.offsetHandler = new OffsetHandler(streamOffset);
+        log.info("offSet: " + offsetHandler.toString());
         jobID = traceID + 0;
         isEnd = false;
         int buffSize = 2048;

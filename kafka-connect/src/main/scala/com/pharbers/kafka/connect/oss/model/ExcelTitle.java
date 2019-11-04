@@ -13,8 +13,6 @@ public class ExcelTitle {
     private String key;
     private String type;
 
-    public ExcelTitle(){}
-
     public ExcelTitle(String key, String type){
         this.key = key;
         this.type = type;

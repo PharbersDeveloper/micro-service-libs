@@ -25,9 +25,9 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
-        val jobId = "201910141549"
-        val traceId = "201910171824"
-        val ossKey = "transformed.xlsx"
+        val jobId = "201911041631"
+        val traceId = "201911041631"
+        val ossKey = "3a1f9-a74d-4a71-9481-d2203/1572704547537"
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
