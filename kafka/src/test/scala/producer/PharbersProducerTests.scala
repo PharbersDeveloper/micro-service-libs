@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import com.pharbers.kafka.producer.PharbersKafkaProducer
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericRecord}
-import com.pharbers.kafka.schema.RecordDemo
+import com.pharbers.kafka.schema.{OssTask, RecordDemo}
 import org.scalatest.FunSuite
 import scalaj.http.Http
 
@@ -38,7 +38,6 @@ class PharbersProducerTests extends FunSuite {
         gr.put("traceId", traceId)
         gr.put("ossKey", ossKey)
         gr.put("fileType", fileType)
-
         val fu = pkp.produce("oss_task_submit", jobId, gr)
         println(fu.get(10, TimeUnit.SECONDS))
     }

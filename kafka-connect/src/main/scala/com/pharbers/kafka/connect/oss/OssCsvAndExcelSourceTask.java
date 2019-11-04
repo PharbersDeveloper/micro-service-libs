@@ -65,7 +65,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         String topic = props.get(OssCsvAndExcelSourceConnector.TOPIC_CONFIG);
         int batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
         client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        consumer = new ConsumerBuilder<>(ossTaskTopic);
+        consumer = new ConsumerBuilder<>(ossTaskTopic, OssTask.class);
         executorService = Executors.newSingleThreadExecutor();
         executorService.execute(consumer);
         csvReader = new CsvReader(topic, batchSize);

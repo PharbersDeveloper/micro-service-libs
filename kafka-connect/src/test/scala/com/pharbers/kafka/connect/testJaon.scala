@@ -1,8 +1,12 @@
 package com.pharbers.kafka.connect
 
 import com.pharbers.kafka.connect.oss.model.ExcelTitle
+import com.pharbers.kafka.schema.OssTask
+import org.apache.avro.specific.SpecificRecordBase
 import org.codehaus.jackson.map.ObjectMapper
+
 import collection.JavaConverters._
+import scala.reflect.ClassTag
 
 /** 功能描述
   *
@@ -17,4 +21,13 @@ object testJaon extends App {
     val list = List(new ExcelTitle("a", "b"), new ExcelTitle("a", "b"))
     val a = new ObjectMapper().writeValueAsString(list.asJava)
     println(a)
+}
+
+object testClass extends App{
+
+    class a[T](classTag: Class[T]) {
+        val ins: T = classTag.newInstance()
+//        val ins: T = Class.forName(implicitly[ClassTag[T]].runtimeClass.getCanonicalName).newInstance().asInstanceOf[T]
+    }
+    println(new a(classOf[OssTask]).ins)
 }
