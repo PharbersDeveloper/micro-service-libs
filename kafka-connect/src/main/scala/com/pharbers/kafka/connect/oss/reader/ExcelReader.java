@@ -130,7 +130,7 @@ public class ExcelReader implements Reader {
         do{
             synchronized (this) {
                 if (!rowsIterator.hasNext()) {
-                    records.add(endBuilder(jobID));
+                    if(offsetHandler.get(jobID) > 0) records.add(endBuilder(jobID));
                     jobIDs.remove(rowsIterator);
                     break;
                 }
