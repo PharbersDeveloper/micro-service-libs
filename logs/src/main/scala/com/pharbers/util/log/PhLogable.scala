@@ -18,12 +18,14 @@ trait PhLogable{
 
 object PhLogable {
     def useJobId[B](userId: String, traceId: String, jobId: String)(f: Unit => B): B ={
+        val cache = ThreadContext.getContext
         try {
             ThreadContext.putAll(Map("USERID" -> userId, "TRACEID" -> traceId, "JOBID" -> jobId).asJava)
             f()
         }
         finally {
             ThreadContext.clearAll()
+            ThreadContext.putAll(cache)
         }
     }
 }

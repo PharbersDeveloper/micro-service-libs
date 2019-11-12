@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import com.pharbers.kafka.producer.PharbersKafkaProducer
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericRecord}
-import com.pharbers.kafka.schema.RecordDemo
+import com.pharbers.kafka.schema.{OssTask, RecordDemo}
 import org.scalatest.FunSuite
 import scalaj.http.Http
 
@@ -25,9 +25,9 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
-        val jobId = "201910141549"
-        val traceId = "201910171824"
-        val ossKey = "transformed.xlsx"
+        val jobId = "201911041631"
+        val traceId = "201911041631"
+        val ossKey = "3a1f9-a74d-4a71-9481-d2203/1572704547537"
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
@@ -38,7 +38,6 @@ class PharbersProducerTests extends FunSuite {
         gr.put("traceId", traceId)
         gr.put("ossKey", ossKey)
         gr.put("fileType", fileType)
-
         val fu = pkp.produce("oss_task_submit", jobId, gr)
         println(fu.get(10, TimeUnit.SECONDS))
     }
