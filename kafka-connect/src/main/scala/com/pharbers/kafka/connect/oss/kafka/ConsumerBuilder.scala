@@ -50,6 +50,7 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
 
     def next: V = {
         path.delete()
+        path.createNewFile()
         val write = new FileWriter(path)
         msgList.asScala.foreach(x => write.write(x.toString + "\n"))
         write.flush()

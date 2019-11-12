@@ -2,6 +2,7 @@ package com.pharbers.kafka.connect.oss.reader;
 
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
+import com.pharbers.kafka.connect.oss.model.CellData;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -30,8 +31,8 @@ public class CsvReader implements Reader {
     private static final Logger log = LoggerFactory.getLogger(CsvReader.class);
     private Boolean isEnd = true;
     private BufferedReader bufferedReader = null;
-    private String traceID;
-    private String jobID;
+    private String traceId;
+    private String jobId;
     private String topic;
     private TitleHandler titleHandler = null;
     private OffsetHandler offsetHandler = null;
@@ -66,34 +67,34 @@ public class CsvReader implements Reader {
                     break;
                 }
             }
-            if (offsetHandler.get(jobID) == 0L) {
-                records.add(new SourceRecord(offsetHandler.offsetKey(jobID), offsetHandler.offsetValueCoding(), topic, null,
-                        KEY_SCHEMA, jobID, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceID, jobID), System.currentTimeMillis()));
-            }
-            synchronized (this) {
-                offsetHandler.add(jobID);
+            if (offsetHandler.get(jobId) == 0L) {
+                records.add(new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceId, jobId), System.currentTimeMillis()));
             }
             records.add(readLine(row));
+            synchronized (this) {
+                offsetHandler.add(jobId);
+            }
         } while (records.size() < batchSize);
-        return null;
+        return records;
     }
 
     @Override
-    public void init(InputStream stream, String traceID, Map<String, Object> streamOffset) {
-        this.traceID = traceID;
+    public void init(InputStream stream, String traceId, Map<String, Object> streamOffset) {
+        this.traceId = traceId;
         this.offsetHandler = new OffsetHandler(streamOffset);
         log.info("offSet: " + offsetHandler.toString());
-        jobID = traceID + 0;
+        jobId = traceId + 0;
         isEnd = false;
         int buffSize = 2048;
         bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")), buffSize);
         log.info("*********************START!");
         try {
-            titleHandler = new TitleHandler(bufferedReader.readLine().split(","), traceID);
+            titleHandler = new TitleHandler(bufferedReader.readLine().split(","), traceId);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        long rowOffset = offsetHandler.get(jobID);
+        long rowOffset = offsetHandler.get(jobId);
         while (rowOffset > 0) {
             try {
                 bufferedReader.readLine();
@@ -112,9 +113,11 @@ public class CsvReader implements Reader {
     @Override
     public void close() {
         try {
-            bufferedReader.close();
+           if(bufferedReader != null) {
+               bufferedReader.close();
+           }
         } catch (IOException e) {
-            log.error(jobID, e);
+            log.error(jobId, e);
         }
         isEnd = true;
     }
@@ -129,12 +132,12 @@ public class CsvReader implements Reader {
 
     private SourceRecord endBuild() {
         Struct headValue = new Struct(VALUE_SCHEMA);
-        headValue.put("jobId", jobID);
-        headValue.put("traceId", traceID);
+        headValue.put("jobId", jobId);
+        headValue.put("traceId", traceId);
         headValue.put("type", "SandBox-Length");
-        headValue.put("data", "{\"length\": " + (offsetHandler.get(jobID)) + " }");
-        return new SourceRecord(offsetHandler.offsetKey(jobID), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis());
+        headValue.put("data", "{\"length\": " + (offsetHandler.get(jobId)) + " }");
+        return new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
+                KEY_SCHEMA, jobId, VALUE_SCHEMA, headValue, System.currentTimeMillis());
     }
 
     private void endHandler(ArrayList<SourceRecord> records) {
@@ -150,26 +153,23 @@ public class CsvReader implements Reader {
     }
 
     private SourceRecord readLine(String row) {
-        List<String> titleList = titleHandler.getTitleMap().get(jobID);
+        List<String> titleList = titleHandler.getTitleMap().get(jobId);
         String[] r = row.split(",");
         Struct value = new Struct(VALUE_SCHEMA);
-        value.put("jobId", jobID);
-        value.put("traceId", traceID);
+        value.put("jobId", jobId);
+        value.put("traceId", traceId);
         value.put("type", "SandBox");
-        Map<String, String> rowValue = new LinkedHashMap<>();
+        List<Map.Entry<String, String>> rowValue = new ArrayList<>();
         for (int i = 0; i < titleList.size(); i++) {
             String v = i >= r.length ? "" : r[i];
-            rowValue.put(titleList.get(i), v);
+            rowValue.add(new CellData(titleList.get(i), v));
         }
         try {
             value.put("data", mapper.writeValueAsString(rowValue));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        synchronized (this) {
-            offsetHandler.add(jobID);
-        }
-        return new SourceRecord(offsetHandler.offsetKey(jobID), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobID, VALUE_SCHEMA, value, System.currentTimeMillis());
+        return new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
+                KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
     }
 }

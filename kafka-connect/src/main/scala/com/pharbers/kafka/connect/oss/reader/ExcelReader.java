@@ -3,6 +3,7 @@ package com.pharbers.kafka.connect.oss.reader;
 import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
+import com.pharbers.kafka.connect.oss.model.CellData;
 import com.pharbers.kafka.connect.oss.model.ExcelTitle;
 import com.redis.S;
 import org.apache.kafka.connect.data.Schema;
@@ -144,27 +145,29 @@ public class ExcelReader implements Reader {
         return records;
     }
 
-    private SourceRecord readRow(Row r, String jobID){
-        List<String> titleList = titleHandler.getTitleMap().get(jobID);
+    private SourceRecord readRow(Row r, String jobId){
+        List<String> titleList = titleHandler.getTitleMap().get(jobId);
         Struct value = new Struct(VALUE_SCHEMA);
-        value.put("jobId", jobID);
+        value.put("jobId", jobId);
         value.put("traceId", traceID);
         value.put("type", "SandBox");
-        Map<String, String> rowValue = new LinkedHashMap<>();
+        List<Map.Entry<String, String>> rowValue = new ArrayList<>();
         for (int i = 0; i < titleList.size(); i++) {
             String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
-            if (!titleList.get(i).equals("")) rowValue.put(titleList.get(i), v);
+            if (!"".equals(titleList.get(i))) {
+                rowValue.add(new CellData(titleList.get(i), v));
+            }
         }
         try {
             value.put("data", mapper.writeValueAsString(rowValue));
         } catch (IOException e) {
-            log.error(jobID, e);
+            log.error(jobId, e);
         }
         synchronized (this) {
-            offsetHandler.add(jobID);
+            offsetHandler.add(jobId);
         }
         return new SourceRecord(offsetHandler.offsetKey(traceID), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobID, VALUE_SCHEMA, value, System.currentTimeMillis());
+                KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
     }
 
     private SourceRecord endBuilder(String jobID){
