@@ -26,9 +26,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author cui
@@ -43,7 +42,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private String bucketName;
     private OSS client = null;
     private ConsumerBuilder<String, OssTask> consumer;
-    private  ExecutorService executorService = null;
+    private ExecutorService executorService = null;
     private CsvReader csvReader = null;
     private ExcelReader excelReader = null;
     private boolean stop = false;
@@ -66,7 +65,9 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         int batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
         client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         consumer = new ConsumerBuilder<>(ossTaskTopic, OssTask.class);
-        executorService = Executors.newSingleThreadExecutor();
+        ThreadFactory threadFactory = new NameThreadFactory("kafka_listener");
+        executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(), threadFactory);
         executorService.execute(consumer);
         csvReader = new CsvReader(topic, batchSize);
         excelReader = new ExcelReader(topic, batchSize);
@@ -79,7 +80,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             if (csvReader.isEnd() && excelReader.isEnd()) {
                 log.info("准备任务," + Thread.currentThread().getName());
                 while (!consumer.hasNext()) {
-                    if(stop){
+                    if (stop) {
                         log.info("结束任务," + Thread.currentThread().getName());
                         return new ArrayList<>();
                     }
@@ -88,16 +89,16 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 }
                 OssTask task = consumer.next();
                 String ossKey = task.getOssKey().toString();
-                String traceID = task.getTraceId().toString();
+                String traceId = task.getTraceId().toString();
                 fileType = task.getFileType().toString();
-                log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceID + " type:" + fileType);
+                log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceId + " type:" + fileType);
                 try {
                     OSSObject object = client.getObject(bucketName, ossKey);
                     stream = object.getObjectContent();
                 } catch (OSSException | ClientException oe) {
                     log.error(ossKey, oe);
                 }
-                buildReader (fileType, traceID);
+                buildReader(fileType, task);
             }
         }
         return read(fileType);
@@ -127,29 +128,32 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    private Map<String, Object> getStreamOffset(String traceID) {
+    private Map<String, Object> getStreamOffset(String traceId) {
         String offsetKey = "traceID";
-        Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(offsetKey, traceID));
+        Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(offsetKey, traceId));
         if (offset != null) {
             return offset;
         } else {
-            return new HashMap<>();
+            return new HashMap<>(10);
         }
     }
 
-    private void buildReader(String fileType, String traceID){
+    private void buildReader(String fileType, OssTask task) {
         switch (fileType) {
             case "csv":
                 csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
-                csvReader.init(stream, traceID, getStreamOffset(traceID));
+                csvReader.init(stream, task, getStreamOffset(task.getTraceId().toString()));
                 break;
             case "xlsx":
                 excelReader = new ExcelReader(excelReader.getTopic(), excelReader.getBatchSize());
-                excelReader.init(stream, traceID, getStreamOffset(traceID));
+                excelReader.init(stream, task, getStreamOffset(task.getTraceId().toString()));
+                break;
+            default:
+                log.error("不支持的类型" + fileType);
         }
     }
 
-    private List<SourceRecord> read(String fileType){
+    private List<SourceRecord> read(String fileType) {
         switch (fileType) {
             case "csv":
                 return csvReader.read();
@@ -158,6 +162,36 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             default:
                 log.error(fileType + "is Error Message: fileType missMatch");
                 return new ArrayList<>();
+        }
+    }
+
+    static class NameThreadFactory implements ThreadFactory {
+        private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
+        private final ThreadGroup group;
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+        private final String namePrefix;
+
+        NameThreadFactory(String name) {
+            SecurityManager s = System.getSecurityManager();
+            group = (s != null) ? s.getThreadGroup() :
+                    Thread.currentThread().getThreadGroup();
+            namePrefix = name +
+                    POOL_NUMBER.getAndIncrement() +
+                    "-thread-";
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(group, r,
+                    namePrefix + threadNumber.getAndIncrement(),
+                    0);
+            if (t.isDaemon()) {
+                t.setDaemon(false);
+            }
+            if (t.getPriority() != Thread.NORM_PRIORITY) {
+                t.setPriority(Thread.NORM_PRIORITY);
+            }
+            return t;
         }
     }
 }

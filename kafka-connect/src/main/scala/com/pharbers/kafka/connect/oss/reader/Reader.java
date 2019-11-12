@@ -1,5 +1,6 @@
 package com.pharbers.kafka.connect.oss.reader;
 
+import com.pharbers.kafka.schema.OssTask;
 import org.apache.kafka.connect.source.SourceRecord;
 
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public interface Reader {
     List<SourceRecord> read();
-    void init(InputStream stream, String traceID, Map<String, Object> streamOffset);
+    void init(InputStream stream, OssTask task, Map<String, Object> streamOffset);
     boolean isEnd();
     void close();
 }

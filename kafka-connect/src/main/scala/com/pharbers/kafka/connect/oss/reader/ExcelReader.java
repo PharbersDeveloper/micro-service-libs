@@ -4,8 +4,8 @@ import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.CellData;
-import com.pharbers.kafka.connect.oss.model.ExcelTitle;
-import com.redis.S;
+import com.pharbers.kafka.connect.oss.model.Label;
+import com.pharbers.kafka.schema.OssTask;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -17,8 +17,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -36,9 +34,11 @@ public class ExcelReader implements Reader {
     private static final Logger log = LoggerFactory.getLogger(ExcelReader.class);
     private Boolean isEnd = true;
     private Workbook reader = null;
-    private String traceID;
+    private String traceId;
     private String topic;
-    private Map<Iterator<Row>, String> jobIDs = new HashMap<>();
+    private OssTask task;
+    private Map<Iterator<Row>, String> jobIds = new HashMap<>();
+    private Map<String, String> SheetNames = new HashMap<>();
     private TitleHandler titleHandler = null;
     private OffsetHandler offsetHandler = null;
     private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct()
@@ -58,7 +58,7 @@ public class ExcelReader implements Reader {
 
     @Override
     public List<SourceRecord> read() {
-        if (jobIDs.keySet().size() == 0) {
+        if (jobIds.keySet().size() == 0) {
             try {
                 reader.close();
             } catch (IOException e) {
@@ -67,14 +67,15 @@ public class ExcelReader implements Reader {
             isEnd = true;
             return new ArrayList<>();
         }
-        Iterator<Row> rowsIterator = jobIDs.keySet().iterator().next();
-        String jobID = jobIDs.get(rowsIterator);
+        Iterator<Row> rowsIterator = jobIds.keySet().iterator().next();
+        String jobID = jobIds.get(rowsIterator);
         return readSheet(rowsIterator, jobID);
     }
 
     @Override
-    public void init(InputStream stream, String traceID, Map<String, Object> streamOffset) {
-        this.traceID = traceID;
+    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) {
+        this.traceId = task.getTraceId().toString();
+        this.task = task;
         this.offsetHandler = new OffsetHandler(streamOffset);
         isEnd = false;
         reader = StreamingReader.builder().open(stream);
@@ -84,7 +85,8 @@ public class ExcelReader implements Reader {
         titleHandler = new TitleHandler();
         while (sheets.hasNext()) {
             Sheet sheet = sheets.next();
-            jobIDs.put(sheet.rowIterator(), traceID + index);
+            jobIds.put(sheet.rowIterator(), traceId + index);
+            SheetNames.put(traceId + index, sheet.getSheetName());
             //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
             if (sheet.rowIterator().hasNext()) {
                 Row titleRow = sheet.rowIterator().next();
@@ -92,9 +94,9 @@ public class ExcelReader implements Reader {
                 for (Cell c : titleRow) {
                     row.add(c.getStringCellValue());
                 }
-                titleHandler.addTitle(row.toArray(new String[0]), traceID, index);
+                titleHandler.addTitle(row.toArray(new String[0]), traceId, index);
             }
-            long rowOffset = offsetHandler.get(traceID + index);
+            long rowOffset = offsetHandler.get(traceId + index);
             while (sheet.rowIterator().hasNext() && rowOffset > 0) {
                 sheet.rowIterator().next();
                 rowOffset--;
@@ -126,31 +128,32 @@ public class ExcelReader implements Reader {
         return batchSize;
     }
 
-    private ArrayList<SourceRecord> readSheet(Iterator<Row> rowsIterator, String jobID){
+    private ArrayList<SourceRecord> readSheet(Iterator<Row> rowsIterator, String jobId){
         ArrayList<SourceRecord> records = new ArrayList<>();
         do{
             synchronized (this) {
                 if (!rowsIterator.hasNext()) {
-                    if(offsetHandler.get(jobID) > 0) records.add(endBuilder(jobID));
-                    jobIDs.remove(rowsIterator);
+                    if(offsetHandler.get(jobId) > 0) {
+                        records.add(endBuilder(jobId));
+                    }
+                    jobIds.remove(rowsIterator);
                     break;
                 }
             }
-            if (offsetHandler.get(jobID) == 0L) {
-                records.add(new SourceRecord(offsetHandler.offsetKey(traceID), offsetHandler.offsetValueCoding(), topic, null,
-                        KEY_SCHEMA, jobID, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceID, jobID), System.currentTimeMillis()));
+            if (offsetHandler.get(jobId) == 0L) {
+                records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceId, jobId), System.currentTimeMillis()));
+                records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, buildValue(traceId, jobId, "SandBox-Lables", new Label(task, SheetNames.get(jobId))), System.currentTimeMillis()));
             }
-            records.add(readRow(rowsIterator.next(), jobID));
+            records.add(readRow(rowsIterator.next(), jobId));
         }while (records.size() < batchSize);
         return records;
     }
 
     private SourceRecord readRow(Row r, String jobId){
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
-        Struct value = new Struct(VALUE_SCHEMA);
-        value.put("jobId", jobId);
-        value.put("traceId", traceID);
-        value.put("type", "SandBox");
+
         List<Map.Entry<String, String>> rowValue = new ArrayList<>();
         for (int i = 0; i < titleList.size(); i++) {
             String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
@@ -158,29 +161,37 @@ public class ExcelReader implements Reader {
                 rowValue.add(new CellData(titleList.get(i), v));
             }
         }
-        try {
-            value.put("data", mapper.writeValueAsString(rowValue));
-        } catch (IOException e) {
-            log.error(jobId, e);
-        }
+        Struct value = buildValue(traceId, jobId, "SandBox", rowValue);
         synchronized (this) {
             offsetHandler.add(jobId);
         }
-        return new SourceRecord(offsetHandler.offsetKey(traceID), offsetHandler.offsetValueCoding(), topic, null,
+        return new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
                 KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
     }
 
-    private SourceRecord endBuilder(String jobID){
+    private SourceRecord endBuilder(String jobId){
         log.info("读取完成");
         log.info(offsetHandler.toString());
         Struct headValue = new Struct(VALUE_SCHEMA);
-        headValue.put("jobId", jobID);
-        headValue.put("traceId", traceID);
+        headValue.put("jobId", jobId);
+        headValue.put("traceId", traceId);
         headValue.put("type", "SandBox-Length");
-        headValue.put("data", "{\"length\": " + offsetHandler.get(jobID) + " }");
-        return new SourceRecord(offsetHandler.offsetKey(traceID), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobID, VALUE_SCHEMA, headValue, System.currentTimeMillis());
+        headValue.put("data", "{\"length\": " + offsetHandler.get(jobId) + " }");
+        return new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
+                KEY_SCHEMA, jobId, VALUE_SCHEMA, headValue, System.currentTimeMillis());
 
     }
 
+    private Struct buildValue(String traceId, String jobId, String type, Object data){
+        Struct value = new Struct(VALUE_SCHEMA);
+        value.put("jobId", jobId);
+        value.put("traceId", traceId);
+        value.put("type", type);
+        try {
+            value.put("data", mapper.writeValueAsString(data));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
 }

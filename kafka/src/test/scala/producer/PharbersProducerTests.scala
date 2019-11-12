@@ -1,6 +1,7 @@
 package producer
 
 import java.io.File
+import java.util
 import java.util.concurrent.TimeUnit
 
 import com.pharbers.kafka.producer.PharbersKafkaProducer
@@ -25,15 +26,21 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
-        val jobId = "201911041631"
-        val traceId = "201911041631"
-        val ossKey = "3a1f9-a74d-4a71-9481-d2203/1572704547537"
+        val jobId = "201911121509"
+        val traceId = "201911121509"
+        val ossKey = "test1.xlsx"
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
-        val gr: GenericRecord = new GenericData.Record(sche)
+        val gr: OssTask = new OssTask(jobId, traceId, ossKey, fileType, "test", "",
+            new util.ArrayList[CharSequence](),
+            new util.ArrayList[CharSequence](),
+            new util.ArrayList[CharSequence](),
+            new util.ArrayList[CharSequence](),
+            new util.ArrayList[CharSequence](),
+            new util.ArrayList[CharSequence]())
 
-        val pkp = new PharbersKafkaProducer[String, GenericRecord]
+        val pkp = new PharbersKafkaProducer[String, OssTask]
         gr.put("jobId", jobId)
         gr.put("traceId", traceId)
         gr.put("ossKey", ossKey)

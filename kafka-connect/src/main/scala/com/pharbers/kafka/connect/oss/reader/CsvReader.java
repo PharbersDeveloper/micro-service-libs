@@ -3,6 +3,8 @@ package com.pharbers.kafka.connect.oss.reader;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.CellData;
+import com.pharbers.kafka.connect.oss.model.Label;
+import com.pharbers.kafka.schema.OssTask;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -34,6 +36,7 @@ public class CsvReader implements Reader {
     private String traceId;
     private String jobId;
     private String topic;
+    private Label label;
     private TitleHandler titleHandler = null;
     private OffsetHandler offsetHandler = null;
     private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct()
@@ -70,6 +73,8 @@ public class CsvReader implements Reader {
             if (offsetHandler.get(jobId) == 0L) {
                 records.add(new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
                         KEY_SCHEMA, jobId, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceId, jobId), System.currentTimeMillis()));
+                records.add(new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, buildValue(traceId, jobId, "SandBox-Lables", label), System.currentTimeMillis()));
             }
             records.add(readLine(row));
             synchronized (this) {
@@ -80,8 +85,9 @@ public class CsvReader implements Reader {
     }
 
     @Override
-    public void init(InputStream stream, String traceId, Map<String, Object> streamOffset) {
-        this.traceId = traceId;
+    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) {
+        this.traceId = task.getTraceId().toString();
+        label = new Label(task, task.getFileName().toString() + "_0");
         this.offsetHandler = new OffsetHandler(streamOffset);
         log.info("offSet: " + offsetHandler.toString());
         jobId = traceId + 0;
@@ -155,21 +161,26 @@ public class CsvReader implements Reader {
     private SourceRecord readLine(String row) {
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
         String[] r = row.split(",");
-        Struct value = new Struct(VALUE_SCHEMA);
-        value.put("jobId", jobId);
-        value.put("traceId", traceId);
-        value.put("type", "SandBox");
         List<Map.Entry<String, String>> rowValue = new ArrayList<>();
         for (int i = 0; i < titleList.size(); i++) {
             String v = i >= r.length ? "" : r[i];
             rowValue.add(new CellData(titleList.get(i), v));
         }
+        Struct value = buildValue(traceId, jobId, "SandBox", rowValue);
+        return new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
+                KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
+    }
+
+    private Struct buildValue(String traceId, String jobId, String type, Object data){
+        Struct value = new Struct(VALUE_SCHEMA);
+        value.put("jobId", jobId);
+        value.put("traceId", traceId);
+        value.put("type", type);
         try {
-            value.put("data", mapper.writeValueAsString(rowValue));
+            value.put("data", mapper.writeValueAsString(data));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
+        return value;
     }
 }
