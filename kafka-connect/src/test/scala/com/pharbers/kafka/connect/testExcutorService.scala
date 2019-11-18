@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import java.time.{LocalDate, LocalDateTime}
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
 import com.aliyun.oss.OSSClientBuilder
 import com.aliyun.oss.model.OSSObject
@@ -24,13 +25,22 @@ import scala.collection.mutable.ArrayBuffer
   * @note 一些值得注意的地方
   */
 object Solution extends App{
-    val fomatter1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z")
-    val a = fomatter1.parse("2019-10-11T03:12:36.809 UTC")
-    val time = new Date()
-    println(time)
-    println(InetAddress.getLocalHost.getHostName)
 
-    def findWords(board: Array[Array[Char]], words: Array[String]): List[String] = {
-        ???
+    val executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue[Runnable]())
+    executorService.execute(new testRun())
+    Thread.sleep(1000)
+    executorService.shutdownNow()
+    executorService.awaitTermination(1000, TimeUnit.MILLISECONDS)
+    println("shutdown*************")
+}
+
+class testRun() extends Runnable{
+    override def run(): Unit = {
+        while(!Thread.currentThread().isInterrupted){
+            Thread.sleep(100)
+            println("run")
+        }
+        println("end*************")
     }
 }

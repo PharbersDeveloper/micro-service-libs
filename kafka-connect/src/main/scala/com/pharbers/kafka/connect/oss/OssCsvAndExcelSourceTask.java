@@ -97,6 +97,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     stream = object.getObjectContent();
                 } catch (OSSException | ClientException oe) {
                     log.error(ossKey, oe);
+                    return new ArrayList<>();
                 }
                 buildReader(fileType, task);
             }
@@ -107,7 +108,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     @Override
     public void stop() {
         log.trace("Stopping");
-        executorService.shutdown();
+        executorService.shutdownNow();
         try {
             executorService.awaitTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
@@ -117,6 +118,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         client.shutdown();
         synchronized (this) {
             try {
+                consumer.close();
                 csvReader.close();
                 excelReader.close();
                 stream.close();

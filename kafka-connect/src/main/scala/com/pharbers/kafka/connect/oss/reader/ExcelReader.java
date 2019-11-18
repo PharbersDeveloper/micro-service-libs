@@ -144,7 +144,7 @@ public class ExcelReader implements Reader {
                 records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
                         KEY_SCHEMA, jobId, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceId, jobId), System.currentTimeMillis()));
                 records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
-                        KEY_SCHEMA, jobId, VALUE_SCHEMA, buildValue(traceId, jobId, "SandBox-Lables", new Label(task, SheetNames.get(jobId))), System.currentTimeMillis()));
+                        KEY_SCHEMA, jobId, VALUE_SCHEMA, buildValue(traceId, jobId, "SandBox-Labels", new Label(task, SheetNames.get(jobId))), System.currentTimeMillis()));
             }
             records.add(readRow(rowsIterator.next(), jobId));
         }while (records.size() < batchSize);

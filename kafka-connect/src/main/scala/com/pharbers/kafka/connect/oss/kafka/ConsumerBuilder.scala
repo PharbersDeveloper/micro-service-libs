@@ -57,4 +57,8 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
         write.close()
         msgList.pollFirst()
     }
+
+    def close: Unit ={
+        next
+    }
 }
