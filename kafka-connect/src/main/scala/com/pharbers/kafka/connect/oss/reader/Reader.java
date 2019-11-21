@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface Reader {
     List<SourceRecord> read();
-    void init(InputStream stream, OssTask task, Map<String, Object> streamOffset);
+    void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) throws Exception;
     boolean isEnd();
     void close();
 }

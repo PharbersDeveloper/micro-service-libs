@@ -85,16 +85,27 @@ public class CsvReader implements Reader {
     }
 
     @Override
-    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) {
+    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) throws Exception {
         this.traceId = task.getTraceId().toString();
         label = new Label(task, task.getFileName().toString() + "_0");
         this.offsetHandler = new OffsetHandler(streamOffset);
         log.info("offSet: " + offsetHandler.toString());
         jobId = traceId + 0;
+        //todo: 从task获取title位置
+        List<Integer> titleIndexs = task.getTitleIndex();
+        int titleIndex = titleIndexs.size() > 0 ? titleIndexs.get(0) : 0;
         isEnd = false;
         int buffSize = 2048;
         bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")), buffSize);
         log.info("*********************START!");
+        while (titleIndex > 0) {
+            try {
+                bufferedReader.readLine();
+            } catch (IOException e) {
+                throw new Exception("title index 指定错误", e);
+            }
+            titleIndex--;
+        }
         try {
             titleHandler = new TitleHandler(bufferedReader.readLine().split(","), traceId);
         } catch (IOException e) {

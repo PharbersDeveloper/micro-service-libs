@@ -73,10 +73,12 @@ public class ExcelReader implements Reader {
     }
 
     @Override
-    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) {
+    public void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) throws Exception{
         this.traceId = task.getTraceId().toString();
         this.task = task;
         this.offsetHandler = new OffsetHandler(streamOffset);
+        //todo: 从task获取title位置
+        List<Integer> titleIndexList = task.getTitleIndex();
         isEnd = false;
         reader = StreamingReader.builder().open(stream);
         log.info("*********************START!");
@@ -85,10 +87,17 @@ public class ExcelReader implements Reader {
         titleHandler = new TitleHandler();
         while (sheets.hasNext()) {
             Sheet sheet = sheets.next();
+            int titleIndex = titleIndexList.size() > index ? titleIndexList.get(index) : 0;
             jobIds.put(sheet.rowIterator(), traceId + index);
             SheetNames.put(traceId + index, sheet.getSheetName());
-            //根据配置文件以第一行为title并且跳过，或者使用指定title不跳过
             if (sheet.rowIterator().hasNext()) {
+                while (sheet.rowIterator().hasNext() && titleIndex > 0) {
+                    sheet.rowIterator().next();
+                    titleIndex--;
+                }
+                if(!sheet.rowIterator().hasNext()){
+                    throw new Exception("title index 指定错误");
+                }
                 Row titleRow = sheet.rowIterator().next();
                 List<String> row = new ArrayList<>();
                 for (Cell c : titleRow) {

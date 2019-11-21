@@ -16,8 +16,15 @@
       "type": "string"
     },
     {
-      "name": "fileType",
-      "type": "string"
+      "name": "titleIndex",
+      "type": {
+        "items": "int",
+        "type": "array"
+       }
+    },
+    {
+        "name": "fileType",
+        "type": "string"
     },
     {
       "name": "fileName",

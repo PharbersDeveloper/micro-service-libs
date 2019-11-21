@@ -98,8 +98,12 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 } catch (OSSException | ClientException oe) {
                     log.error(ossKey, oe);
                     return new ArrayList<>();
+                }try {
+                    buildReader(fileType, task);
+                } catch (Exception e){
+                    log.error("构建reader异常", e);
+                    return new ArrayList<>();
                 }
-                buildReader(fileType, task);
             }
         }
         return read(fileType);
@@ -140,7 +144,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    private void buildReader(String fileType, OssTask task) {
+    private void buildReader(String fileType, OssTask task) throws Exception {
         switch (fileType) {
             case "csv":
                 csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
