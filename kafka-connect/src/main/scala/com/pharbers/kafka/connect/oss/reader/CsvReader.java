@@ -5,6 +5,7 @@ import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.CellData;
 import com.pharbers.kafka.connect.oss.model.Label;
 import com.pharbers.kafka.schema.OssTask;
+import com.redis.S;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -172,10 +173,10 @@ public class CsvReader implements Reader {
     private SourceRecord readLine(String row) {
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
         String[] r = row.split(",");
-        List<Map.Entry<String, String>> rowValue = new ArrayList<>();
+        Map<String, String> rowValue = new HashMap<>(10);
         for (int i = 0; i < titleList.size(); i++) {
             String v = i >= r.length ? "" : r[i];
-            rowValue.add(new CellData(titleList.get(i), v));
+            rowValue.put(titleList.get(i), v);
         }
         Struct value = buildValue(traceId, jobId, "SandBox", rowValue);
         return new SourceRecord(offsetHandler.offsetKey(jobId), offsetHandler.offsetValueCoding(), topic, null,

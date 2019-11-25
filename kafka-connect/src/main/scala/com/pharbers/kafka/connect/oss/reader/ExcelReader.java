@@ -163,11 +163,11 @@ public class ExcelReader implements Reader {
     private SourceRecord readRow(Row r, String jobId){
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
 
-        List<Map.Entry<String, String>> rowValue = new ArrayList<>();
+        Map<String, String> rowValue = new HashMap<>(10);
         for (int i = 0; i < titleList.size(); i++) {
             String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
             if (!"".equals(titleList.get(i))) {
-                rowValue.add(new CellData(titleList.get(i), v));
+                rowValue.put(titleList.get(i), v);
             }
         }
         Struct value = buildValue(traceId, jobId, "SandBox", rowValue);

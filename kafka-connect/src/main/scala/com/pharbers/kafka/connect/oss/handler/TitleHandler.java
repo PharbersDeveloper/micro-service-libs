@@ -26,31 +26,35 @@ public class TitleHandler {
     private Map<String, List<ExcelTitle>> title = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public TitleHandler(String[] titleRow, String traceID) {
-        addTitle(titleRow, traceID,0);
+    public TitleHandler(String[] titleRow, String traceId) {
+        addTitle(titleRow, traceId,0);
     }
 
     public TitleHandler() {
     }
 
-    public void addTitle(String[] titleRow, String traceID, int index) {
+    public void addTitle(String[] titleRow, String traceId, int index) {
         List<ExcelTitle> sheetTitle = new ArrayList<>();
         List<String> titleList = new ArrayList<>();
+        int titleIndex = 0;
         for (String value : titleRow) {
-            titleList.add(value);
-            if (!value.equals("")) sheetTitle.add(new ExcelTitle(value, "String"));
+            titleList.add(titleIndex + "#" + value);
+            if (!"".equals(value)) {
+                sheetTitle.add(new ExcelTitle(titleIndex + "#" + value, "String"));
+            }
+            titleIndex ++;
         }
-        titleMap.put(traceID + index, titleList);
-        title.put(traceID + index, sheetTitle);
+        titleMap.put(traceId + index, titleList);
+        title.put(traceId + index, sheetTitle);
     }
 
-    public Struct titleBuild(Schema schema, String traceID, String jobID) {
+    public Struct titleBuild(Schema schema, String traceId, String jobId) {
         Struct headValue = new Struct(schema);
-        headValue.put("jobId", jobID);
-        headValue.put("traceId", traceID);
+        headValue.put("jobId", jobId);
+        headValue.put("traceId", traceId);
         headValue.put("type", "SandBox-Schema");
         try {
-            headValue.put("data", mapper.writeValueAsString(title.get(jobID)));
+            headValue.put("data", mapper.writeValueAsString(title.get(jobId)));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,9 +63,5 @@ public class TitleHandler {
 
     public Map<String, List<String>> getTitleMap() {
         return titleMap;
-    }
-
-    public Map<String, List<ExcelTitle>> getTitle() {
-        return title;
     }
 }
