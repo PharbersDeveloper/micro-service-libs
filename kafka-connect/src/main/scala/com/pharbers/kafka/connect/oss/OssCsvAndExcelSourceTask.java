@@ -5,26 +5,18 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.OSSObject;
+import com.pharbers.kafka.connect.oss.kafka.Producer;
 import com.pharbers.kafka.connect.oss.reader.CsvReader;
 import com.pharbers.kafka.connect.oss.reader.ExcelReader;
 import com.pharbers.kafka.schema.OssTask;
-import com.monitorjbl.xlsx.StreamingReader;
-import com.monitorjbl.xlsx.exceptions.ParseException;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
-import com.pharbers.kafka.connect.oss.model.ExcelTitle;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.connect.data.Struct;
+import com.pharbers.kafka.schema.PhErrorMsg;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ooxml.POIXMLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -98,9 +90,17 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 } catch (OSSException | ClientException oe) {
                     log.error(ossKey, oe);
                     return new ArrayList<>();
-                }try {
+                }
+                try {
                     buildReader(fileType, task);
-                } catch (Exception e){
+                } catch (POIXMLException e) {
+                    log.info("poi异常", e);
+                    Producer.getIns().pull(new PhErrorMsg(
+                            task.getJobId(), task.getTraceId(),
+                            "", "kafka-connector",
+                            "ooxml_exception", e.getMessage()));
+                    return new ArrayList<>();
+                } catch (Exception e) {
                     log.error("构建reader异常", e);
                     return new ArrayList<>();
                 }
