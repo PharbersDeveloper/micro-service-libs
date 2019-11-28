@@ -8,6 +8,7 @@ import java.util.Scanner
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import org.apache.avro.specific.SpecificRecordBase
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.errors.InterruptException
 import org.codehaus.jackson.map.ObjectMapper
 
 import scala.collection.JavaConverters._
@@ -38,10 +39,16 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
     consumer.subscribe(List(topic).asJava)
 
     override def run(): Unit = {
-        while(!Thread.currentThread().isInterrupted){
-            consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => msgList.add(x.value()))
+        try {
+            while(!Thread.currentThread().isInterrupted){
+                consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => msgList.add(x.value()))
+            }
+        } catch {
+            case e: InterruptException =>
+            case e: Exception => e.printStackTrace()
+        } finally {
+            consumer.close()
         }
-        consumer.close()
     }
 
     def hasNext: Boolean ={
@@ -59,6 +66,7 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
     }
 
     def close: Unit ={
+        consumer.close()
         next
     }
 }

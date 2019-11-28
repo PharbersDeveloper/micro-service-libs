@@ -125,10 +125,14 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 consumer.close();
                 csvReader.close();
                 excelReader.close();
-                stream.close();
+                if (stream != null){
+                    stream.close();
+                }
                 log.trace("Closed input stream");
             } catch (IOException e) {
                 log.error("Failed to close FileStreamSourceTask stream: ", e);
+            } catch (NullPointerException e){
+                log.error("NullPointerException", e);
             }
             this.notify();
         }

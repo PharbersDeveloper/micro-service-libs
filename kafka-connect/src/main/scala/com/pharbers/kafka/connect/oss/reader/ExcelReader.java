@@ -122,7 +122,9 @@ public class ExcelReader implements Reader {
     @Override
     public void close() {
         try {
-            reader.close();
+            if (reader != null) {
+                reader.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
