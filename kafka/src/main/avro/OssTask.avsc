@@ -4,6 +4,10 @@
   "namespace": "com.pharbers.kafka.schema",
   "fields": [
     {
+      "name": "assetId",
+      "type": "string"
+    },
+    {
       "name": "jobId",
       "type": "string"
     },

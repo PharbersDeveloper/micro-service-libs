@@ -32,7 +32,7 @@ class PharbersProducerTests extends FunSuite {
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
-        val gr: OssTask = new OssTask(jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
+        val gr: OssTask = new OssTask("", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
