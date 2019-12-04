@@ -83,7 +83,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 String ossKey = task.getOssKey().toString();
                 String traceId = task.getTraceId().toString();
                 fileType = task.getFileType().toString();
-                log.info("ossKey:" + ossKey + " jobID:" + " ," + " traceID:" + traceId + " type:" + fileType);
+                log.info("ossKey:" + ossKey + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + traceId + " type:" + fileType);
                 try {
                     OSSObject object = client.getObject(bucketName, ossKey);
                     stream = object.getObjectContent();
@@ -99,9 +99,13 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                             task.getJobId(), task.getTraceId(),
                             "", "kafka-connector",
                             "ooxml_exception", e.getMessage()));
+                    excelReader.close();
+                    csvReader.close();
                     return new ArrayList<>();
                 } catch (Exception e) {
                     log.error("构建reader异常", e);
+                    excelReader.close();
+                    csvReader.close();
                     return new ArrayList<>();
                 }
             }
@@ -138,9 +142,9 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
     }
 
-    private Map<String, Object> getStreamOffset(String traceId) {
-        String offsetKey = "traceID";
-        Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(offsetKey, traceId));
+    private Map<String, Object> getStreamOffset(String jobId) {
+        String offsetKey = "jobId";
+        Map<String, Object> offset = context.offsetStorageReader().offset(Collections.singletonMap(offsetKey, jobId));
         if (offset != null) {
             return offset;
         } else {
@@ -152,11 +156,11 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         switch (fileType) {
             case "csv":
                 csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
-                csvReader.init(stream, task, getStreamOffset(task.getTraceId().toString()));
+                csvReader.init(stream, task, getStreamOffset(task.getJobId().toString()));
                 break;
             case "xlsx":
                 excelReader = new ExcelReader(excelReader.getTopic(), excelReader.getBatchSize());
-                excelReader.init(stream, task, getStreamOffset(task.getTraceId().toString()));
+                excelReader.init(stream, task, getStreamOffset(task.getJobId().toString()));
                 break;
             default:
                 log.error("不支持的类型" + fileType);

@@ -21,8 +21,12 @@ public class OffsetHandler {
         }
     }
 
-    public Map<String, String> offsetKey(String filename) {
-        return Collections.singletonMap("traceID", filename);
+    /**
+     *
+     * @param filename jobId
+     */
+    public static Map<String, String> offsetKey(String filename) {
+        return Collections.singletonMap("jobId", filename);
     }
 
     public Map<String, String> offsetValueCoding(){

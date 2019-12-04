@@ -26,14 +26,14 @@ public class TitleHandler {
     private Map<String, List<ExcelTitle>> title = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public TitleHandler(String[] titleRow, String traceId) {
-        addTitle(titleRow, traceId,0);
+    public TitleHandler(String[] titleRow, String jobId) {
+        addTitle(titleRow, jobId);
     }
 
     public TitleHandler() {
     }
 
-    public void addTitle(String[] titleRow, String traceId, int index) {
+    public void addTitle(String[] titleRow, String jobId) {
         List<ExcelTitle> sheetTitle = new ArrayList<>();
         List<String> titleList = new ArrayList<>();
         int titleIndex = 0;
@@ -44,8 +44,8 @@ public class TitleHandler {
             }
             titleIndex ++;
         }
-        titleMap.put(traceId + index, titleList);
-        title.put(traceId + index, sheetTitle);
+        titleMap.put(jobId, titleList);
+        title.put(jobId, sheetTitle);
     }
 
     public Struct titleBuild(Schema schema, String traceId, String jobId) {

@@ -2,6 +2,7 @@ package com.pharbers.kafka.connect.oss.reader;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
+import com.pharbers.kafka.connect.oss.handler.SourceRecordHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.CellData;
 import com.pharbers.kafka.connect.oss.model.Label;
@@ -41,14 +42,8 @@ public class ExcelReader implements Reader {
     private Map<String, String> SheetNames = new HashMap<>();
     private TitleHandler titleHandler = null;
     private OffsetHandler offsetHandler = null;
-    private final SchemaBuilder VALUE_SCHEMA_BUILDER = SchemaBuilder.struct()
-            .field("jobId", Schema.STRING_SCHEMA)
-            .field("traceId", Schema.STRING_SCHEMA)
-            .field("type", Schema.STRING_SCHEMA)
-            .field("data", Schema.STRING_SCHEMA);
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Schema VALUE_SCHEMA = VALUE_SCHEMA_BUILDER.build();
-    private final Schema KEY_SCHEMA = Schema.STRING_SCHEMA;
+    private SourceRecordHandler sourceRecordHandler;
     private int batchSize;
 
     public ExcelReader(String topic, int batchSize){
@@ -81,6 +76,13 @@ public class ExcelReader implements Reader {
         List<Integer> titleIndexList = task.getTitleIndex();
         isEnd = false;
         reader = StreamingReader.builder().open(stream);
+        Schema valueSchema = SchemaBuilder.struct()
+                .field("jobId", Schema.STRING_SCHEMA)
+                .field("traceId", Schema.STRING_SCHEMA)
+                .field("type", Schema.STRING_SCHEMA)
+                .field("data", Schema.STRING_SCHEMA).build();
+        Schema keySchema = SchemaBuilder.string().optional().build();
+        sourceRecordHandler = new SourceRecordHandler(OffsetHandler.offsetKey(task.getJobId().toString()), topic, keySchema, valueSchema);
         log.info("*********************START!");
         Iterator<Sheet> sheets = reader.sheetIterator();
         int index = 0;
@@ -88,8 +90,9 @@ public class ExcelReader implements Reader {
         while (sheets.hasNext()) {
             Sheet sheet = sheets.next();
             int titleIndex = titleIndexList.size() > index ? titleIndexList.get(index) : 0;
-            jobIds.put(sheet.rowIterator(), traceId + index);
-            SheetNames.put(traceId + index, sheet.getSheetName());
+            String jobId = UUID.randomUUID().toString() + index;
+            jobIds.put(sheet.rowIterator(), jobId);
+            SheetNames.put(jobId, sheet.getSheetName());
             if (sheet.rowIterator().hasNext()) {
                 while (sheet.rowIterator().hasNext() && titleIndex > 0) {
                     sheet.rowIterator().next();
@@ -103,9 +106,9 @@ public class ExcelReader implements Reader {
                 for (Cell c : titleRow) {
                     row.add(c.getStringCellValue());
                 }
-                titleHandler.addTitle(row.toArray(new String[0]), traceId, index);
+                titleHandler.addTitle(row.toArray(new String[0]), jobId);
             }
-            long rowOffset = offsetHandler.get(traceId + index);
+            long rowOffset = offsetHandler.get(jobId);
             while (sheet.rowIterator().hasNext() && rowOffset > 0) {
                 sheet.rowIterator().next();
                 rowOffset--;
@@ -152,10 +155,11 @@ public class ExcelReader implements Reader {
                 }
             }
             if (offsetHandler.get(jobId) == 0L) {
-                records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
-                        KEY_SCHEMA, jobId, VALUE_SCHEMA, titleHandler.titleBuild(VALUE_SCHEMA, traceId, jobId), System.currentTimeMillis()));
-                records.add(new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
-                        KEY_SCHEMA, jobId, VALUE_SCHEMA, buildValue(traceId, jobId, "SandBox-Labels", new Label(task, SheetNames.get(jobId))), System.currentTimeMillis()));
+                Struct title = titleHandler.titleBuild(sourceRecordHandler.getValueSchema(), traceId, jobId);
+                records.add(sourceRecordHandler.builder(null, title, offsetHandler.offsetValueCoding()));
+                Struct labels = buildValue(traceId, jobId, "SandBox-Labels", new Label(task, SheetNames.get(jobId)));
+                records.add(sourceRecordHandler.builder(null, labels,
+                        offsetHandler.offsetValueCoding()));
             }
             records.add(readRow(rowsIterator.next(), jobId));
         }while (records.size() < batchSize);
@@ -176,25 +180,22 @@ public class ExcelReader implements Reader {
         synchronized (this) {
             offsetHandler.add(jobId);
         }
-        return new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobId, VALUE_SCHEMA, value, System.currentTimeMillis());
+        return sourceRecordHandler.builder(null, value, offsetHandler.offsetValueCoding());
     }
 
     private SourceRecord endBuilder(String jobId){
         log.info("读取完成");
         log.info(offsetHandler.toString());
-        Struct headValue = new Struct(VALUE_SCHEMA);
+        Struct headValue = new Struct(sourceRecordHandler.getValueSchema());
         headValue.put("jobId", jobId);
         headValue.put("traceId", traceId);
         headValue.put("type", "SandBox-Length");
         headValue.put("data", "{\"length\": " + offsetHandler.get(jobId) + " }");
-        return new SourceRecord(offsetHandler.offsetKey(traceId), offsetHandler.offsetValueCoding(), topic, null,
-                KEY_SCHEMA, jobId, VALUE_SCHEMA, headValue, System.currentTimeMillis());
-
+        return sourceRecordHandler.builder(null, headValue, offsetHandler.offsetValueCoding());
     }
 
     private Struct buildValue(String traceId, String jobId, String type, Object data){
-        Struct value = new Struct(VALUE_SCHEMA);
+        Struct value = new Struct(sourceRecordHandler.getValueSchema());
         value.put("jobId", jobId);
         value.put("traceId", traceId);
         value.put("type", type);
