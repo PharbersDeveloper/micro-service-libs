@@ -24,6 +24,8 @@ public class Label {
     private String sheetName;
     private String fileName;
 
+    private String assetId;
+
     public Label(List<String> label,
                  List<String> dataCover,
                  List<String> geoCover,
@@ -31,7 +33,8 @@ public class Label {
                  List<String> molecules,
                  List<String> providers,
                  String sheetName,
-                 String fileName) {
+                 String fileName,
+                 String assetId) {
         this.label = label;
         this.dataCover = dataCover;
         this.geoCover = geoCover;
@@ -40,6 +43,7 @@ public class Label {
         this.providers = providers;
         this.sheetName = sheetName;
         this.fileName = fileName;
+        this.assetId = assetId;
     }
 
     public Label(OssTask task, String sheetName) {
@@ -57,6 +61,7 @@ public class Label {
         task.getProviders().forEach(x -> providers.add(x.toString()));
         this.sheetName = sheetName;
         this.fileName = task.getFileName().toString();
+        this.assetId = task.getAssetId().toString();
     }
 
     public List<String> getLabel() {
@@ -121,5 +126,13 @@ public class Label {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 }

@@ -26,6 +26,7 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
     val path = new File("/usr/share/logs-path/msgList")
     val mapping = new ObjectMapper()
     val consumer: KafkaConsumer[K, V] =  new PharbersKafkaConsumer[K, V](List(topic)).getConsumer
+    var keySet: Set[K] = Set()
     val msgList = new util.LinkedList[V]()
     if(path.exists()){
         val scanner = new Scanner(path)
@@ -41,7 +42,12 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
     override def run(): Unit = {
         try {
             while(!Thread.currentThread().isInterrupted){
-                consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => msgList.add(x.value()))
+                consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => {
+                    if (!keySet.contains(x.key())) {
+                        keySet += x.key()
+                        msgList.add(x.value())
+                    }
+                })
             }
         } catch {
             case e: InterruptException =>
@@ -62,6 +68,7 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
         msgList.asScala.foreach(x => write.write(x.toString + "\n"))
         write.flush()
         write.close()
+        keySet = Set()
         msgList.pollFirst()
     }
 

@@ -21,7 +21,7 @@ class Producer {
 
     def pull(msg: PhErrorMsg): Unit = {
         val topic = "pharbers_error"
-        val fu = pkp.produce(topic, msg.getErrorNode.toString, msg)
+        val fu = pkp.produce(topic, msg.getErrorCode.toString, msg)
         try
             println(fu.get(10, TimeUnit.SECONDS))
         catch {

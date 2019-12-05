@@ -98,7 +98,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     Producer.getIns().pull(new PhErrorMsg(
                             task.getJobId(), task.getTraceId(),
                             "", "kafka-connector",
-                            "ooxml_exception", e.getMessage()));
+                            "ooxml_exception", e.getMessage(), task.getAssetId()));
                     excelReader.close();
                     csvReader.close();
                     return new ArrayList<>();
