@@ -38,8 +38,8 @@ public class TitleHandler {
         List<String> titleList = new ArrayList<>();
         int titleIndex = 0;
         for (String value : titleRow) {
-            titleList.add(titleIndex + "#" + value);
             if (!"".equals(value)) {
+                titleList.add(titleIndex + "#" + value);
                 sheetTitle.add(new ExcelTitle(titleIndex + "#" + value, "String"));
             }
             titleIndex ++;
@@ -63,5 +63,11 @@ public class TitleHandler {
 
     public Map<String, List<String>> getTitleMap() {
         return titleMap;
+    }
+
+    public void resetTitle(String[] titleRow, String jobId, String oldJobId){
+        titleMap.remove(oldJobId);
+        title.remove(oldJobId);
+        addTitle(titleRow, jobId);
     }
 }

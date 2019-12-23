@@ -1,6 +1,6 @@
 package com.pharbers.kafka.connect
 
-import com.pharbers.kafka.connect.oss.model.ExcelTitle
+import com.pharbers.kafka.connect.oss.model.{CellData, ExcelTitle}
 import com.pharbers.kafka.schema.OssTask
 import org.apache.avro.specific.SpecificRecordBase
 import org.codehaus.jackson.map.ObjectMapper
@@ -18,9 +18,10 @@ import scala.reflect.ClassTag
   * @note 一些值得注意的地方
   */
 object testJaon extends App {
-    val list = List(new ExcelTitle("a", "b"), new ExcelTitle("a", "b"))
+    val list = List(new CellData("a", "b"), new CellData("a", "b"))
     val a = new ObjectMapper().writeValueAsString(list.asJava)
     println(a)
+    println(new ObjectMapper().writeValueAsString(Map("a" -> "a", "b" -> "b").asJava))
 }
 
 object testClass extends App{

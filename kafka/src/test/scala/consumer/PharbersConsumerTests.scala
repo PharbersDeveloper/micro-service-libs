@@ -4,6 +4,7 @@ import java.time.Duration
 
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import com.pharbers.kafka.schema.{OssTask, RecordDemo}
+import com.pharbers.util.log.PhLogable
 import io.confluent.ksql.avro_schemas.KsqlDataSourceSchema
 import kafka.cluster.Partition
 import org.apache.avro.generic.GenericRecord
@@ -17,7 +18,7 @@ import org.scalatest.FunSuite
   * @ date 19-6-11
   * @ Description: TODO
   */
-class PharbersConsumerTests extends FunSuite {
+class PharbersConsumerTests extends FunSuite with PhLogable{
 
     test("PharbersKafkaConsumer") {
 //        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, Int.MaxValue)

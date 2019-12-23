@@ -5,6 +5,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.model.OSSObject;
+import com.pharbers.kafka.connect.oss.exception.TitleLengthException;
 import com.pharbers.kafka.connect.oss.kafka.Producer;
 import com.pharbers.kafka.connect.oss.reader.CsvReader;
 import com.pharbers.kafka.connect.oss.reader.ExcelReader;
@@ -38,6 +39,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private CsvReader csvReader = null;
     private ExcelReader excelReader = null;
     private boolean stop = false;
+    private OssTask task;
     private String fileType = "";
 
     @Override
@@ -79,7 +81,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     log.info("等待kafka任务," + Thread.currentThread().getName());
                     Thread.sleep(1000);
                 }
-                OssTask task = consumer.next();
+                task = consumer.next();
                 String ossKey = task.getOssKey().toString();
                 String traceId = task.getTraceId().toString();
                 fileType = task.getFileType().toString();
@@ -164,19 +166,49 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 break;
             default:
                 log.error("不支持的类型" + fileType);
+                Producer.getIns().pull(new PhErrorMsg(
+                        task.getJobId(), task.getTraceId(),
+                        "", "kafka-connector",
+                        "type_exception", fileType, task.getAssetId()));
         }
     }
 
     private List<SourceRecord> read(String fileType) {
         switch (fileType) {
             case "csv":
-                return csvReader.read();
+                try {
+                    return csvReader.read();
+                } catch (TitleLengthException e) {
+                    resetCsvRead();
+                    log.error(e.getMessage(), e);
+                }
             case "xlsx":
                 return excelReader.read();
             default:
                 log.error(fileType + "is Error Message: fileType missMatch");
                 return new ArrayList<>();
         }
+    }
+
+    private void resetCsvRead(){
+        CsvReader oldRead = csvReader;
+        CsvReader reader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
+        InputStream newStream = client.getObject(bucketName, task.getOssKey().toString()).getObjectContent();
+        List<Integer> titleIndex = new ArrayList<>();
+        if(task.getTitleIndex().isEmpty()){
+            titleIndex.set(0, 1);
+        } else {
+            titleIndex.set(0, task.getTitleIndex().get(0) + 1);
+        }
+        task.setTitleIndex(titleIndex);
+        try {
+            reader.init(newStream, task, new HashMap<>(0));
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        csvReader = reader;
+        oldRead.close();
     }
 
     static class NameThreadFactory implements ThreadFactory {

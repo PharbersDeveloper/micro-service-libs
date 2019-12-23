@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import com.pharbers.kafka.producer.PharbersKafkaProducer
 import org.apache.avro.Schema
 import org.apache.avro.generic.{GenericData, GenericRecord}
-import com.pharbers.kafka.schema.{OssTask, RecordDemo}
+import com.pharbers.kafka.schema.{OssTask, PhErrorMsg, RecordDemo}
 import org.scalatest.FunSuite
 import scalaj.http.Http
 
@@ -26,9 +26,9 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
-        val jobId = "201911121509"
-        val traceId = "201911181700"
-        val ossKey = "test1.xlsx"
+        val jobId = "201911221139"
+        val traceId = "201911221139"
+        val ossKey = "b44320ab-9557-491e-a382-c65e49ed4682/1574249020667"
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
@@ -50,9 +50,9 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use SpecificRecord") {
-        val pkp = new PharbersKafkaProducer[String, RecordDemo]
-        val rd = new RecordDemo("005", "WOLO")
-        val fu = pkp.produce("test6", "key", rd)
+        val pkp = new PharbersKafkaProducer[String, PhErrorMsg]
+        val rd = new PhErrorMsg("005", "WOLO", "", "test", "testException", "test" ,"")
+        val fu = pkp.produce("pharbers_error", "key", rd)
         println(fu.get(10, TimeUnit.SECONDS))
     }
 

@@ -45,15 +45,15 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
                 consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => {
                     if (!keySet.contains(x.key())) {
                         keySet += x.key()
-                        msgList.add(x.value())
+                        this.synchronized{
+                            msgList.add(x.value())
+                        }
                     }
                 })
             }
         } catch {
             case e: InterruptException =>
             case e: Exception => e.printStackTrace()
-        } finally {
-            consumer.close()
         }
     }
 
@@ -65,7 +65,9 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
         path.delete()
         path.createNewFile()
         val write = new FileWriter(path)
-        msgList.asScala.foreach(x => write.write(x.toString + "\n"))
+        this.synchronized{
+            msgList.asScala.foreach(x => write.write(x.toString + "\n"))
+        }
         write.flush()
         write.close()
         keySet = Set()

@@ -1,10 +1,10 @@
 package com.pharbers.kafka.connect.oss.reader;
 
 import com.monitorjbl.xlsx.StreamingReader;
+import com.pharbers.kafka.connect.oss.exception.TitleLengthException;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.SourceRecordHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
-import com.pharbers.kafka.connect.oss.model.CellData;
 import com.pharbers.kafka.connect.oss.model.Label;
 import com.pharbers.kafka.schema.OssTask;
 import org.apache.kafka.connect.data.Schema;
@@ -39,7 +39,8 @@ public class ExcelReader implements Reader {
     private String topic;
     private OssTask task;
     private Map<Iterator<Row>, String> jobIds = new HashMap<>();
-    private Map<String, String> SheetNames = new HashMap<>();
+    private Map<String, String> sheetNames = new HashMap<>();
+    private Map<String, Integer> registers = new HashMap<>();
     private TitleHandler titleHandler = null;
     private OffsetHandler offsetHandler = null;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -63,8 +64,15 @@ public class ExcelReader implements Reader {
             return new ArrayList<>();
         }
         Iterator<Row> rowsIterator = jobIds.keySet().iterator().next();
-        String jobID = jobIds.get(rowsIterator);
-        return readSheet(rowsIterator, jobID);
+        String jobId = jobIds.get(rowsIterator);
+
+        try {
+            return readSheet(rowsIterator, jobId);
+        } catch (TitleLengthException e) {
+            log.error("title 错误， 创建新title");
+            resetSheet(rowsIterator, e);
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -92,7 +100,7 @@ public class ExcelReader implements Reader {
             int titleIndex = titleIndexList.size() > index ? titleIndexList.get(index) : 0;
             String jobId = UUID.randomUUID().toString() + index;
             jobIds.put(sheet.rowIterator(), jobId);
-            SheetNames.put(jobId, sheet.getSheetName());
+            sheetNames.put(jobId, sheet.getSheetName());
             if (sheet.rowIterator().hasNext()) {
                 while (sheet.rowIterator().hasNext() && titleIndex > 0) {
                     sheet.rowIterator().next();
@@ -142,11 +150,16 @@ public class ExcelReader implements Reader {
         return batchSize;
     }
 
-    private ArrayList<SourceRecord> readSheet(Iterator<Row> rowsIterator, String jobId){
+    private ArrayList<SourceRecord> readSheet(Iterator<Row> rowsIterator, String jobId) throws TitleLengthException {
+        registers.put(jobId, registers.getOrDefault(jobId, 0) + 1);
         ArrayList<SourceRecord> records = new ArrayList<>();
         do{
             synchronized (this) {
                 if (!rowsIterator.hasNext()) {
+                    //这儿发送end length，但是可能到这一步的时候，其他还有线程需要修改length
+                    if(registers.getOrDefault(jobId, -1) != 1){
+                        break;
+                    }
                     if(offsetHandler.get(jobId) > 0) {
                         records.add(endBuilder(jobId));
                     }
@@ -157,18 +170,24 @@ public class ExcelReader implements Reader {
             if (offsetHandler.get(jobId) == 0L) {
                 Struct title = titleHandler.titleBuild(sourceRecordHandler.getValueSchema(), traceId, jobId);
                 records.add(sourceRecordHandler.builder(null, title, offsetHandler.offsetValueCoding()));
-                Struct labels = buildValue(traceId, jobId, "SandBox-Labels", new Label(task, SheetNames.get(jobId)));
+                Struct labels = buildValue(traceId, jobId, "SandBox-Labels", new Label(task, sheetNames.get(jobId)));
                 records.add(sourceRecordHandler.builder(null, labels,
                         offsetHandler.offsetValueCoding()));
             }
             records.add(readRow(rowsIterator.next(), jobId));
         }while (records.size() < batchSize);
+        registers.put(jobId, registers.get(jobId) - 1);
         return records;
     }
 
-    private SourceRecord readRow(Row r, String jobId){
+    private SourceRecord readRow(Row r, String jobId) throws TitleLengthException {
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
-
+        if (r.getLastCellNum() > titleList.size()){
+            String value = r.getCell(titleList.size()).getStringCellValue();
+            if (value != null && !"".equals(value)){
+                throw new TitleLengthException(r);
+            }
+        }
         Map<String, String> rowValue = new HashMap<>(10);
         for (int i = 0; i < titleList.size(); i++) {
             String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
@@ -205,5 +224,27 @@ public class ExcelReader implements Reader {
             e.printStackTrace();
         }
         return value;
+    }
+
+    private void resetSheet(Iterator<Row> rowsIterator, TitleLengthException e){
+        /**
+         * 1 重新设置title
+         * 2 重新设置jobid
+         * 4 title jobid 绑定关系改变
+         */
+
+        String oldJobId = jobIds.get(rowsIterator);
+        String newJobId = UUID.randomUUID().toString();
+        Iterator<Row> newRowsIterator =  reader.getSheet(sheetNames.get(oldJobId)).rowIterator();
+        for (int i = 0; i <= e.getIndex(); i++){
+            if(newRowsIterator.hasNext()){
+                newRowsIterator.next();
+            }
+        }
+        registers.put(oldJobId, 10000);
+        titleHandler.resetTitle(e.getErrorLine(), newJobId, oldJobId);
+        jobIds.put(newRowsIterator, newJobId);
+        jobIds.remove(rowsIterator);
+        sheetNames.put(newJobId, sheetNames.get(oldJobId));
     }
 }

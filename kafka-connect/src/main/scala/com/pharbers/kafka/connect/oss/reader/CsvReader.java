@@ -1,5 +1,6 @@
 package com.pharbers.kafka.connect.oss.reader;
 
+import com.pharbers.kafka.connect.oss.exception.TitleLengthException;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.SourceRecordHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
@@ -44,15 +45,18 @@ public class CsvReader implements Reader {
     private int batchSize;
     private final ObjectMapper mapper = new ObjectMapper();
     private SourceRecordHandler sourceRecordHandler;
+    private int register = 0;
     public CsvReader(String topic, int batchSize) {
         this.topic = topic;
         this.batchSize = batchSize;
     }
 
     @Override
-    public List<SourceRecord> read() {
-        String key = UUID.randomUUID().toString();
+    public List<SourceRecord> read() throws TitleLengthException {
         ArrayList<SourceRecord> records = new ArrayList<>();
+        synchronized (this){
+            register ++;
+        }
         do {
             String row = null;
             try {
@@ -62,7 +66,9 @@ public class CsvReader implements Reader {
             }
             synchronized (this) {
                 if (row == null) {
-                    endHandler(records);
+                    if(register == 1) {
+                        endHandler(records);
+                    }
                     break;
                 }
             }
@@ -77,6 +83,9 @@ public class CsvReader implements Reader {
                 offsetHandler.add(jobId);
             }
         } while (records.size() < batchSize);
+        synchronized (this){
+            register --;
+        }
         return records;
     }
 
@@ -171,9 +180,15 @@ public class CsvReader implements Reader {
         isEnd = true;
     }
 
-    private SourceRecord readLine(String row) {
+    private SourceRecord readLine(String row) throws TitleLengthException {
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
         String[] r = row.split(",");
+        if (r.length > titleList.size()){
+            String value = r[titleList.size()];
+            if (value != null && !"".equals(value)){
+                throw new TitleLengthException(r);
+            }
+        }
         Map<String, String> rowValue = new HashMap<>(10);
         for (int i = 0; i < titleList.size(); i++) {
             String v = i >= r.length ? "" : r[i];
@@ -194,5 +209,12 @@ public class CsvReader implements Reader {
             e.printStackTrace();
         }
         return value;
+    }
+
+    private void resetSheet(TitleLengthException e){
+        //todo：还是需要重新创建迭代器，并且跳过现有的
+        String newJobId = UUID.randomUUID().toString();
+        titleHandler.resetTitle(e.getErrorLine(), newJobId, jobId);
+        jobId = newJobId;
     }
 }
