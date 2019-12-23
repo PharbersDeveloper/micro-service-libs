@@ -2,10 +2,11 @@ package com.pharbers.kafka.producer
 
 import java.net.InetAddress
 import java.util.Properties
-import java.util.concurrent.{Future, TimeUnit}
+import java.util.concurrent.Future
 
 import com.pharbers.kafka.common.kafka_config_obj
-import org.apache.kafka.clients.producer.{Callback, KafkaProducer, ProducerRecord, RecordMetadata}
+import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
+import org.apache.kafka.clients.producer._
 
 import scala.tools.jline_embedded.internal.Log
 
@@ -25,18 +26,19 @@ object PharbersKafkaProducer {
 class PharbersKafkaProducer[K, V] {
 
     lazy val config = new Properties()
-    config.put("client.id", InetAddress.getLocalHost.getHostName)
-    config.put("bootstrap.servers", kafka_config_obj.broker)
-    config.put("acks", kafka_config_obj.acks)
-    config.put("key.serializer", kafka_config_obj.keyDefaultSerializer)
-    config.put("value.serializer", kafka_config_obj.valueDefaultSerializer)
+    config.put(ProducerConfig.CLIENT_ID_CONFIG, InetAddress.getLocalHost.getHostName)
+    config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka_config_obj.broker)
+    config.put(ProducerConfig.ACKS_CONFIG, kafka_config_obj.acks)
+    config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafka_config_obj.keyDefaultSerializer)
+    config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafka_config_obj.valueDefaultSerializer)
+    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl)
     config.put("security.protocol", kafka_config_obj.securityProtocol)
     config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
     config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
     config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
     config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
     config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
-    lazy val producer = new KafkaProducer[K, V](config)
+    val producer = new KafkaProducer[K, V](config)
 
     def produce(topic: String, key: K, value: V): Future[RecordMetadata] = {
         val record: ProducerRecord[K, V] = new ProducerRecord[K, V](topic, key, value)
@@ -46,7 +48,6 @@ class PharbersKafkaProducer[K, V] {
                     if (e != null) Log.debug("Send failed for record {}", record, e) else Log.info("SUCCEED!")
                 }
             })
-
         return future
     }
 

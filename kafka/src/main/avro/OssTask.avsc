@@ -1,0 +1,84 @@
+{
+  "type": "record",
+  "name": "OssTask",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "assetId",
+      "type": "string"
+    },
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "traceId",
+      "type": "string"
+    },
+    {
+      "name": "ossKey",
+      "type": "string"
+    },
+    {
+      "name": "titleIndex",
+      "type": {
+        "items": "int",
+        "type": "array"
+       }
+    },
+    {
+        "name": "fileType",
+        "type": "string"
+    },
+    {
+      "name": "fileName",
+      "type": "string"
+    },
+    {
+      "name": "sheetName",
+      "type": "string"
+    },
+    {
+      "name": "labels",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    {
+      "name": "dataCover",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    {
+      "name": "geoCover",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    {
+      "name": "markets",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    {
+      "name": "molecules",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    {
+      "name": "providers",
+      "type": {
+        "items": "string",
+        "type": "array"
+      }
+    }
+  ]
+}

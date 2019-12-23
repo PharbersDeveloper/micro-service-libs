@@ -1,0 +1,1 @@
+{"type":"record","name":"KsqlDataSourceSchema","namespace":"io.confluent.ksql.avro_schemas","fields":[{"name":"CORP_NAME","type":["null","string"],"default":null}]}

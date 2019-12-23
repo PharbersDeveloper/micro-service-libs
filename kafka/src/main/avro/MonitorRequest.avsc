@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "MonitorRequest",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "strategy",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "SparkDriverConfig",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "cup",
+      "type": "int"
+    },
+    {
+        "name": "eme",
+        "type": "int"
+    },
+    {
+        "name": "topic",
+        "type": "string"
+    }
+  ]
+}

@@ -12,8 +12,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kafka.version>0.10.1.0</kafka.version>
-        <confluent.version>3.1.1</confluent.version>
+        <kafka.version>2.2.1</kafka.version>
+        <confluent.version>5.2.1</confluent.version>
         <hadoop.version>2.9.0</hadoop.version>
         <avro.version>1.8.1</avro.version>
         <parquet.version>1.9.0</parquet.version>
@@ -62,7 +62,47 @@
                     <artifactId>aliyun-sdk-oss</artifactId>
                     <version>3.5.0</version>
                 </dependency>
-
+                <!--excel流式读取库-->
+                <dependency>
+                    <groupId>com.monitorjbl</groupId>
+                    <artifactId>xlsx-streamer</artifactId>
+                    <version>2.1.0</version>
+                </dependency>
+                <!--json-->
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                    <version>2.9.8</version>
+                </dependency>
+                <!--mongo driver-->
+                <dependency>
+                    <groupId>org.mongodb.scala</groupId>
+                    <artifactId>mongo-scala-driver_2.11</artifactId>
+                    <version>2.6.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver-sync</artifactId>
+                    <version>3.9.1</version>
+                </dependency>
+                <!--冲突-->
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-compress</artifactId>
+                    <version>1.18</version>
+                </dependency>
+                <!--kafka-->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>pharbers-kafka</artifactId>
+                    <version>1.0</version>
+                </dependency>
+                <!--log-->
+                <dependency>
+                    <groupId>com.pharbers</groupId>
+                    <artifactId>logs</artifactId>
+                    <version>1.0</version>
+                </dependency>
             </dependencies>
 
             <build>

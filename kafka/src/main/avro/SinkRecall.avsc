@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "SinkRecall",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "count",
+      "type": "long"
+    }
+  ]
+}

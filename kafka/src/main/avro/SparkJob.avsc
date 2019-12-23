@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "SparkJob",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "bucketName",
+      "type": "string"
+    },
+    {
+        "name": "ossKey",
+        "type": "string"
+    },
+    {
+       "name": "mode",
+       "type": "string"
+    },
+    {
+       "name": "config",
+       "type": {"type": "map", "values": "string"}
+    }
+  ]
+}

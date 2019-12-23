@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "BPJob",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "traceId",
+      "type": "string"
+    },
+    {
+        "name": "type",
+        "type": "string"
+    },
+    {
+       "name": "job",
+       "type": "string"
+    }
+  ]
+}

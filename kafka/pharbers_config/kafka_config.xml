@@ -1,18 +1,20 @@
 <pharbers-modules>
     <kafka-config>
         <broker value="59.110.31.50:9092" />
-        <group value="test20190611" />
+        <group value="test20190715" />
         <topics value="test" />
         <acks value="all" />
         <keyDefaultSerializer value="org.apache.kafka.common.serialization.StringSerializer" />
-        <valueDefaultSerializer value="org.apache.kafka.common.serialization.ByteArraySerializer" />
         <keyDefaultDeserializer value="org.apache.kafka.common.serialization.StringDeserializer" />
-        <valueDefaultDeserializer value="org.apache.kafka.common.serialization.ByteArrayDeserializer" />
+        <valueDefaultSerializer value="io.confluent.kafka.serializers.KafkaAvroSerializer" />
+        <valueDefaultDeserializer value="io.confluent.kafka.serializers.KafkaAvroDeserializer" />
+        <schemaRegistryUrl value="http://59.110.31.50:8081" />
+        <specificAvroReader value="true" />
         <securityProtocol value="SSL" />
         <sslAlgorithm value=" " />
-        <sslTruststoreLocation value="/home/jeorch/tools/kafka_2.11-1.1.0/config/secrets/kafka.broker1.truststore.jks" />
+        <sslTruststoreLocation value="D:\code\secrets\kafka.broker1.truststore.jks" />
         <sslTruststorePassword value="pharbers" />
-        <sslKeystoreLocation value="/home/jeorch/tools/kafka_2.11-1.1.0/config/secrets/kafka.broker1.keystore.jks" />
+        <sslKeystoreLocation value="D:\code\secrets\kafka.broker1.keystore.jks" />
         <sslKeystorePassword value="pharbers" />
     </kafka-config>
 </pharbers-modules>

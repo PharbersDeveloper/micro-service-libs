@@ -11,8 +11,9 @@ import java.net.InetAddress
 import java.util.Properties
 import java.util.concurrent.{Semaphore, TimeUnit}
 import java.util.concurrent.atomic.AtomicBoolean
-
+import org.apache.kafka.common.TopicPartition
 import com.pharbers.kafka.common.kafka_config_obj
+import io.confluent.kafka.serializers.{AbstractKafkaAvroSerDeConfig, KafkaAvroDeserializerConfig}
 
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
@@ -28,6 +29,8 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
     config.put("bootstrap.servers", kafka_config_obj.broker)
     config.put("key.deserializer", kafka_config_obj.keyDefaultDeserializer)
     config.put("value.deserializer", kafka_config_obj.valueDefaultDeserializer)
+    config.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, kafka_config_obj.specificAvroReader)
+    config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl);
     config.put("security.protocol", kafka_config_obj.securityProtocol)
     config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
     config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
@@ -41,8 +44,12 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
 
     override def run(): Unit = {
         try {
+            //动态分配partition
             if (topics.nonEmpty) CONSUMER.subscribe(topics.asJava) else CONSUMER.subscribe(kafka_config_obj.topics.toList.asJava)
+            //自己指定topic和partition，如果group内其他也分配这个partition，会导致offset错乱
+//            if (topics.nonEmpty) CONSUMER.assign(List(new TopicPartition("DCS1", 2)).asJava) else CONSUMER.subscribe(kafka_config_obj.topics.toList.asJava)
             Log.info("Origin PERMITS_COUNT=" + PERMITS.availablePermits())
+
             while ( {
                 !SHUTDOWN.get
             }) {
@@ -62,9 +69,17 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
         }
     }
 
+    def getConsumer: KafkaConsumer[K, V] ={
+        CONSUMER
+    }
+
     @throws[InterruptedException]
-    def shutdown(): Unit = {
+    private def shutdown(): Unit = {
         if (PERMITS.availablePermits() < 0) Log.warn("Excessive consumption! The rest of CONSUME_TIMES=" + PERMITS.availablePermits())
-        CONSUMER.close(1, TimeUnit.SECONDS)
+        CONSUMER.close()
+    }
+
+    def close(): Unit = {
+        SHUTDOWN.set(true)
     }
 }

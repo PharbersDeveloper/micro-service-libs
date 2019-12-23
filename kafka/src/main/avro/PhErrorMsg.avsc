@@ -1,0 +1,31 @@
+{
+  "type": "record",
+  "name": "PhErrorMsg",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "traceId",
+      "type": "string"
+    },
+    {
+      "name": "runId",
+      "type": "string"
+    },
+    {
+      "name": "productName",
+      "type": "string"
+    },
+    {
+      "name": "errorNode",
+      "type": "string"
+    },
+    {
+      "name": "errorMsg",
+      "type": "string"
+    }
+  ]
+}
