@@ -1,6 +1,7 @@
 package com.pharbers.kafka.connect.oss.reader;
 
 import com.monitorjbl.xlsx.StreamingReader;
+import com.pharbers.kafka.connect.oss.exception.EmptyRowException;
 import com.pharbers.kafka.connect.oss.exception.TitleLengthException;
 import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.SourceRecordHandler;
@@ -21,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述
@@ -174,26 +177,40 @@ public class ExcelReader implements Reader {
                 records.add(sourceRecordHandler.builder(null, labels,
                         offsetHandler.offsetValueCoding()));
             }
-            records.add(readRow(rowsIterator.next(), jobId));
+            try {
+                records.add(readRow(rowsIterator.next(), jobId));
+            } catch (EmptyRowException e) {
+                log.debug("empty row");
+            }
         }while (records.size() < batchSize);
         registers.put(jobId, registers.get(jobId) - 1);
         return records;
     }
 
-    private SourceRecord readRow(Row r, String jobId) throws TitleLengthException {
+    private SourceRecord readRow(Row r, String jobId) throws TitleLengthException, EmptyRowException {
         List<String> titleList = titleHandler.getTitleMap().get(jobId);
         if (r.getLastCellNum() > titleList.size()){
-            String value = r.getCell(titleList.size()).getStringCellValue();
+            String value = null;
+            try{
+                value = r.getCell(titleList.size()).getStringCellValue();
+            } catch (Exception e){
+                log.warn(e.getMessage(), e);
+            }
             if (value != null && !"".equals(value)){
                 throw new TitleLengthException(r);
             }
         }
         Map<String, String> rowValue = new HashMap<>(10);
+        Set<String> valueSet = new HashSet<>();
         for (int i = 0; i < titleList.size(); i++) {
             String v = r.getCell(i) == null ? "" : r.getCell(i).getStringCellValue();
             if (!"".equals(titleList.get(i))) {
                 rowValue.put(titleList.get(i), v);
+                valueSet.add(v);
             }
+        }
+        if((valueSet.size() == 1) && ("".equals(valueSet.iterator().next()))){
+            throw new EmptyRowException();
         }
         Struct value = buildValue(traceId, jobId, "SandBox", rowValue);
         synchronized (this) {
