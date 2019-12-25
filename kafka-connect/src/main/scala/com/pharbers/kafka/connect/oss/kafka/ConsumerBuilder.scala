@@ -20,7 +20,9 @@ import scala.reflect.ClassTag
   * @author dcs
   * @version 0.0
   * @since 2019/09/26 11:06
-  * @note 一些值得注意的地方
+  * @note 如果kafka非常多，在这儿一直积压，可能会造成oom
+  *       如果消费和生产都特别快，这儿会写本地io，可能造成性能瓶颈
+  *       变成分布式connector后，这儿消费是基于消费组的，要是kafka分片小于worker数量，就会有worker空转
   */
 class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class[V]) extends Runnable{
     val path = new File("/usr/share/logs-path/msgList")

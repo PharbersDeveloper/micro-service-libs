@@ -34,7 +34,9 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private InputStream stream;
     private String bucketName;
     private OSS client = null;
-    private ConsumerBuilder<String, OssTask> consumer;
+    private ConsumerBuilder<String, OssTask> kafkaConsumerBuffer;
+    //todo: plate
+
     private ExecutorService executorService = null;
     private CsvReader csvReader = null;
     private ExcelReader excelReader = null;
@@ -58,11 +60,11 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         String topic = props.get(OssCsvAndExcelSourceConnector.TOPIC_CONFIG);
         int batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
         client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        consumer = new ConsumerBuilder<>(ossTaskTopic, OssTask.class);
+        kafkaConsumerBuffer = new ConsumerBuilder<>(ossTaskTopic, OssTask.class);
         ThreadFactory threadFactory = new NameThreadFactory("kafka_listener");
         executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(), threadFactory);
-        executorService.execute(consumer);
+        executorService.execute(kafkaConsumerBuffer);
         csvReader = new CsvReader(topic, batchSize);
         excelReader = new ExcelReader(topic, batchSize);
         stop = false;
@@ -73,7 +75,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         synchronized (this) {
             if (csvReader.isEnd() && excelReader.isEnd()) {
                 log.info("准备任务," + Thread.currentThread().getName());
-                while (!consumer.hasNext()) {
+                while (!kafkaConsumerBuffer.hasNext()) {
                     if (stop) {
                         log.info("结束任务," + Thread.currentThread().getName());
                         return new ArrayList<>();
@@ -81,7 +83,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                     log.info("等待kafka任务," + Thread.currentThread().getName());
                     Thread.sleep(1000);
                 }
-                task = consumer.next();
+                task = kafkaConsumerBuffer.next();
                 String ossKey = task.getOssKey().toString();
                 String traceId = task.getTraceId().toString();
                 fileType = task.getFileType().toString();
@@ -128,7 +130,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         client.shutdown();
         synchronized (this) {
             try {
-                consumer.close();
+                kafkaConsumerBuffer.close();
                 csvReader.close();
                 excelReader.close();
                 if (stream != null){

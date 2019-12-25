@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * 功能描述
@@ -49,6 +47,7 @@ public class ExcelReader implements Reader {
     private final ObjectMapper mapper = new ObjectMapper();
     private SourceRecordHandler sourceRecordHandler;
     private int batchSize;
+    private boolean reset = false;
 
     public ExcelReader(String topic, int batchSize){
         this.topic = topic;
@@ -157,6 +156,7 @@ public class ExcelReader implements Reader {
         registers.put(jobId, registers.getOrDefault(jobId, 0) + 1);
         ArrayList<SourceRecord> records = new ArrayList<>();
         do{
+            Row r;
             synchronized (this) {
                 if (!rowsIterator.hasNext()) {
                     //这儿发送end length，但是可能到这一步的时候，其他还有线程需要修改length
@@ -168,6 +168,8 @@ public class ExcelReader implements Reader {
                     }
                     jobIds.remove(rowsIterator);
                     break;
+                } else {
+                    r = rowsIterator.next();
                 }
             }
             if (offsetHandler.get(jobId) == 0L) {
@@ -178,7 +180,7 @@ public class ExcelReader implements Reader {
                         offsetHandler.offsetValueCoding()));
             }
             try {
-                records.add(readRow(rowsIterator.next(), jobId));
+                records.add(readRow(r, jobId));
             } catch (EmptyRowException e) {
                 log.debug("empty row");
             }
@@ -197,6 +199,7 @@ public class ExcelReader implements Reader {
                 log.warn(e.getMessage(), e);
             }
             if (value != null && !"".equals(value)){
+                //todo: 这个错误不应该多线程抛出
                 throw new TitleLengthException(r);
             }
         }
@@ -244,24 +247,28 @@ public class ExcelReader implements Reader {
     }
 
     private void resetSheet(Iterator<Row> rowsIterator, TitleLengthException e){
-        /**
-         * 1 重新设置title
-         * 2 重新设置jobid
-         * 4 title jobid 绑定关系改变
-         */
-
+        if(reset || !jobIds.containsKey(rowsIterator)){
+            return;
+        }
+        reset = true;
         String oldJobId = jobIds.get(rowsIterator);
         String newJobId = UUID.randomUUID().toString();
         Iterator<Row> newRowsIterator =  reader.getSheet(sheetNames.get(oldJobId)).rowIterator();
         for (int i = 0; i <= e.getIndex(); i++){
-            if(newRowsIterator.hasNext()){
-                newRowsIterator.next();
+            //零时方案
+            synchronized (this){
+                if(newRowsIterator.hasNext()){
+                    //todo： 这儿可能会有java.util.ConcurrentModificationException，其他线程在hasNext时可能会修改集合
+                    newRowsIterator.next();
+                }
             }
+
         }
         registers.put(oldJobId, 10000);
         titleHandler.resetTitle(e.getErrorLine(), newJobId, oldJobId);
         jobIds.put(newRowsIterator, newJobId);
         jobIds.remove(rowsIterator);
         sheetNames.put(newJobId, sheetNames.get(oldJobId));
+        reset = false;
     }
 }
