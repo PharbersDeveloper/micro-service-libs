@@ -65,6 +65,10 @@ public class TitleHandler {
         return titleMap;
     }
 
+    public List<ExcelTitle> getTitleForPoll(String jobId) {
+        return title.getOrDefault(jobId, new ArrayList<>());
+    }
+
     public void resetTitle(String[] titleRow, String jobId, String oldJobId){
         titleMap.remove(oldJobId);
         title.remove(oldJobId);

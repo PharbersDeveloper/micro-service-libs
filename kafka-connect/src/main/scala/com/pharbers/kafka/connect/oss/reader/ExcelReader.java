@@ -118,6 +118,7 @@ public class ExcelReader implements Reader {
                 }
                 titleHandler.addTitle(row.toArray(new String[0]), jobId);
             }
+            //todo：这儿每次jobId都是新生成的，根本就取不到offset
             long rowOffset = offsetHandler.get(jobId);
             while (sheet.rowIterator().hasNext() && rowOffset > 0) {
                 sheet.rowIterator().next();

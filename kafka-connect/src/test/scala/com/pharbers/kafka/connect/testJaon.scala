@@ -21,7 +21,7 @@ object testJaon extends App {
     val list = List(new CellData("a", "b"), new CellData("a", "b"))
     val a = new ObjectMapper().writeValueAsString(list.asJava)
     println(a)
-    println(new ObjectMapper().writeValueAsString(Map("a" -> "a", "b" -> "b").asJava))
+    println(new ObjectMapper().writeValueAsString(a))
 }
 
 object testClass extends App{

@@ -1,23 +1,23 @@
 package com.pharbers.kafka.connect.oss;
 
-import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.OSSObject;
-import com.pharbers.kafka.connect.oss.exception.TitleLengthException;
-import com.pharbers.kafka.connect.oss.kafka.Producer;
-import com.pharbers.kafka.connect.oss.reader.CsvReader;
-import com.pharbers.kafka.connect.oss.reader.ExcelReader;
+import com.pharbers.kafka.connect.oss.concurrent.RowData;
+import com.pharbers.kafka.connect.oss.concurrent.RowDataProducer;
+import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
+import com.pharbers.kafka.connect.oss.handler.TitleHandler;
+import com.pharbers.kafka.connect.oss.model.ExcelTitle;
+import com.pharbers.kafka.connect.oss.model.Label;
+import com.pharbers.kafka.connect.utils.JsonUtil;
 import com.pharbers.kafka.schema.OssTask;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
-import com.pharbers.kafka.schema.PhErrorMsg;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaBuilder;
+import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
-import org.apache.poi.ooxml.POIXMLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,18 +31,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class OssCsvAndExcelSourceTask extends SourceTask {
     private static final Logger log = LoggerFactory.getLogger(OssCsvAndExcelSourceTask.class);
-    private InputStream stream;
-    private String bucketName;
-    private OSS client = null;
     private ConsumerBuilder<String, OssTask> kafkaConsumerBuffer;
-    //todo: plate
-
+    private int batchSize;
+    private TitleHandler titleHandler = new TitleHandler();
+    /**
+     * 暂时没啥用，所以可能会导致发不全的情况
+     */
+    private OffsetHandler offsetHandler = new OffsetHandler(new HashMap<>());
+    private RecordBuilder recordBuilder;
+    private LinkedBlockingQueue<RowData> plate;
     private ExecutorService executorService = null;
-    private CsvReader csvReader = null;
-    private ExcelReader excelReader = null;
-    private boolean stop = false;
-    private OssTask task;
-    private String fileType = "";
 
     @Override
     public String version() {
@@ -51,70 +49,45 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
 
     @Override
     public void start(Map<String, String> props) {
-        log.info("start");
-        String endpoint = props.get(OssCsvAndExcelSourceConnector.ENDPOINT_CONFIG);
-        String accessKeyId = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_ID_CONFIG);
-        String accessKeySecret = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_SECRET_CONFIG);
-        bucketName = props.get(OssCsvAndExcelSourceConnector.BUCKET_NAME_CONFIG);
-        String ossTaskTopic = props.get(OssCsvAndExcelSourceConnector.OSS_TASK_TOPIC);
-        String topic = props.get(OssCsvAndExcelSourceConnector.TOPIC_CONFIG);
-        int batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
-        client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-        kafkaConsumerBuffer = new ConsumerBuilder<>(ossTaskTopic, OssTask.class);
+        StringBuilder configs = new StringBuilder();
+        props.forEach((k, v) -> configs.append(k).append(":").append(v).append("\n"));
+        log.info("start:" + configs.toString());
+        batchSize = Integer.parseInt(props.get(OssCsvAndExcelSourceConnector.TASK_BATCH_SIZE_CONFIG));
+        plate = new LinkedBlockingQueue<>(batchSize * 8);
+        recordBuilder = new RecordBuilder(props.get(OssCsvAndExcelSourceConnector.TOPIC_CONFIG));
+        kafkaConsumerBuffer = new ConsumerBuilder<>(props.get(OssCsvAndExcelSourceConnector.OSS_TASK_TOPIC), OssTask.class);
         ThreadFactory threadFactory = new NameThreadFactory("kafka_listener");
-        executorService = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(), threadFactory);
+        executorService = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(), threadFactory);
         executorService.execute(kafkaConsumerBuffer);
-        csvReader = new CsvReader(topic, batchSize);
-        excelReader = new ExcelReader(topic, batchSize);
-        stop = false;
+        RowDataProducer rowDataProducer = new RowDataProducer(kafkaConsumerBuffer, plate, props);
+        executorService.execute(rowDataProducer);
     }
 
     @Override
     public List<SourceRecord> poll() throws InterruptedException {
-        synchronized (this) {
-            if (csvReader.isEnd() && excelReader.isEnd()) {
-                log.info("准备任务," + Thread.currentThread().getName());
-                while (!kafkaConsumerBuffer.hasNext()) {
-                    if (stop) {
-                        log.info("结束任务," + Thread.currentThread().getName());
-                        return new ArrayList<>();
-                    }
-                    log.info("等待kafka任务," + Thread.currentThread().getName());
-                    Thread.sleep(1000);
-                }
-                task = kafkaConsumerBuffer.next();
-                String ossKey = task.getOssKey().toString();
-                String traceId = task.getTraceId().toString();
-                fileType = task.getFileType().toString();
-                log.info("ossKey:" + ossKey + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + traceId + " type:" + fileType);
-                try {
-                    OSSObject object = client.getObject(bucketName, ossKey);
-                    stream = object.getObjectContent();
-                } catch (OSSException | ClientException oe) {
-                    log.error(ossKey, oe);
-                    return new ArrayList<>();
-                }
-                try {
-                    buildReader(fileType, task);
-                } catch (POIXMLException e) {
-                    log.info("poi异常", e);
-                    Producer.getIns().pull(new PhErrorMsg(
-                            task.getJobId(), task.getTraceId(),
-                            "", "kafka-connector",
-                            "ooxml_exception", e.getMessage(), task.getAssetId()));
-                    excelReader.close();
-                    csvReader.close();
-                    return new ArrayList<>();
-                } catch (Exception e) {
-                    log.error("构建reader异常", e);
-                    excelReader.close();
-                    csvReader.close();
-                    return new ArrayList<>();
+        List<SourceRecord> sources = new ArrayList<>();
+        try {
+            while (!plate.isEmpty() || sources.size() < batchSize){
+                RowData value = plate.take();
+                switch (value.getType()) {
+                    case "SandBox-Schema": readTitle(value, sources);
+                        break;
+                    case "SandBox-Labels": readLabels(value, sources);
+                        break;
+                    case "SandBox": readData(value, sources);
+                        break;
+                    case "SandBox-Length": readLength(value, sources);
+                        break;
+                    default:
                 }
             }
+        } catch (InterruptedException e){
+            throw e;
+        } catch (Exception e){
+            log.error(e.getMessage(), e);
         }
-        return read(fileType);
+        return  sources;
     }
 
     @Override
@@ -126,24 +99,50 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        stop = true;
-        client.shutdown();
-        synchronized (this) {
-            try {
-                kafkaConsumerBuffer.close();
-                csvReader.close();
-                excelReader.close();
-                if (stream != null){
-                    stream.close();
-                }
-                log.trace("Closed input stream");
-            } catch (IOException e) {
-                log.error("Failed to close FileStreamSourceTask stream: ", e);
-            } catch (NullPointerException e){
-                log.error("NullPointerException", e);
-            }
-            this.notify();
+        try {
+            kafkaConsumerBuffer.close();
+        } catch (NullPointerException e) {
+            log.error("NullPointerException", e);
         }
+    }
+
+    private void readData(RowData row, List<SourceRecord> sources){
+        List<String> titleList = titleHandler.getTitleMap().get(row.getJobId());
+        String[] r = row.getRow();
+        Map<String, String> rowValue = new HashMap<>(10);
+        for (int i = 0; i < titleList.size(); i++) {
+            String v = i >= r.length ? "" : r[i];
+            rowValue.put(titleList.get(i), v);
+        }
+        addSources(sources, rowValue, row);
+    }
+
+    private void readTitle(RowData row, List<SourceRecord> sources){
+        titleHandler.addTitle(row.getRow(), row.getJobId());
+        List<ExcelTitle> title = titleHandler.getTitleForPoll(row.getJobId());
+        addSources(sources, title, row);
+    }
+
+    private void readLength(RowData row, List<SourceRecord> sources){
+        Map<String, String> length = new HashMap<String, String>(1){{put("length", row.getRow()[0]);}};
+        addSources(sources, length, row);
+    }
+
+    private void readLabels(RowData row, List<SourceRecord> sources){
+        addSources(sources, new Label((OssTask)row.getMetaDate().get("task"), row.getRow()[0]), row);
+    }
+
+    private void addSources(List<SourceRecord> sources, Object data, RowData row){
+        Struct value = new Struct(recordBuilder.valueSchema);
+        value.put("jobId", row.getJobId());
+        value.put("traceId", row.getTraceId());
+        value.put("type", row.getType());
+        try {
+            value.put("data", JsonUtil.MAPPER.writeValueAsString(data));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sources.add(recordBuilder.build(OffsetHandler.offsetKey(row.getJobId()), value, offsetHandler.offsetValueCoding()));
     }
 
     private Map<String, Object> getStreamOffset(String jobId) {
@@ -154,63 +153,6 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         } else {
             return new HashMap<>(10);
         }
-    }
-
-    private void buildReader(String fileType, OssTask task) throws Exception {
-        switch (fileType) {
-            case "csv":
-                csvReader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
-                csvReader.init(stream, task, getStreamOffset(task.getJobId().toString()));
-                break;
-            case "xlsx":
-                excelReader = new ExcelReader(excelReader.getTopic(), excelReader.getBatchSize());
-                excelReader.init(stream, task, getStreamOffset(task.getJobId().toString()));
-                break;
-            default:
-                log.error("不支持的类型" + fileType);
-                Producer.getIns().pull(new PhErrorMsg(
-                        task.getJobId(), task.getTraceId(),
-                        "", "kafka-connector",
-                        "type_exception", fileType, task.getAssetId()));
-        }
-    }
-
-    private List<SourceRecord> read(String fileType) {
-        switch (fileType) {
-            case "csv":
-                try {
-                    return csvReader.read();
-                } catch (TitleLengthException e) {
-                    resetCsvRead();
-                    log.error(e.getMessage(), e);
-                }
-            case "xlsx":
-                return excelReader.read();
-            default:
-                log.error(fileType + "is Error Message: fileType missMatch");
-                return new ArrayList<>();
-        }
-    }
-
-    private void resetCsvRead(){
-        CsvReader oldRead = csvReader;
-        CsvReader reader = new CsvReader(csvReader.getTopic(), csvReader.getBatchSize());
-        InputStream newStream = client.getObject(bucketName, task.getOssKey().toString()).getObjectContent();
-        List<Integer> titleIndex = new ArrayList<>();
-        if(task.getTitleIndex().isEmpty()){
-            titleIndex.set(0, 1);
-        } else {
-            titleIndex.set(0, task.getTitleIndex().get(0) + 1);
-        }
-        task.setTitleIndex(titleIndex);
-        try {
-            reader.init(newStream, task, new HashMap<>(0));
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        csvReader = reader;
-        oldRead.close();
     }
 
     static class NameThreadFactory implements ThreadFactory {
@@ -240,6 +182,27 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
                 t.setPriority(Thread.NORM_PRIORITY);
             }
             return t;
+        }
+    }
+
+    class RecordBuilder{
+        private String topic;
+        private Schema keySchema;
+        private Schema valueSchema;
+
+        RecordBuilder(String topic){
+            this.topic = topic;
+            this.keySchema = SchemaBuilder.string().optional().build();
+            this.valueSchema = SchemaBuilder.struct()
+                    .field("jobId", Schema.STRING_SCHEMA)
+                    .field("traceId", Schema.STRING_SCHEMA)
+                    .field("type", Schema.STRING_SCHEMA)
+                    .field("data", Schema.STRING_SCHEMA).build();
+        }
+
+        SourceRecord build(Map<String, String> sourceOffsetKey, Struct value, Map<String, ?> sourceOffset){
+            return new SourceRecord(sourceOffsetKey, sourceOffset, topic, null,
+                    keySchema, null, valueSchema, value, System.currentTimeMillis());
         }
     }
 }
