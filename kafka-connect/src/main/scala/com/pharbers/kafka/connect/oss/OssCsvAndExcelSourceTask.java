@@ -68,7 +68,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     public List<SourceRecord> poll() throws InterruptedException {
         List<SourceRecord> sources = new ArrayList<>();
         try {
-            while (!plate.isEmpty() || sources.size() < batchSize){
+            while (!plate.isEmpty() && sources.size() < batchSize){
                 RowData value = plate.take();
                 switch (value.getType()) {
                     case "SandBox-Schema": readTitle(value, sources);
@@ -204,5 +204,29 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             return new SourceRecord(sourceOffsetKey, sourceOffset, topic, null,
                     keySchema, null, valueSchema, value, System.currentTimeMillis());
         }
+    }
+
+    protected LinkedBlockingQueue<RowData> getPlate() {
+        return plate;
+    }
+
+    protected void setPlate(LinkedBlockingQueue<RowData> plate) {
+        this.plate = plate;
+    }
+
+    protected int getBatchSize() {
+        return batchSize;
+    }
+
+    protected void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public RecordBuilder getRecordBuilder() {
+        return recordBuilder;
+    }
+
+    public void setRecordBuilder(RecordBuilder recordBuilder) {
+        this.recordBuilder = recordBuilder;
     }
 }

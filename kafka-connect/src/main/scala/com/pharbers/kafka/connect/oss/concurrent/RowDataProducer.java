@@ -108,7 +108,7 @@ public class RowDataProducer implements Runnable {
         ReaderV2 reader;
         switch (fileType) {
             case "csv":
-                reader = new CsvReaderV2(UUID.randomUUID().toString());
+                reader = new CsvReaderV2(UUID.randomUUID().toString(), task);
                 reader.init(stream);
                 break;
             case "xlsx":

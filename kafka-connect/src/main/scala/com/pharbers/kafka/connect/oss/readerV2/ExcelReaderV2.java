@@ -2,8 +2,6 @@ package com.pharbers.kafka.connect.oss.readerV2;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.concurrent.RowData;
-import com.pharbers.kafka.connect.oss.model.Label;
-import com.pharbers.kafka.connect.utils.JsonUtil;
 import com.pharbers.kafka.schema.OssTask;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -57,10 +55,10 @@ public class ExcelReaderV2 implements ReaderV2 {
                     break;
                 }
             }
-            String[] schema = getTitleAndPutOtherCache(cacheList, seq, jobId);
-            seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
+            List<Row> titleBeginList = getBeginList(cacheList, seq, jobId);
             seq.put(new RowData(LABELS_TYPE, new String[]{sheet.getSheetName()}, metaDate, jobId, task.getTraceId().toString()));
-            Long length = putRow(seq, rows, jobId, TITLE_MAX_INDEX - 1);
+            Long cacheLength = putRow(seq, titleBeginList.iterator(), jobId, 0);
+            Long length = putRow(seq, rows, jobId, cacheLength);
             seq.put(new RowData(LENGTH_TYPE, new String[]{length.toString()}, metaDate, jobId, task.getTraceId().toString()));
             sheetIndex ++;
         }
@@ -80,13 +78,15 @@ public class ExcelReaderV2 implements ReaderV2 {
     @Override
     public void close() {
         try {
-            reader.close();
+            if(null != reader){
+                reader.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String[] getTitleAndPutOtherCache(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
+    private List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
         for(int i = 0; i < cacheList.size(); i++){
@@ -102,10 +102,9 @@ public class ExcelReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
-        cacheList.remove(titleIndex);
         String[] schema = titleValues.toArray(new String[0]);
-        putRow(seq, cacheList.iterator(), jobId, 0);
-        return schema;
+        seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
+        return cacheList.subList(titleIndex + 1, cacheList.size());
     }
 
 
@@ -116,10 +115,12 @@ public class ExcelReaderV2 implements ReaderV2 {
             List<String> cellValues = new ArrayList<>();
             row.cellIterator().forEachRemaining(x -> {
                 String value = x.getStringCellValue();
-                if (!"".equals(value)){
-                    cellValues.add(x.getStringCellValue());
-                }
+                cellValues.add(value);
+
             });
+            if(cellValues.stream().allMatch(""::equals)){
+                continue;
+            }
             seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), null, jobId, task.getTraceId().toString()));
             length ++;
         }

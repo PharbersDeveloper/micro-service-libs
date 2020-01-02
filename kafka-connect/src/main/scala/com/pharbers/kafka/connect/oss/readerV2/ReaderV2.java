@@ -23,7 +23,7 @@ public interface ReaderV2 {
      * seq最好是阻塞队列，已保证不会oom，以及并发消费此seq的安全
      * @param seq 读取的数据存入此集合
      */
-    void read(BlockingQueue<RowData> seq) throws InterruptedException;
+    void read(BlockingQueue<RowData> seq) throws Exception;
 
     /**
      * 初始化
