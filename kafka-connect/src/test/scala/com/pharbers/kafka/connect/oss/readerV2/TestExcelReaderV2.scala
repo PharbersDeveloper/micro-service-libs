@@ -53,8 +53,8 @@ class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
                     while (rowIterator.hasNext){
                         val row = rowIterator.next().getRow
                         val checkRow = check.nextLine().replace("\uFEFF", "").replaceAll("\"", "")
-                        logger.debug(row.mkString(","))
-                        logger.debug(checkRow)
+                        println(row.mkString(","))
+                        println(checkRow)
                         assert(row.mkString(",").equals(checkRow))
                     }
                 })

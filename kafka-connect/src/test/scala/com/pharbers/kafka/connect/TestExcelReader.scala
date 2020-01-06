@@ -4,6 +4,8 @@ import java.io.{File, FileInputStream}
 import java.util
 import java.util.concurrent.CopyOnWriteArrayList
 
+import com.monitorjbl.xlsx.StreamingReader
+
 import collection.JavaConverters._
 import com.pharbers.kafka.connect.oss.reader.ExcelReader
 import com.pharbers.kafka.schema.OssTask
@@ -57,4 +59,21 @@ object TestExcelReader extends App with Runnable{
         excelReader.init(stream, task, new util.HashMap[String, Object](0))
         excelReader
     }
+}
+
+object TestExcel extends App{
+    val path = "src/test/resources/Hospital Data for Zytiga Market 201801-201908.xlsx"
+    val stream = new FileInputStream(new File(path))
+    val reader = StreamingReader.builder().open(stream)
+    val cells = reader.getSheetAt(0).rowIterator().next().cellIterator()
+    while (cells.hasNext){
+        val cell = cells.next()
+        cell.getCellType.name() match {
+            case "NUMERIC" => println(cell.getNumericCellValue)
+            case _ => println(cell.getStringCellValue)
+        }
+
+    }
+
+    reader.close()
 }

@@ -114,7 +114,12 @@ public class ExcelReaderV2 implements ReaderV2 {
             Row row = rows.next();
             List<String> cellValues = new ArrayList<>();
             row.cellIterator().forEachRemaining(x -> {
-                String value = x.getStringCellValue();
+                String value;
+                if ("NUMERIC".equals(x.getCellType().name())) {
+                    value = Double.toString(x.getNumericCellValue());
+                } else {
+                    value = x.getStringCellValue();
+                }
                 cellValues.add(value);
 
             });
