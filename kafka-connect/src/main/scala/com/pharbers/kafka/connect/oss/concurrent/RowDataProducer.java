@@ -15,9 +15,11 @@ import com.pharbers.kafka.schema.OssTask;
 import com.pharbers.kafka.schema.PhErrorMsg;
 import org.apache.kafka.connect.source.SourceTaskContext;
 import org.apache.poi.ooxml.POIXMLException;
+import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -72,9 +74,7 @@ public class RowDataProducer implements Runnable {
             log.info("接收到任务," + Thread.currentThread().getName());
             log.info("ossKey:" + task.getOssKey().toString() + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + task.getTraceId().toString() + " type:" + task.getFileType().toString());
             try {
-                InputStream stream = getStream(task);
-                ReaderV2 reader = buildReader(task.getFileType().toString(), task, stream);
-                reader.read(plate);
+                readOss(task);
             }catch (POIXMLException e) {
                 log.info("poi异常", e);
                 Producer.getIns().pull(new PhErrorMsg(
@@ -94,26 +94,56 @@ public class RowDataProducer implements Runnable {
         }
     }
 
-    private InputStream getStream(OssTask task) throws OSSException, ClientException {
+    protected void readOss(OssTask task) throws Exception {
+        OSSObject object = getOSSObject(task);
+        String format = getFormat(object.getObjectContent(), task.getFileType().toString());
+        object.forcedClose();
+        object = getOSSObject(task);
+        ReaderV2 reader = buildReader(task.getFileType().toString(), task, object.getObjectContent(), format);
+        reader.read(plate);
+    }
+
+    protected OSSObject getOSSObject(OssTask task) throws OSSException, ClientException {
         String ossKey = task.getOssKey().toString();
         String traceId = task.getTraceId().toString();
         String fileType = task.getFileType().toString();
         String bucketName = props.get(OssCsvAndExcelSourceConnector.BUCKET_NAME_CONFIG);
         log.info("ossKey:" + ossKey + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + traceId + " type:" + fileType);
         OSSObject object = client.getObject(bucketName, ossKey);
-        return object.getObjectContent();
+        return object;
     }
 
-    private ReaderV2 buildReader(String fileType, OssTask task, InputStream stream) throws Exception {
+    protected String getFormat(InputStream stream, String fileType){
+        if("csv".equals(fileType)){
+            UniversalDetector detector = new UniversalDetector();
+            String format = "UTF-8";
+            byte[] bytes = new byte[4069];
+            try {
+                int i = stream.read(bytes);
+                detector.handleData(bytes, 0, i);
+                detector.dataEnd();
+                String encode = detector.getDetectedCharset();
+                detector.reset();
+                format = encode.equals(format) ? format : "GBK";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return format;
+        } else {
+            return "";
+        }
+    }
+
+    protected ReaderV2 buildReader(String fileType, OssTask task, InputStream stream, String format) throws Exception {
         ReaderV2 reader;
         switch (fileType) {
             case "csv":
                 reader = new CsvReaderV2(UUID.randomUUID().toString(), task);
-                reader.init(stream);
+                reader.init(stream, format);
                 break;
             case "xlsx":
                 reader = new ExcelReaderV2(UUID.randomUUID().toString(), task);
-                reader.init(stream);
+                reader.init(stream, format);
                 break;
             default:
                 log.error("不支持的类型" + fileType);

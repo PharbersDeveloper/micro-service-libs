@@ -26,19 +26,27 @@ class PharbersProducerTests extends FunSuite {
     }
 
     test("PharbersKafkaProducer with avro use GenericRecord") {
-        val jobId = "201911221139"
-        val traceId = "201911221139"
-        val ossKey = "b44320ab-9557-491e-a382-c65e49ed4682/1574249020667"
+        val jobId = "202001061133"
+        val traceId = "202001061133"
+        val ossKey = "07a1d883-def2-4301-8f8c-28527335939b/1578882666129"
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
-        val gr: OssTask = new OssTask("", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
+//        val gr: OssTask = new OssTask("test", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
+//            new util.ArrayList[CharSequence](),
+//            new util.ArrayList[CharSequence](),
+//            new util.ArrayList[CharSequence](),
+//            new util.ArrayList[CharSequence](),
+//            new util.ArrayList[CharSequence](),
+//            new util.ArrayList[CharSequence]())
+
+        val gr: OssTask = new OssTask("5e1bd753f2f2d3cd13858b9b", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "Product standardization master data-HBV.xlsx", "",
+            new util.ArrayList[CharSequence](){{add("底层数据")}},
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence]())
+            new util.ArrayList[CharSequence](){{add("Pharbers"); add("PROD")}})
 
         val pkp = new PharbersKafkaProducer[String, OssTask]
         gr.put("jobId", jobId)

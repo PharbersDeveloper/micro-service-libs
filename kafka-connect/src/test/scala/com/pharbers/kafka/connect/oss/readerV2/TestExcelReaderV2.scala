@@ -33,7 +33,7 @@ class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
     val stream = new FileInputStream(new File(path))
     test("test excel reader"){
         val plate = new LinkedBlockingQueue[RowData]()
-        reader.init(stream)
+        reader.init(stream, "")
         reader.read(plate)
         plate.asScala
                 .groupBy(x => x.getJobId)

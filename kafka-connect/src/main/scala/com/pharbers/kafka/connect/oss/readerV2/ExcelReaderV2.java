@@ -55,7 +55,13 @@ public class ExcelReaderV2 implements ReaderV2 {
                     break;
                 }
             }
-            List<Row> titleBeginList = getBeginList(cacheList, seq, jobId);
+            List<Row> titleBeginList;
+            try {
+                titleBeginList = getBeginList(cacheList, seq, jobId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
             seq.put(new RowData(LABELS_TYPE, new String[]{sheet.getSheetName()}, metaDate, jobId, task.getTraceId().toString()));
             Long cacheLength = putRow(seq, titleBeginList.iterator(), jobId, 0);
             Long length = putRow(seq, rows, jobId, cacheLength);
@@ -66,7 +72,7 @@ public class ExcelReaderV2 implements ReaderV2 {
     }
 
     @Override
-    public void init(InputStream stream) {
+    public void init(InputStream stream, String format) {
         reader = StreamingReader.builder().open(stream);
     }
 
@@ -86,7 +92,7 @@ public class ExcelReaderV2 implements ReaderV2 {
         }
     }
 
-    private List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
+    private List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
         for(int i = 0; i < cacheList.size(); i++){
@@ -102,6 +108,10 @@ public class ExcelReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
+        //todo： 临时过滤
+//        if(titleValues.size() > 24){
+//            throw new Exception("title 过长");
+//        }
         String[] schema = titleValues.toArray(new String[0]);
         seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());

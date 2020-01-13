@@ -34,7 +34,7 @@ class TestCsvReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable {
 
     test("test excel reader"){
         val plate = new LinkedBlockingQueue[RowData]()
-        reader.init(stream)
+        reader.init(stream, "utf-8")
         reader.read(plate)
         plate.asScala
                 .groupBy(x => x.getJobId)

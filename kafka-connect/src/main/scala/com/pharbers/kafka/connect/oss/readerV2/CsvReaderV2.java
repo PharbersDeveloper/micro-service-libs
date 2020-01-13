@@ -4,12 +4,10 @@ import com.pharbers.kafka.connect.oss.concurrent.RowData;
 import com.pharbers.kafka.schema.OssTask;
 import com.redis.S;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述
@@ -25,6 +23,7 @@ public class CsvReaderV2 implements ReaderV2 {
     private String jobId;
     private Map<String, Object> metaDate = new HashMap<>();
     private OssTask task;
+    private String regex;
     //todo: 和cvsReader统一
 
     private final int TITLE_MAX_INDEX = 100;
@@ -32,7 +31,7 @@ public class CsvReaderV2 implements ReaderV2 {
     private final String LABELS_TYPE = "SandBox-Labels";
     private final String DATA_TYPE = "SandBox";
     private final String LENGTH_TYPE = "SandBox-Length";
-    private final String DEFAULT_REGEX = ",";
+    private final String[] DEFAULT_REGEXS = new String[]{",", String.valueOf((char)31), "#"};
 
     public CsvReaderV2(String jobIdPrefix, OssTask task) {
         this.jobId = jobIdPrefix + 0;
@@ -52,7 +51,15 @@ public class CsvReaderV2 implements ReaderV2 {
                 break;
             }
         }
-        List<String> titleBeginList = getBeginList(cacheList, seq, jobId);
+        getRegex(cacheList);
+        List<String> titleBeginList;
+        try {
+            titleBeginList = getBeginList(cacheList, seq, jobId);
+        } catch (Exception e){
+            e.printStackTrace();
+           close();
+           return;
+        }
         seq.put(new RowData(LABELS_TYPE, new String[]{""}, metaDate, jobId, task.getTraceId().toString()));
         Long cacheLength = putRow(seq, titleBeginList.iterator(), jobId, 0);
         Long length = putRow(seq, jobId, cacheLength);
@@ -61,8 +68,13 @@ public class CsvReaderV2 implements ReaderV2 {
     }
 
     @Override
-    public void init(InputStream stream) {
-        reader = new BufferedReader(new InputStreamReader(stream));
+    public void init(InputStream stream, String format) {
+        try {
+            reader = new BufferedReader(new InputStreamReader(stream, format));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            reader = new BufferedReader(new InputStreamReader(stream));
+        }
     }
 
     @Override
@@ -81,12 +93,20 @@ public class CsvReaderV2 implements ReaderV2 {
         }
     }
 
-    private List<String> getBeginList(List<String> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
+    private void getRegex(List<String> checkList){
+        List<Integer> res = Arrays.stream(DEFAULT_REGEXS).map(regex ->
+            checkList.stream().reduce(0, (l, r) -> l + r.split(regex).length, (l, r) -> l + r)
+        ).collect(Collectors.toList());
+        int max = res.stream().max(Integer::compareTo).orElse(0);
+        regex = DEFAULT_REGEXS[res.indexOf(max)];
+    }
+
+    private List<String> getBeginList(List<String> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
         for(int i = 0; i < cacheList.size(); i++){
             List<String> values = new ArrayList<>();
-            for(String cell : cacheList.get(i).split(DEFAULT_REGEX)){
+            for(String cell : cacheList.get(i).split(regex)){
                 if(!"".equals(cell)){
                     values.add(cell);
                 }
@@ -97,6 +117,10 @@ public class CsvReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
+        //todo： 临时过滤
+        if(titleValues.size() > 24){
+            throw new Exception("title 过长");
+        }
         String[] schema = titleValues.toArray(new String[0]);
         seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());
@@ -106,7 +130,7 @@ public class CsvReaderV2 implements ReaderV2 {
         long length = beginLength;
         while (rows.hasNext()) {
             String row = rows.next();
-            List<String> cellValues = new ArrayList<>(Arrays.asList(row.split(DEFAULT_REGEX)));
+            List<String> cellValues = new ArrayList<>(Arrays.asList(row.split(regex)));
             if (cellValues.stream().allMatch(""::equals)) {
                 continue;
             }
@@ -120,7 +144,7 @@ public class CsvReaderV2 implements ReaderV2 {
         long length = beginLength;
         String row = reader.readLine();
         while (row != null){
-            List<String> cellValues = new ArrayList<>(Arrays.asList(row.split(DEFAULT_REGEX)));
+            List<String> cellValues = new ArrayList<>(Arrays.asList(row.split(regex)));
             row = reader.readLine();
             if (cellValues.stream().allMatch(""::equals)) {
                 continue;

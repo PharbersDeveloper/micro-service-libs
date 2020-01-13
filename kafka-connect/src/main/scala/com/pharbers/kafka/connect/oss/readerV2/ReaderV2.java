@@ -28,9 +28,9 @@ public interface ReaderV2 {
     /**
      * 初始化
      * @param stream 需要读的流
-     * @param streamOffset 需要跳过的部分
+     * @param format 编码格式
      */
-    void init(InputStream stream);
+    void init(InputStream stream, String format);
 
     /**
      * 是否完成
