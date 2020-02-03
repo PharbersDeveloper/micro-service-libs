@@ -32,7 +32,7 @@ class TestCsvReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable {
     val path = "src/test/resources/1575555558843.csv"
     val stream = new FileInputStream(new File(path))
 
-    test("test excel reader"){
+    test("test csv reader"){
         val plate = new LinkedBlockingQueue[RowData]()
         reader.init(stream, "utf-8")
         reader.read(plate)

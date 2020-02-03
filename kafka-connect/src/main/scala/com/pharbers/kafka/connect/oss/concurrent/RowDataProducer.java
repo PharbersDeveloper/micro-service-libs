@@ -39,6 +39,7 @@ public class RowDataProducer implements Runnable {
     private LinkedBlockingQueue<RowData> plate;
     private Map<String, String> props;
     private OSS client;
+    private Boolean isRun;
 
     public RowDataProducer(ConsumerBuilder<String, OssTask> kafkaConsumerBuffer,
                            LinkedBlockingQueue<RowData> plate,
@@ -54,6 +55,7 @@ public class RowDataProducer implements Runnable {
 
     @Override
     public void run() {
+        isRun = true;
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
@@ -65,7 +67,11 @@ public class RowDataProducer implements Runnable {
         } finally {
             client.shutdown();
         }
+        isRun = false;
+    }
 
+    public boolean isRun(){
+       return isRun;
     }
 
     private void runTask(){
@@ -87,10 +93,12 @@ public class RowDataProducer implements Runnable {
             }
         }
         log.info("等待kafka任务," + Thread.currentThread().getName());
+        System.out.println("等待kafka任务," + Thread.currentThread().getName());
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.info("Interrupted");
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -117,14 +125,18 @@ public class RowDataProducer implements Runnable {
         if("csv".equals(fileType)){
             UniversalDetector detector = new UniversalDetector();
             String format = "UTF-8";
-            byte[] bytes = new byte[4069];
+            byte[] bytes = new byte[4096];
             try {
-                int i = stream.read(bytes);
-                detector.handleData(bytes, 0, i);
+                int i = 0;
+                while (i < bytes.length){
+                    i += stream.read(bytes, i, bytes.length - i);
+                }
+
+                detector.handleData(bytes);
                 detector.dataEnd();
                 String encode = detector.getDetectedCharset();
                 detector.reset();
-                format = encode.equals(format) ? format : "GBK";
+                format = format.equals(encode) ? format : "GBK";
             } catch (IOException e) {
                 e.printStackTrace();
             }

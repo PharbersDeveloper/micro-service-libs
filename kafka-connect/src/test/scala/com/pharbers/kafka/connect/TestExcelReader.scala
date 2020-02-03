@@ -1,16 +1,20 @@
 package com.pharbers.kafka.connect
 
-import java.io.{File, FileInputStream}
+import java.io._
 import java.util
-import java.util.concurrent.CopyOnWriteArrayList
-
+import java.util.concurrent.{ConcurrentHashMap, CopyOnWriteArrayList}
+import com.aliyun.oss.OSSClientBuilder
+import com.aliyun.oss.model.OSSObject
+import com.mongodb.client.MongoClients
+import com.mongodb.client.model.Filters
 import com.monitorjbl.xlsx.StreamingReader
-
 import collection.JavaConverters._
 import com.pharbers.kafka.connect.oss.reader.ExcelReader
 import com.pharbers.kafka.schema.OssTask
 import org.apache.kafka.connect.data.Struct
 import org.apache.kafka.connect.source.SourceRecord
+import org.bson.BsonDocument
+import org.mozilla.universalchardet.{ReaderFactory, UniversalDetector}
 
 /** 功能描述
   *
@@ -68,6 +72,7 @@ object TestExcel extends App{
     val cells = reader.getSheetAt(0).rowIterator().next().cellIterator()
     while (cells.hasNext){
         val cell = cells.next()
+        cell.getNumericCellValue
         cell.getCellType.name() match {
             case "NUMERIC" => println(cell.getNumericCellValue)
             case _ => println(cell.getStringCellValue)
@@ -77,3 +82,35 @@ object TestExcel extends App{
 
     reader.close()
 }
+
+object TestCsvFormat extends App{
+    val file = new File("C:\\Users\\EDZ\\Desktop\\Product_matching_table_packid_v2.csv")
+    val stream = new FileInputStream(file)
+    val array = new Array[Byte](4096)
+    stream.read(array)
+    val detector = new UniversalDetector()
+    detector.handleData(array, 0, 4096)
+    detector.dataEnd()
+    val encoding = detector.getDetectedCharset
+    detector.reset()
+}
+
+object getCsvHeard extends App{
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val mongoClient = MongoClients.create("mongodb://123.56.179.133:5555")
+    val database = mongoClient.getDatabase("pharbers-sandbox-max-result")
+    val files = database.getCollection("files", classOf[BsonDocument])
+    val iter = files.find(Filters.eq("extension", "csv")).iterator()
+//    val iter = files.find(Filters.eq("fileName", "信立泰完整权限.csv")).iterator()
+    while (iter.hasNext){
+        val url = iter.next().getString("url").getValue
+        val obj = client.getObject("pharbers-sandbox", url)
+        val s = new BufferedReader(new InputStreamReader(obj.getObjectContent)).readLine()
+        val length = (s.split(",").length :: s.split(31.toChar.toString).length :: s.split("#").length :: Nil).max
+        println(s"length:$length")
+        if(length > 24) println(url)
+        println(s)
+        obj.forcedClose()
+    }
+}
+

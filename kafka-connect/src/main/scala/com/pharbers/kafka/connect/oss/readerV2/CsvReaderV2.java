@@ -26,11 +26,13 @@ public class CsvReaderV2 implements ReaderV2 {
     private String regex;
     //todo: 和cvsReader统一
 
+    //todo: 由配置指定
     private final int TITLE_MAX_INDEX = 100;
     private final String TITLE_TYPE = "SandBox-Schema";
     private final String LABELS_TYPE = "SandBox-Labels";
     private final String DATA_TYPE = "SandBox";
     private final String LENGTH_TYPE = "SandBox-Length";
+    //todo: 由配置指定
     private final String[] DEFAULT_REGEXS = new String[]{",", String.valueOf((char)31), "#"};
 
     public CsvReaderV2(String jobIdPrefix, OssTask task) {
@@ -118,6 +120,7 @@ public class CsvReaderV2 implements ReaderV2 {
             }
         }
         //todo： 临时过滤
+        //todo: 由配置指定
         if(titleValues.size() > 24){
             throw new Exception("title 过长");
         }

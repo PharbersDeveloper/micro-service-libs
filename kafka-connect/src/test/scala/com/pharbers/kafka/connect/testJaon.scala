@@ -32,3 +32,5 @@ object testClass extends App{
     }
     println(new a(classOf[OssTask]).ins)
 }
+
+

@@ -1,13 +1,9 @@
 package com.pharbers.kafka.connect.oss.concurrent
 
-import java.io.{BufferedReader, InputStreamReader}
 import java.util
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
-import com.aliyun.oss.model.OSSObject
-import com.pharbers.kafka.connect.oss.OssCsvAndExcelSourceConnector
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder
-import com.pharbers.kafka.connect.oss.readerV2.ReaderV2
 import com.pharbers.kafka.schema.OssTask
 import org.scalatest.FunSuite
 
@@ -56,7 +52,7 @@ class TestRowDataProducer extends FunSuite{
     test("test csv format"){
         val plate = new LinkedBlockingQueue[RowData](1000)
         val product = new RowDataProducer(null, plate, config.asJava)
-        val task = new OssTask("test", "jobId", "traceId", "2278b5bb-b9f7-4bbf-a052-81be153471e8/1575959457790",
+        val task = new OssTask("test", "jobId", "traceId", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312",
             new util.ArrayList[Integer](), "csv", "test", "",
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
@@ -75,5 +71,18 @@ class TestRowDataProducer extends FunSuite{
             }).start()
         }
         product.readOss(task)
+    }
+
+    test("test stop"){
+        val executorServices = new ThreadPoolExecutor(2, 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue[Runnable])
+        val kafkaConsumerBuffer = new ConsumerBuilder[String, OssTask]("test", classOf[OssTask])
+        val producer = new RowDataProducer(kafkaConsumerBuffer, null, config.asJava)
+        executorServices.execute(producer)
+        Thread.sleep(10000)
+        println("stop...")
+        executorServices.shutdownNow
+        executorServices.awaitTermination(5, TimeUnit.SECONDS)
+        Thread.sleep(5000)
+        assert(!producer.isRun)
     }
 }
