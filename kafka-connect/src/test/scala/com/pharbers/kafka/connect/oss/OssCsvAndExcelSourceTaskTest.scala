@@ -17,9 +17,9 @@ import org.scalatest.FunSuite
   * @since 2020/01/02 13:31
   * @note 一些值得注意的地方
   */
-class testOssCsvAndExcelSourceTask extends FunSuite with PhLogable{
+class OssCsvAndExcelSourceTaskTest extends FunSuite with PhLogable{
     test("test poll"){
-        val task = new OssTask("", "jobId", "traceId", "ossKey", new util.ArrayList[Integer](), "xlsx", "testFileName", "",
+        val task = new OssTask("", "jobId", "traceId", "ossKey", "xlsx", "testFileName", "", "", 0L,
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
@@ -31,12 +31,13 @@ class testOssCsvAndExcelSourceTask extends FunSuite with PhLogable{
         ossCsvAndExcelSourceTask.setPlate(plate)
         ossCsvAndExcelSourceTask.setBatchSize(500)
         ossCsvAndExcelSourceTask.setRecordBuilder(new ossCsvAndExcelSourceTask.RecordBuilder("test"))
-        plate.put(new RowData("SandBox-Schema", Array("title1", "title2", "title3"), new util.HashMap(), "test", "testTraceId"))
-        plate.put(new RowData("SandBox", Array("1", "2", "3"), new util.HashMap(), "test", "testTraceId"))
-        plate.put(new RowData("SandBox-Length", Array("1"), new util.HashMap(), "test", "testTraceId"))
-        plate.put(new RowData("SandBox-Labels", Array("sheetName"), new util.HashMap[String, Object](){{put("task", task)}}, "test", "testTraceId"))
+        val mateData = new util.HashMap[String, Object](){{put("task", task); put("test", "task")}}
+        plate.put(new RowData("SandBox-Schema", Array("title1", "title2", "title3"), mateData, "test", "testTraceId"))
+        plate.put(new RowData("SandBox", Array("1", "2", "3"), mateData, "test", "testTraceId"))
+        plate.put(new RowData("SandBox-Length", Array("1"), mateData, "test", "testTraceId"))
+        plate.put(new RowData("SandBox-Labels", Array("sheetName"), mateData, "test", "testTraceId"))
         val list = ossCsvAndExcelSourceTask.poll()
         assert(list.size() == 4)
-        list.asScala.foreach(x => logger.debug(x.value().toString))
+        list.asScala.foreach(x => println(x.value().toString))
     }
 }

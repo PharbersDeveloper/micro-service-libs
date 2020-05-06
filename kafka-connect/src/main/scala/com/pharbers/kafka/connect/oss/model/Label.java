@@ -1,7 +1,7 @@
 package com.pharbers.kafka.connect.oss.model;
 
+import com.pharbers.kafka.connect.utils.CodeUtil;
 import com.pharbers.kafka.schema.OssTask;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +23,7 @@ public class Label {
     private List<String> providers;
     private String sheetName;
     private String fileName;
+    private String tag;
 
     private String assetId;
 
@@ -34,7 +35,8 @@ public class Label {
                  List<String> providers,
                  String sheetName,
                  String fileName,
-                 String assetId) {
+                 String assetId,
+                 String tag) {
         this.label = label;
         this.dataCover = dataCover;
         this.geoCover = geoCover;
@@ -44,6 +46,7 @@ public class Label {
         this.sheetName = sheetName;
         this.fileName = fileName;
         this.assetId = assetId;
+        this.tag = tag;
     }
 
     public Label(OssTask task, String sheetName) {
@@ -62,6 +65,7 @@ public class Label {
         this.sheetName = sheetName;
         this.fileName = task.getFileName().toString();
         this.assetId = task.getAssetId().toString();
+        this.tag = CodeUtil.md5Encode(task.getOwner().toString() + task.getFileName() + sheetName + task.getCreateTime());
     }
 
     public List<String> getLabel() {

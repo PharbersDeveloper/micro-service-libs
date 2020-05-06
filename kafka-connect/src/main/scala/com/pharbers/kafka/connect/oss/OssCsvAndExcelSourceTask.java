@@ -7,6 +7,7 @@ import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.ExcelTitle;
 import com.pharbers.kafka.connect.oss.model.Label;
 import com.pharbers.kafka.connect.utils.JsonUtil;
+import com.pharbers.kafka.connect.utils.CodeUtil;
 import com.pharbers.kafka.schema.OssTask;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import org.apache.kafka.connect.data.Schema;
@@ -16,7 +17,6 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -41,6 +41,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private RecordBuilder recordBuilder;
     private LinkedBlockingQueue<RowData> plate;
     private ExecutorService executorService = null;
+    private final String MD5_TAG = "_tag";
 
     @Override
     public String version() {
@@ -85,6 +86,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         } catch (InterruptedException e){
             throw e;
         } catch (Exception e){
+            e.printStackTrace();
             log.error(e.getMessage(), e);
         }
         return  sources;
@@ -114,12 +116,17 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             String v = i >= r.length ? "" : r[i];
             rowValue.put(titleList.get(i), v);
         }
+        OssTask task = (OssTask)row.getMetaDate().get("task");
+        String sheetName = row.getMetaDate().get(row.getJobId()).toString();
+        String tag = CodeUtil.md5Encode(task.getOwner().toString() + task.getFileName() + sheetName + task.getCreateTime());
+        rowValue.put(MD5_TAG, tag);
         addSources(sources, rowValue, row);
     }
 
     private void readTitle(RowData row, List<SourceRecord> sources){
         titleHandler.addTitle(row.getRow(), row.getJobId());
         List<ExcelTitle> title = titleHandler.getTitleForPoll(row.getJobId());
+        title.add(new ExcelTitle(MD5_TAG, "string"));
         addSources(sources, title, row);
     }
 

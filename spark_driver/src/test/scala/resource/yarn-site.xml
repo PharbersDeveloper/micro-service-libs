@@ -19,7 +19,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.hostname</name>
-        <value>spark.master</value>
+        <value>StarLord</value>
     </property>
     <property>
         <name>yarn.nodemanager.vmem-check-enabled</name>
@@ -27,7 +27,7 @@
     </property>
     <property>
         <name>yarn.resourcemanager.address</name>
-        <value>spark.master:8032</value>
+        <value>StarLord:8032</value>
     </property>
     <property>
         <name>yarn.nodemanager.vmem-pmem-ratio</name>

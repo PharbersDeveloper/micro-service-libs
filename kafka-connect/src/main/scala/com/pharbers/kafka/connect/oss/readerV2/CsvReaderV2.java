@@ -39,6 +39,7 @@ public class CsvReaderV2 implements ReaderV2 {
         this.jobId = jobIdPrefix + 0;
         this.task = task;
         metaDate.put("task", task);
+        metaDate.put(jobId, "0");
     }
 
     @Override
@@ -125,7 +126,7 @@ public class CsvReaderV2 implements ReaderV2 {
             throw new Exception("title 过长");
         }
         String[] schema = titleValues.toArray(new String[0]);
-        seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
+        seq.put(new RowData(TITLE_TYPE, schema, metaDate, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());
     }
 
@@ -137,7 +138,7 @@ public class CsvReaderV2 implements ReaderV2 {
             if (cellValues.stream().allMatch(""::equals)) {
                 continue;
             }
-            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), null, jobId, task.getTraceId().toString()));
+            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), metaDate, jobId, task.getTraceId().toString()));
             length++;
         }
         return length;
@@ -152,7 +153,7 @@ public class CsvReaderV2 implements ReaderV2 {
             if (cellValues.stream().allMatch(""::equals)) {
                 continue;
             }
-            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), null, jobId, task.getTraceId().toString()));
+            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), metaDate, jobId, task.getTraceId().toString()));
             length ++;
         }
         return length;

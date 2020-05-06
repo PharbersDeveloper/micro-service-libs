@@ -21,7 +21,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite}
   * @note 一些值得注意的地方
   */
 class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
-    val task = new OssTask("", "jobId", "traceId", "ossKey", new util.ArrayList[Integer](), "xlsx", "test", "",
+    val task = new OssTask("", "jobId", "traceId", "ossKey", "xlsx", "test", "", "", 0L,
         new util.ArrayList[CharSequence](),
         new util.ArrayList[CharSequence](),
         new util.ArrayList[CharSequence](),

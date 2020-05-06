@@ -46,6 +46,7 @@ public class ExcelReaderV2 implements ReaderV2 {
         while (sheets.hasNext()){
             Sheet sheet = sheets.next();
             String jobId = jobIdPrefix + sheetIndex;
+            metaDate.put(jobId, sheet.getSheetName());
             Iterator<Row> rows =  sheet.rowIterator();
             List<Row> cacheList = new ArrayList<>();
             for (int i = 0; i < TITLE_MAX_INDEX; i ++){
@@ -113,7 +114,7 @@ public class ExcelReaderV2 implements ReaderV2 {
 //            throw new Exception("title 过长");
 //        }
         String[] schema = titleValues.toArray(new String[0]);
-        seq.put(new RowData(TITLE_TYPE, schema, null, jobId, task.getTraceId().toString()));
+        seq.put(new RowData(TITLE_TYPE, schema, metaDate, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());
     }
 
@@ -136,7 +137,7 @@ public class ExcelReaderV2 implements ReaderV2 {
             if(cellValues.stream().allMatch(""::equals)){
                 continue;
             }
-            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), null, jobId, task.getTraceId().toString()));
+            seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), metaDate, jobId, task.getTraceId().toString()));
             length ++;
         }
         return length;

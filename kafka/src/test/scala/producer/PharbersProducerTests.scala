@@ -32,7 +32,7 @@ class PharbersProducerTests extends FunSuite {
         val fileType = "xlsx"
 
         val sche: Schema = new Schema.Parser().parse(new File("src/main/avro/OssTask.avsc"))
-//        val gr: OssTask = new OssTask("test", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
+//        val gr: OssTask = new OssTask("", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "test", "",
 //            new util.ArrayList[CharSequence](),
 //            new util.ArrayList[CharSequence](),
 //            new util.ArrayList[CharSequence](),
@@ -40,7 +40,8 @@ class PharbersProducerTests extends FunSuite {
 //            new util.ArrayList[CharSequence](),
 //            new util.ArrayList[CharSequence]())
 
-        val gr: OssTask = new OssTask("5e1bd753f2f2d3cd13858b9b", jobId, traceId, ossKey, new util.ArrayList[Integer](), fileType, "Product standardization master data-HBV.xlsx", "",
+        val gr: OssTask = new OssTask("5df75f48ea4ea33708c05af2", jobId, traceId, ossKey, fileType, "Product standardization master data-HBV.xlsx", "",
+            "", 0L,
             new util.ArrayList[CharSequence](){{add("底层数据")}},
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),

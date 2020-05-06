@@ -3,11 +3,7 @@ package com.pharbers.kafka.connect.oss.handler;
 import com.pharbers.kafka.connect.oss.model.ExcelTitle;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.Struct;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.codehaus.jackson.map.ObjectMapper;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -25,6 +21,8 @@ public class TitleHandler {
     private Map<String, List<String>> titleMap = new HashMap<>();
     private Map<String, List<ExcelTitle>> title = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
+    private List<String> jobIdList = new LinkedList<>();
+    private final int MAX_TITLE_NUM = 100;
 
     public TitleHandler(String[] titleRow, String jobId) {
         addTitle(titleRow, jobId);
@@ -46,6 +44,12 @@ public class TitleHandler {
         }
         titleMap.put(jobId, titleList);
         title.put(jobId, sheetTitle);
+        jobIdList.add(jobId);
+        if(jobIdList.size() > MAX_TITLE_NUM){
+            titleMap.remove(jobIdList.get(0));
+            title.remove(jobIdList.get(0));
+            jobIdList.remove(0);
+        }
     }
 
     public Struct titleBuild(Schema schema, String traceId, String jobId) {

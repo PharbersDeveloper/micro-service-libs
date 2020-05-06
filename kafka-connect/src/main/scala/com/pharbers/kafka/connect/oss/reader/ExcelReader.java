@@ -32,6 +32,7 @@ import java.util.*;
  * @note 一些值得注意的地方
  * @since 2019/10/29 13:21
  */
+@Deprecated
 public class ExcelReader implements Reader {
     private static final Logger log = LoggerFactory.getLogger(ExcelReader.class);
     private Boolean isEnd = true;
@@ -83,7 +84,7 @@ public class ExcelReader implements Reader {
         this.task = task;
         this.offsetHandler = new OffsetHandler(streamOffset);
         //todo: 从task获取title位置
-        List<Integer> titleIndexList = task.getTitleIndex();
+//        List<Integer> titleIndexList = task.getTitleIndex();
         isEnd = false;
         reader = StreamingReader.builder().open(stream);
         Schema valueSchema = SchemaBuilder.struct()
@@ -99,15 +100,15 @@ public class ExcelReader implements Reader {
         titleHandler = new TitleHandler();
         while (sheets.hasNext()) {
             Sheet sheet = sheets.next();
-            int titleIndex = titleIndexList.size() > index ? titleIndexList.get(index) : 0;
+//            int titleIndex = 0;
             String jobId = UUID.randomUUID().toString() + index;
             jobIds.put(sheet.rowIterator(), jobId);
             sheetNames.put(jobId, sheet.getSheetName());
             if (sheet.rowIterator().hasNext()) {
-                while (sheet.rowIterator().hasNext() && titleIndex > 0) {
-                    sheet.rowIterator().next();
-                    titleIndex--;
-                }
+//                while (sheet.rowIterator().hasNext() && titleIndex > 0) {
+//                    sheet.rowIterator().next();
+//                    titleIndex--;
+//                }
                 if(!sheet.rowIterator().hasNext()){
                     throw new Exception("title index 指定错误");
                 }

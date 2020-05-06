@@ -51,7 +51,7 @@ object TestExcelReader extends App with Runnable{
     }
 
     def init(path: String): ExcelReader ={
-        val task = new OssTask("", "jobId", "traceId", "ossKey", new util.ArrayList[Integer](), "xlsx", "test", "",
+        val task = new OssTask("", "jobId", "traceId", "ossKey", "xlsx", "test", "", "", 0L,
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
@@ -105,12 +105,48 @@ object getCsvHeard extends App{
     while (iter.hasNext){
         val url = iter.next().getString("url").getValue
         val obj = client.getObject("pharbers-sandbox", url)
-        val s = new BufferedReader(new InputStreamReader(obj.getObjectContent)).readLine()
+        val reader = new BufferedReader(new InputStreamReader(obj.getObjectContent))
+//        reader.readLine()
+        val s = reader.readLine()
         val length = (s.split(",").length :: s.split(31.toChar.toString).length :: s.split("#").length :: Nil).max
         println(s"length:$length")
         if(length > 24) println(url)
         println(s)
         obj.forcedClose()
+    }
+}
+
+object getCSV extends App{
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val obj = client.getObject("pharbers-sandbox", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312")
+    val file = new File("xinlitai.csv")
+    file.createNewFile()
+    val fileWrite = new FileWriter(file)
+    println(obj.getObjectMetadata.getContentLength)
+    val reader = new BufferedReader(new InputStreamReader(obj.getObjectContent, "UTF-16"))
+    var s = reader.readLine()
+    while (s != null){
+        s = s.split("\t").mkString(",")
+        fileWrite.write(s + "\n")
+        Thread.sleep(1)
+        s = reader.readLine()
+    }
+}
+
+object getExcel extends App{
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val obj = client.getObject("pharbers-sandbox", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312")
+    val file = new File("excel")
+    file.createNewFile()
+    val fileWrite = new FileWriter(file)
+    println(obj.getObjectMetadata.getContentLength)
+    val reader = new BufferedReader(new InputStreamReader(obj.getObjectContent, "UTF-16"))
+    var s = reader.readLine()
+    while (s != null){
+        s = s.split("\t").mkString(",")
+        fileWrite.write(s + "\n")
+        Thread.sleep(1)
+        s = reader.readLine()
     }
 }
 

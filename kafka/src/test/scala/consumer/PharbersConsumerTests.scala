@@ -54,6 +54,12 @@ class PharbersConsumerTests extends FunSuite with PhLogable{
         import scala.collection.JavaConverters._
         val consumer = new PharbersKafkaConsumer[String, OssTask](List("oss_task")).getConsumer
         consumer.subscribe(List("oss_task").asJava)
+        val consumer2 = new PharbersKafkaConsumer[String, OssTask](List("oss_task2")).getConsumer
+        val consumer3 = new PharbersKafkaConsumer[String, OssTask](List("oss_task3")).getConsumer
+        val consumer4 = new PharbersKafkaConsumer[String, OssTask](List("oss_task4")).getConsumer
+        consumer2.subscribe(List("oss_task").asJava)
+        consumer3.subscribe(List("oss_task").asJava)
+        consumer4.subscribe(List("oss_task").asJava)
         while (true){
             val end = consumer.endOffsets(List(new TopicPartition("oss_source_1", 0)).asJava, Duration.ofSeconds(10))
             println(end)

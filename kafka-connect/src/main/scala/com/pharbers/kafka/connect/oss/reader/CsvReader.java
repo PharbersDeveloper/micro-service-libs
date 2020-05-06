@@ -32,6 +32,7 @@ import java.util.*;
  * @note 一些值得注意的地方
  * @since 2019/10/28 18:33
  */
+@Deprecated
 public class CsvReader implements Reader {
     private static final Logger log = LoggerFactory.getLogger(CsvReader.class);
     private Boolean isEnd = true;
@@ -104,20 +105,19 @@ public class CsvReader implements Reader {
         sourceRecordHandler = new SourceRecordHandler(OffsetHandler.offsetKey(task.getJobId().toString()), topic, keySchema, valueSchema);
         jobId = UUID.randomUUID().toString();
         //todo: 从task获取title位置
-        List<Integer> titleIndexs = task.getTitleIndex();
-        int titleIndex = titleIndexs.size() > 0 ? titleIndexs.get(0) : 0;
+//        int titleIndex = 0;
         isEnd = false;
         int buffSize = 2048;
         bufferedReader = new BufferedReader(new InputStreamReader(stream, Charset.forName("UTF-8")), buffSize);
         log.info("*********************START!");
-        while (titleIndex > 0) {
-            try {
-                bufferedReader.readLine();
-            } catch (IOException e) {
-                throw new Exception("title index 指定错误", e);
-            }
-            titleIndex--;
-        }
+//        while (titleIndex > 0) {
+//            try {
+//                bufferedReader.readLine();
+//            } catch (IOException e) {
+//                throw new Exception("title index 指定错误", e);
+//            }
+//            titleIndex--;
+//        }
         try {
             titleHandler = new TitleHandler(bufferedReader.readLine().split(","), jobId);
         } catch (IOException e) {

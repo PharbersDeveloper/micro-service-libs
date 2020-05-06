@@ -31,7 +31,7 @@ class TestRowDataProducer extends FunSuite{
     test("test close Stream"){
         val product = new RowDataProducer(null, null, config.asJava)
         val task = new OssTask("test", "jobId", "traceId", "5211b69b-d568-43ab-8ce4-968c7cf5a04e/1575882092028",
-            new util.ArrayList[Integer](), "fileType", "test", "",
+            "fileType", "test", "", "", 0L,
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
@@ -53,7 +53,7 @@ class TestRowDataProducer extends FunSuite{
         val plate = new LinkedBlockingQueue[RowData](1000)
         val product = new RowDataProducer(null, plate, config.asJava)
         val task = new OssTask("test", "jobId", "traceId", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312",
-            new util.ArrayList[Integer](), "csv", "test", "",
+            "csv", "test", "", "", 0L,
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
