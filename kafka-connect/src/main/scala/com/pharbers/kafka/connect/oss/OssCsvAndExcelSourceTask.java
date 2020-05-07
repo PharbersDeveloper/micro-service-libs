@@ -6,8 +6,8 @@ import com.pharbers.kafka.connect.oss.handler.OffsetHandler;
 import com.pharbers.kafka.connect.oss.handler.TitleHandler;
 import com.pharbers.kafka.connect.oss.model.ExcelTitle;
 import com.pharbers.kafka.connect.oss.model.Label;
+import com.pharbers.kafka.connect.utils.FileTagUtil;
 import com.pharbers.kafka.connect.utils.JsonUtil;
-import com.pharbers.kafka.connect.utils.CodeUtil;
 import com.pharbers.kafka.schema.OssTask;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import org.apache.kafka.connect.data.Schema;
@@ -41,7 +41,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private RecordBuilder recordBuilder;
     private LinkedBlockingQueue<RowData> plate;
     private ExecutorService executorService = null;
-    private final String MD5_TAG = "_tag";
+    private final String TAG_KEY = "_tag";
 
     @Override
     public String version() {
@@ -118,15 +118,15 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
         }
         OssTask task = (OssTask)row.getMetaDate().get("task");
         String sheetName = row.getMetaDate().get(row.getJobId()).toString();
-        String tag = CodeUtil.md5Encode(task.getOwner().toString() + task.getFileName() + sheetName + task.getCreateTime());
-        rowValue.put(MD5_TAG, tag);
+        String tag = FileTagUtil.createTag(new String[]{task.getOwner().toString(), task.getFileName().toString(), sheetName, task.getCreateTime().toString()});
+        rowValue.put(TAG_KEY, tag);
         addSources(sources, rowValue, row);
     }
 
     private void readTitle(RowData row, List<SourceRecord> sources){
         titleHandler.addTitle(row.getRow(), row.getJobId());
         List<ExcelTitle> title = titleHandler.getTitleForPoll(row.getJobId());
-        title.add(new ExcelTitle(MD5_TAG, "string"));
+        title.add(new ExcelTitle(TAG_KEY, "string"));
         addSources(sources, title, row);
     }
 

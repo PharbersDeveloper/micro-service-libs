@@ -19,7 +19,7 @@ import org.scalatest.FunSuite
   */
 class OssCsvAndExcelSourceTaskTest extends FunSuite with PhLogable{
     test("test poll"){
-        val task = new OssTask("", "jobId", "traceId", "ossKey", "xlsx", "testFileName", "", "", 0L,
+        val task = new OssTask("", "jobId", "traceId", "ossKey", "xlsx", "testFileName", "testSheetName", "TestOwner", 0L,
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),
             new util.ArrayList[CharSequence](),

@@ -1,6 +1,7 @@
 package com.pharbers.kafka.connect.oss.model;
 
 import com.pharbers.kafka.connect.utils.CodeUtil;
+import com.pharbers.kafka.connect.utils.FileTagUtil;
 import com.pharbers.kafka.schema.OssTask;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,6 @@ public class Label {
     private String sheetName;
     private String fileName;
     private String tag;
-
     private String assetId;
 
     public Label(List<String> label,
@@ -65,7 +65,7 @@ public class Label {
         this.sheetName = sheetName;
         this.fileName = task.getFileName().toString();
         this.assetId = task.getAssetId().toString();
-        this.tag = CodeUtil.md5Encode(task.getOwner().toString() + task.getFileName() + sheetName + task.getCreateTime());
+        this.tag = FileTagUtil.createTag(new String[]{task.getOwner().toString(), task.getFileName().toString(), sheetName, task.getCreateTime().toString()});
     }
 
     public List<String> getLabel() {
@@ -138,5 +138,13 @@ public class Label {
 
     public void setAssetId(String assetId) {
         this.assetId = assetId;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }
