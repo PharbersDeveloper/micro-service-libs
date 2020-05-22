@@ -126,7 +126,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
     private void readTitle(RowData row, List<SourceRecord> sources){
         titleHandler.addTitle(row.getRow(), row.getJobId());
         List<ExcelTitle> title = titleHandler.getTitleForPoll(row.getJobId());
-        title.add(new ExcelTitle(TAG_KEY, "string"));
+        title.add(new ExcelTitle(TAG_KEY, "String"));
         addSources(sources, title, row);
     }
 

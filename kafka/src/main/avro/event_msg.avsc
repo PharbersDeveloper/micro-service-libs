@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "EventMsg",
+  "namespace": "com.pharbers.kafka.schema",
+  "fields": [
+    {
+      "name": "jobId",
+      "type": "string"
+    },
+    {
+      "name": "traceId",
+      "type": "string"
+    },
+    {
+      "name": "type",
+      "type": "string"
+    },
+    {
+      "name": "data",
+      "type": "string"
+    }
+  ]
+}

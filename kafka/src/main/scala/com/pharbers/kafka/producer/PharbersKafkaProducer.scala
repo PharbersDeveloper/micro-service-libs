@@ -31,12 +31,12 @@ class PharbersKafkaProducer[K, V] {
     config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafka_config_obj.keyDefaultSerializer)
     config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafka_config_obj.valueDefaultSerializer)
     config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl)
-    config.put("security.protocol", kafka_config_obj.securityProtocol)
-    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
-    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
-    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
-    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
-    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
+//    config.put("security.protocol", kafka_config_obj.securityProtocol)
+//    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
+//    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
+//    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
+//    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
+//    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
     val producer = new KafkaProducer[K, V](config)
 
 

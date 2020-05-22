@@ -8,12 +8,12 @@ import com.aliyun.oss.model.OSSObject;
 import com.pharbers.kafka.connect.oss.OssCsvAndExcelSourceConnector;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import com.pharbers.kafka.connect.oss.kafka.Producer;
+import com.pharbers.kafka.connect.oss.model.BloodMsg;
 import com.pharbers.kafka.connect.oss.readerV2.CsvReaderV2;
 import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderV2;
 import com.pharbers.kafka.connect.oss.readerV2.ReaderV2;
 import com.pharbers.kafka.schema.OssTask;
 import com.pharbers.kafka.schema.PhErrorMsg;
-import org.apache.kafka.connect.source.SourceTaskContext;
 import org.apache.poi.ooxml.POIXMLException;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ public class RowDataProducer implements Runnable {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     runTask();
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -70,25 +70,25 @@ public class RowDataProducer implements Runnable {
         isRun = false;
     }
 
-    public boolean isRun(){
-       return isRun;
+    public boolean isRun() {
+        return isRun;
     }
 
-    private void runTask(){
+    private void runTask() {
         while (kafkaConsumerBuffer.hasNext()) {
             OssTask task = kafkaConsumerBuffer.next();
             log.info("接收到任务," + Thread.currentThread().getName());
             log.info("ossKey:" + task.getOssKey().toString() + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + task.getTraceId().toString() + " type:" + task.getFileType().toString());
             try {
+                pushStatus(task);
                 readOss(task);
-            }catch (POIXMLException e) {
+            } catch (POIXMLException e) {
                 log.info("poi异常", e);
-                Producer.getIns().pull(new PhErrorMsg(
+                Producer.getIns().pushErr(new PhErrorMsg(
                         task.getJobId(), task.getTraceId(),
                         "", "kafka-connector",
                         "ooxml_exception", e.getMessage(), task.getAssetId()));
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
         }
@@ -121,14 +121,14 @@ public class RowDataProducer implements Runnable {
         return object;
     }
 
-    protected String getFormat(InputStream stream, String fileType){
-        if("csv".equals(fileType)){
+    protected String getFormat(InputStream stream, String fileType) {
+        if ("csv".equals(fileType)) {
             UniversalDetector detector = new UniversalDetector();
             String format = "UTF-8";
             byte[] bytes = new byte[4096];
             try {
                 int i = 0;
-                while (i < bytes.length){
+                while (i < bytes.length) {
                     i += stream.read(bytes, i, bytes.length - i);
                 }
 
@@ -159,12 +159,24 @@ public class RowDataProducer implements Runnable {
                 break;
             default:
                 log.error("不支持的类型" + fileType);
-                Producer.getIns().pull(new PhErrorMsg(
+                Producer.getIns().pushErr(new PhErrorMsg(
                         task.getJobId(), task.getTraceId(),
                         "", "kafka-connector",
                         "type_exception", fileType, task.getAssetId()));
                 throw new Exception("不支持的类型" + fileType);
         }
         return reader;
+    }
+
+    protected void pushStatus(OssTask task) {
+        BloodMsg msg = new BloodMsg(
+                task.getAssetId().toString(),
+                new ArrayList<>(),
+                task.getJobId().toString(),
+                new ArrayList<>(),
+                "start",
+                "oss source connector"
+        );
+        Producer.getIns().pushStatus(msg, task.getTraceId().toString());
     }
 }

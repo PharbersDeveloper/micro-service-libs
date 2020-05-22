@@ -31,12 +31,12 @@ class PharbersKafkaConsumer[K, V](val topics: List[String], val msgFrequencyMs: 
     config.put("value.deserializer", kafka_config_obj.valueDefaultDeserializer)
     config.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, kafka_config_obj.specificAvroReader)
     config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl);
-    config.put("security.protocol", kafka_config_obj.securityProtocol)
-    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
-    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
-    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
-    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
-    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
+//    config.put("security.protocol", kafka_config_obj.securityProtocol)
+//    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
+//    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
+//    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
+//    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
+//    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
 
     final private val CONSUMER = new KafkaConsumer[K, V](config)
     final private val SHUTDOWN = new AtomicBoolean(false)

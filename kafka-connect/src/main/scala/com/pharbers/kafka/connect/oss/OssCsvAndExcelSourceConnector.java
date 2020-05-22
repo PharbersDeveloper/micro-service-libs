@@ -24,6 +24,7 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
     public static final String ACCESS_KEY_SECRET_CONFIG = "accessKeySecret";
     public static final String BUCKET_NAME_CONFIG = "bucketName";
     public static final String OSS_TASK_TOPIC = "ossTaskTopic";
+    public static final String STATUS_PUSH_TOPIC = "statusTopic";
     public static final String TASK_BATCH_SIZE_CONFIG = "batch.size";
     public static final String JOB_ID_CONFIG = "jobId";
     public static final String TRACE_ID_CONFIG = "traceId";
@@ -37,7 +38,8 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
             .define(ACCESS_KEY_ID_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH, "Aliyun OSS AccessKeyId")
             .define(ACCESS_KEY_SECRET_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH, "Aliyun OSS AccessKeySecret")
             .define(BUCKET_NAME_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH, "Aliyun OSS BucketName")
-            .define(OSS_TASK_TOPIC, ConfigDef.Type.STRING, null, ConfigDef.Importance.HIGH, "task topic")
+            .define(OSS_TASK_TOPIC, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "task topic")
+            .define(STATUS_PUSH_TOPIC, ConfigDef.Type.STRING, ConfigDef.Importance.HIGH, "任务状态回传topic")
             .define(TOPIC_CONFIG, ConfigDef.Type.LIST, ConfigDef.Importance.HIGH, "The topic to publish data to")
             .define(JOB_ID_CONFIG, ConfigDef.Type.STRING,  UUID.randomUUID().toString(), ConfigDef.Importance.HIGH, "配置job id")
             .define(TRACE_ID_CONFIG, ConfigDef.Type.STRING,  UUID.randomUUID().toString(), ConfigDef.Importance.HIGH, "配置trace id")
@@ -52,6 +54,7 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
     private String bucketName;
     private String ossTaskTopic;
     private String topic;
+    private String statusPushTopic;
     private String autoTitle;
     private List<String> titles;
     private int batchSize;
@@ -86,6 +89,7 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
         autoTitle = parsedConfig.getString(AUTO_TITLE_CONFIG);
         titles = parsedConfig.getList(TITLES_CONFIG);
         batchSize = parsedConfig.getInt(TASK_BATCH_SIZE_CONFIG);
+        statusPushTopic = parsedConfig.getString(STATUS_PUSH_TOPIC);
     }
 
     @Override
@@ -97,12 +101,13 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
     public List<Map<String, String>> taskConfigs(int maxTasks) {
         ArrayList<Map<String, String>> configs = new ArrayList<>();
         // Only one input stream makes sense.
-        Map<String, String> config = new HashMap<>();
+        Map<String, String> config = new HashMap<>(20);
         config.put(ENDPOINT_CONFIG, endpoint);
         config.put(ACCESS_KEY_ID_CONFIG, accessKeyId);
         config.put(ACCESS_KEY_SECRET_CONFIG, accessKeySecret);
         config.put(BUCKET_NAME_CONFIG, bucketName);
         config.put(OSS_TASK_TOPIC, ossTaskTopic);
+        config.put(STATUS_PUSH_TOPIC, statusPushTopic);
         config.put(TOPIC_CONFIG, topic);
         config.put(AUTO_TITLE_CONFIG, autoTitle);
         config.put(TITLES_CONFIG, String.join(",", titles));

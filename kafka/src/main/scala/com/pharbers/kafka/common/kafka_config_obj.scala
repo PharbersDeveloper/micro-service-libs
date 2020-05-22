@@ -15,25 +15,25 @@ object kafka_config_obj extends PharbersInjectModule {
         "keyDefaultSerializer" :: "valueDefaultSerializer" ::
         "keyDefaultDeserializer" :: "valueDefaultDeserializer" ::
         "schemaRegistryUrl" :: "specificAvroReader" ::
-        "securityProtocol" :: "sslAlgorithm" ::
-        "sslTruststoreLocation" :: "sslTruststorePassword" ::
-        "sslKeystoreLocation" :: "sslKeystorePassword" ::
+//        "securityProtocol" :: "sslAlgorithm" ::
+//        "sslTruststoreLocation" :: "sslTruststorePassword" ::
+//        "sslKeystoreLocation" :: "sslKeystorePassword" ::
         Nil
 
-    lazy val broker: String = config.mc.find(p => p._1 == "broker").get._2.toString
-    lazy val group: String = config.mc.find(p => p._1 == "group").get._2.toString
-    lazy val topics: Array[String] = config.mc.find(p => p._1 == "topics").get._2.toString.split("##")
-    lazy val acks: String = config.mc.find(p => p._1 == "acks").get._2.toString
-    lazy val keyDefaultSerializer: String = config.mc.find(p => p._1 == "keyDefaultSerializer").get._2.toString
-    lazy val valueDefaultSerializer: String = config.mc.find(p => p._1 == "valueDefaultSerializer").get._2.toString
-    lazy val keyDefaultDeserializer: String = config.mc.find(p => p._1 == "keyDefaultDeserializer").get._2.toString
-    lazy val valueDefaultDeserializer: String = config.mc.find(p => p._1 == "valueDefaultDeserializer").get._2.toString
-    lazy val schemaRegistryUrl: String = config.mc.find(p => p._1 == "schemaRegistryUrl").get._2.toString
-    lazy val specificAvroReader: String = config.mc.find(p => p._1 == "specificAvroReader").get._2.toString
-    lazy val securityProtocol: String = config.mc.find(p => p._1 == "securityProtocol").get._2.toString
-    lazy val sslAlgorithm: String = config.mc.find(p => p._1 == "sslAlgorithm").get._2.toString
-    lazy val sslTruststoreLocation: String = config.mc.find(p => p._1 == "sslTruststoreLocation").get._2.toString
-    lazy val sslTruststorePassword: String = config.mc.find(p => p._1 == "sslTruststorePassword").get._2.toString
-    lazy val sslKeystoreLocation: String = config.mc.find(p => p._1 == "sslKeystoreLocation").get._2.toString
-    lazy val sslKeystorePassword: String = config.mc.find(p => p._1 == "sslKeystorePassword").get._2.toString
+    lazy val broker: String = config.mc.find(p => p._1 == "broker").getOrElse(("", ""))._2.toString
+    lazy val group: String = config.mc.find(p => p._1 == "group").getOrElse(("", ""))._2.toString
+    lazy val topics: Array[String] = config.mc.find(p => p._1 == "topics").getOrElse(("", ""))._2.toString.split("##")
+    lazy val acks: String = config.mc.find(p => p._1 == "acks").getOrElse(("", ""))._2.toString
+    lazy val keyDefaultSerializer: String = config.mc.find(p => p._1 == "keyDefaultSerializer").getOrElse(("", ""))._2.toString
+    lazy val valueDefaultSerializer: String = config.mc.find(p => p._1 == "valueDefaultSerializer").getOrElse(("", ""))._2.toString
+    lazy val keyDefaultDeserializer: String = config.mc.find(p => p._1 == "keyDefaultDeserializer").getOrElse(("", ""))._2.toString
+    lazy val valueDefaultDeserializer: String = config.mc.find(p => p._1 == "valueDefaultDeserializer").getOrElse(("", ""))._2.toString
+    lazy val schemaRegistryUrl: String = config.mc.find(p => p._1 == "schemaRegistryUrl").getOrElse(("", ""))._2.toString
+    lazy val specificAvroReader: String = config.mc.find(p => p._1 == "specificAvroReader").getOrElse(("", ""))._2.toString
+    lazy val securityProtocol: String = config.mc.find(p => p._1 == "securityProtocol").getOrElse(("", ""))._2.toString
+    lazy val sslAlgorithm: String = config.mc.find(p => p._1 == "sslAlgorithm").getOrElse(("", ""))._2.toString
+    lazy val sslTruststoreLocation: String = config.mc.find(p => p._1 == "sslTruststoreLocation").getOrElse(("", ""))._2.toString
+    lazy val sslTruststorePassword: String = config.mc.find(p => p._1 == "sslTruststorePassword").getOrElse(("", ""))._2.toString
+    lazy val sslKeystoreLocation: String = config.mc.find(p => p._1 == "sslKeystoreLocation").getOrElse(("", ""))._2.toString
+    lazy val sslKeystorePassword: String = config.mc.find(p => p._1 == "sslKeystorePassword").getOrElse(("", ""))._2.toString
 }
