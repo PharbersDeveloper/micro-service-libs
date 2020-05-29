@@ -22,17 +22,17 @@ import java.util.concurrent.BlockingQueue;
  * @since 2019/12/25 16:23
  */
 public class ExcelReaderV2 implements ReaderV2 {
-    private Workbook reader;
-    private String jobIdPrefix;
-    private Map<String, Object> metaDate = new HashMap<>();
-    private OssTask task;
+    protected Workbook reader;
+    protected String jobIdPrefix;
+    protected Map<String, Object> metaDate = new HashMap<>();
+    protected OssTask task;
     //todo: 和cvsReader统一
 
-    private final int TITLE_MAX_INDEX = 100;
-    private final String TITLE_TYPE = "SandBox-Schema";
-    private final String LABELS_TYPE = "SandBox-Labels";
-    private final String DATA_TYPE = "SandBox";
-    private final String LENGTH_TYPE = "SandBox-Length";
+    protected final int TITLE_MAX_INDEX = 100;
+    protected final String TITLE_TYPE = "SandBox-Schema";
+    protected final String LABELS_TYPE = "SandBox-Labels";
+    protected final String DATA_TYPE = "SandBox";
+    protected final String LENGTH_TYPE = "SandBox-Length";
 
     public ExcelReaderV2(String jobIdPrefix, OssTask task){
         this.jobIdPrefix = jobIdPrefix;
@@ -93,7 +93,7 @@ public class ExcelReaderV2 implements ReaderV2 {
         }
     }
 
-    private List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
+    protected List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
         for(int i = 0; i < cacheList.size(); i++){
@@ -109,10 +109,6 @@ public class ExcelReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
-        //todo： 临时过滤
-//        if(titleValues.size() > 24){
-//            throw new Exception("title 过长");
-//        }
         String[] schema = titleValues.toArray(new String[0]);
         seq.put(new RowData(TITLE_TYPE, schema, metaDate, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());

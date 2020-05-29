@@ -10,6 +10,7 @@ import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import com.pharbers.kafka.connect.oss.kafka.Producer;
 import com.pharbers.kafka.connect.oss.model.BloodMsg;
 import com.pharbers.kafka.connect.oss.readerV2.CsvReaderV2;
+import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderForMaxDeliveryData;
 import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderV2;
 import com.pharbers.kafka.connect.oss.readerV2.ReaderV2;
 import com.pharbers.kafka.schema.OssTask;
@@ -148,13 +149,18 @@ public class RowDataProducer implements Runnable {
 
     protected ReaderV2 buildReader(String fileType, OssTask task, InputStream stream, String format) throws Exception {
         ReaderV2 reader;
+        String maxDeliveryTag = "delivery";
         switch (fileType) {
             case "csv":
                 reader = new CsvReaderV2(UUID.randomUUID().toString(), task);
                 reader.init(stream, format);
                 break;
             case "xlsx":
-                reader = new ExcelReaderV2(UUID.randomUUID().toString(), task);
+                if(task.getProviders().contains(maxDeliveryTag)){
+                    reader = new ExcelReaderForMaxDeliveryData(UUID.randomUUID().toString(), task);
+                } else {
+                    reader = new ExcelReaderV2(UUID.randomUUID().toString(), task);
+                }
                 reader.init(stream, format);
                 break;
             default:

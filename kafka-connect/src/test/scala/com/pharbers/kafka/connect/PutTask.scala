@@ -29,7 +29,7 @@ object PutTask extends App {
 
     def push: Unit ={
         val removeCsv = List("5211b69b-d568-43ab-8ce4-968c7cf5a04e/1575882092028", "77d7422e-96b3-4555-9105-7d9d03ce8b8c/1575882711010")
-        val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+        val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", sys.env("OSS_ACCESS_KEY_ID"), sys.env("OSS_ACCESS_KEY_SECRET"))
         val mongoClient = MongoClients.create("mongodb://123.56.179.133:5555")
         val database = mongoClient.getDatabase("pharbers-sandbox-merge")
         val files = database.getCollection("files", classOf[BsonDocument])

@@ -28,10 +28,11 @@ class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
         new util.ArrayList[CharSequence](),
         new util.ArrayList[CharSequence](),
         new util.ArrayList[CharSequence]())
-    val reader = new ExcelReaderV2("test", task)
-    val path = "src/test/resources/1575555558843.xlsx"
-    val stream = new FileInputStream(new File(path))
+
     test("test excel reader"){
+        val reader = new ExcelReaderV2("test", task)
+        val path = "src/test/resources/1575555558843.xlsx"
+        val stream = new FileInputStream(new File(path))
         val plate = new LinkedBlockingQueue[RowData]()
         reader.init(stream, "")
         reader.read(plate)
@@ -60,6 +61,30 @@ class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
                 })
     }
 
+    test("test ExcelReaderForMaxDeliveryData"){
+        val reader = new ExcelReaderForMaxDeliveryData("test", task)
+        val path = "src/test/resources/Amgen_MAX_data_仅201912.xlsx"
+        val stream = new FileInputStream(new File(path))
+        val plate = new LinkedBlockingQueue[RowData]()
+        reader.init(stream, "")
+        reader.read(plate)
+        plate.asScala
+                .groupBy(x => x.getJobId)
+                .foreach(x => {
+                    val rows = x._2.filter(data => data.getType == "SandBox")
+                    val count = rows.size
+                    val length = x._2.filter(data => data.getType == "SandBox-Length").head.getRow.head
+                    val schema = x._2.filter(data => data.getType == "SandBox-Schema").head.getRow
+                    val schemaCheck = "Year\u001F年,Quarter\u001F季度,Month\u001F月,Hospital Code_Pharbers\u001F法伯医院编码,Hospital Code_CPA\u001FCPA医院编码,Hospital Code_Amgen\u001FAmgen医院编码,Hospital Name\u001F医院名称,Province\u001F省份,City\u001F城市,Hospital Grade\u001F医院等级,City Tier\u001F城市等级,CPA Hospital Flag\u001FCPA医院标记,Area_Amgen\u001FAmgen大区,Target Hospital Flag\u001F目标医院标记,Target City Flag\u001F目标城市标记,PCI\u001FPCI手术量,Value (RMB)\u001FMarket\u001FStatin_total\u001F他汀市场,Value (RMB)\u001FMolecule\u001FAtovastatin\u001F阿托伐他汀,Value (RMB)\u001FMolecule\u001FRosuvastatin\u001F瑞舒伐他汀,Value (RMB)\u001FMolecule\u001FSimvastatin\u001F辛伐他汀,Value (RMB)\u001FMolecule\u001FEzetimibe+Ezetimibe/Simvastatin\u001F依折麦布+依折麦布辛伐他汀,Value (RMB)\u001FMolecule\u001FOther statin\u001F其它他汀,Value (RMB)\u001FBrand\u001FAtovastatin_Lipitor\u001F阿托伐他汀_立普妥,Value (RMB)\u001FBrand\u001FAtovastatin_other brand\u001F阿托伐他汀_其他品牌,Value (RMB)\u001FBrand\u001FRosuvastatin_Crestor\u001F瑞舒伐他汀_可定,Value (RMB)\u001FBrand\u001FRosuvastatin_other brand\u001F瑞舒伐他汀_其他品牌,Value (RMB)\u001FBrand\u001FSimvastatin_Zocor\u001F辛伐他汀_舒降之,Value (RMB)\u001FBrand\u001FSimvastatin_other brand\u001F辛伐他汀_其他品牌,Value (RMB)\u001FBrand\u001FEzetimibe_Ezetrol\u001F依折麦布_益适纯,Value (RMB)\u001FBrand\u001FEzetimibe/Simvastatin_Vytorin\u001F依折麦布辛伐他汀_葆至能,Value (RMB)\u001FBrand\u001FOther statin_all brand\u001F其它他汀_全部品牌,Value (RMB)\u001FMarket\u001FAnti-platelet\u001F抗血小板市场,Value (RMB)\u001FMolecule\u001FClopidogrel\u001F氯吡格雷,Value (RMB)\u001FMolecule\u001FTicagrelor\u001F替格瑞洛,Value (RMB)\u001FBrand\u001FClopidogrel_Plavix\u001F氯吡格雷_波立维,Value (RMB)\u001FBrand\u001FClopidogrel_other brand\u001F氯吡格雷_其他品牌,Value (RMB)\u001FBrand\u001FTicagrelor_Brilinta\u001F替格瑞洛_倍林达,Volume (MoT)\u001FMarket\u001FStatin_total\u001F他汀市场,Volume (MoT)\u001FMolecule\u001FAtovastatin\u001F阿托伐他汀,Volume (MoT)\u001FMolecule\u001FRosuvastatin\u001F瑞舒伐他汀,Volume (MoT)\u001FMolecule\u001FSimvastatin\u001F辛伐他汀,Volume (MoT)\u001FMolecule\u001FEzetimibe+Ezetimibe/Simvastatin\u001F依折麦布+依折麦布辛伐他汀,Volume (MoT)\u001FMolecule\u001FOther statin\u001F其它他汀,Volume (MoT)\u001FBrand\u001FAtovastatin_Lipitor\u001F阿托伐他汀_立普妥,Volume (MoT)\u001FBrand\u001FAtovastatin_other brand\u001F阿托伐他汀_其他品牌,Volume (MoT)\u001FBrand\u001FRosuvastatin_Crestor\u001F瑞舒伐他汀_可定,Volume (MoT)\u001FBrand\u001FRosuvastatin_other brand\u001F瑞舒伐他汀_其他品牌,Volume (MoT)\u001FBrand\u001FSimvastatin_Zocor\u001F辛伐他汀_舒降之,Volume (MoT)\u001FBrand\u001FSimvastatin_other brand\u001F辛伐他汀_其他品牌,Volume (MoT)\u001FBrand\u001FEzetimibe_Ezetrol\u001F依折麦布_益适纯,Volume (MoT)\u001FBrand\u001FEzetimibe/Simvastatin_Vytorin\u001F依折麦布辛伐他汀_葆至能,Volume (MoT)\u001FBrand\u001FOther statin_all brand\u001F其它他汀_全部品牌,Volume (MoT)\u001FMarket\u001FAnti-platelet\u001F抗血小板市场,Volume (MoT)\u001FMolecule\u001FClopidogrel\u001F氯吡格雷,Volume (MoT)\u001FMolecule\u001FTicagrelor\u001F替格瑞洛,Volume (MoT)\u001FBrand\u001FClopidogrel_Plavix\u001F氯吡格雷_波立维,Volume (MoT)\u001FBrand\u001FClopidogrel_other brand\u001F氯吡格雷_其他品牌,Volume (MoT)\u001FBrand\u001FTicagrelor_Brilinta\u001F替格瑞洛_倍林达"
+                    assert(schema.mkString(",") == schemaCheck)
+                    logger.debug(s"jobId: ${x._1}, count: $count, length: $length")
+                    x._1 match {
+                        case "test0" => assert(count == 24757 && length == "24757")
+                    }
+                })
+
+    }
+
     def getCheck(jobId: String): Scanner = {
         val path = jobId match {
             case "test0" => "src/test/resources/1-3月未到医院名单及说明.csv"
@@ -70,8 +95,4 @@ class TestExcelReaderV2 extends FunSuite with BeforeAndAfterAll with PhLogable{
         new Scanner(new File(path))
     }
 
-    override def afterAll(): Unit = {
-        reader.close()
-        stream.close()
-    }
 }

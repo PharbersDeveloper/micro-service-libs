@@ -120,11 +120,6 @@ public class CsvReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
-        //todo： 临时过滤
-        //todo: 由配置指定
-        if(titleValues.size() > 24){
-            throw new Exception("title 过长");
-        }
         String[] schema = titleValues.toArray(new String[0]);
         seq.put(new RowData(TITLE_TYPE, schema, metaDate, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());

@@ -96,7 +96,7 @@ object TestCsvFormat extends App{
 }
 
 object getCsvHeard extends App{
-    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", sys.env("OSS_ACCESS_KEY_ID"), sys.env("OSS_ACCESS_KEY_SECRET"))
     val mongoClient = MongoClients.create("mongodb://123.56.179.133:5555")
     val database = mongoClient.getDatabase("pharbers-sandbox-max-result")
     val files = database.getCollection("files", classOf[BsonDocument])
@@ -117,7 +117,7 @@ object getCsvHeard extends App{
 }
 
 object getCSV extends App{
-    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", sys.env("OSS_ACCESS_KEY_ID"), sys.env("OSS_ACCESS_KEY_SECRET"))
     val obj = client.getObject("pharbers-sandbox", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312")
     val file = new File("xinlitai.csv")
     file.createNewFile()
@@ -134,7 +134,7 @@ object getCSV extends App{
 }
 
 object getExcel extends App{
-    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", "LTAI4Fuc5oo46peAcc3LmHb3", "aJRr3DP4nXCFDR3KGRICpIhq5bHfTm")
+    val client = new OSSClientBuilder().build("oss-cn-beijing.aliyuncs.com", sys.env("OSS_ACCESS_KEY_ID"), sys.env("OSS_ACCESS_KEY_SECRET"))
     val obj = client.getObject("pharbers-sandbox", "48750a49-232a-4039-b973-cd6ece31f6af/1575959605312")
     val file = new File("excel")
     file.createNewFile()
