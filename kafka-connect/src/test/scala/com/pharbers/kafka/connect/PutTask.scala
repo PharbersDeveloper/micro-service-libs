@@ -99,7 +99,7 @@ object PushTest extends App{
         println(res)
         count += 1
         println(count)
-        Thread.sleep(1000 * 5)
+        Thread.sleep(1000 * 3)
     }
 
 }

@@ -28,7 +28,7 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
     val path = new File("/usr/share/logs-path/msgList")
     val mapping = new ObjectMapper()
     val consumer: KafkaConsumer[K, V] =  new PharbersKafkaConsumer[K, V](List(topic)).getConsumer
-    var keySet: Set[K] = Set()
+    var keys: List[K] = List()
     val msgList = new util.LinkedList[V]()
     if(path.exists()){
         val scanner = new Scanner(path)
@@ -45,8 +45,9 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
         try {
             while(!Thread.currentThread().isInterrupted){
                 consumer.poll(Duration.ofSeconds(1)).asScala.foreach(x => {
-                    if (!keySet.contains(x.key())) {
-                        keySet += x.key()
+                    if (!keys.contains(x.key())) {
+                        keys = keys.takeRight(99)
+                        keys :+ x.key()
                         this.synchronized{
                             msgList.add(x.value())
                         }
@@ -54,16 +55,22 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
                 })
             }
         } catch {
-            case e: InterruptException =>
+            case _: InterruptException =>
             case e: Exception => e.printStackTrace()
         }
     }
 
     def hasNext: Boolean ={
+        if(msgList.isEmpty) path.delete()
         !msgList.isEmpty
     }
 
     def next: V = {
+        saveMsg()
+        msgList.pollFirst()
+    }
+
+    def saveMsg(): Unit ={
         path.delete()
         path.createNewFile()
         val write = new FileWriter(path)
@@ -72,12 +79,9 @@ class ConsumerBuilder[K, V <: SpecificRecordBase](topic: String, classTag: Class
         }
         write.flush()
         write.close()
-        keySet = Set()
-        msgList.pollFirst()
     }
 
-    def close: Unit ={
+    def close(): Unit ={
         consumer.close()
-        next
     }
 }

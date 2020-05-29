@@ -141,7 +141,8 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
 
     private void addSources(List<SourceRecord> sources, Object data, RowData row){
         Struct value = new Struct(recordBuilder.valueSchema);
-        value.put("jobId", row.getJobId());
+        value.put("jobId", ((OssTask)row.getMetaDate().get("task")).getJobId().toString());
+        value.put("id", row.getJobId());
         value.put("traceId", row.getTraceId());
         value.put("type", row.getType());
         try {
@@ -202,6 +203,7 @@ public class OssCsvAndExcelSourceTask extends SourceTask {
             this.keySchema = SchemaBuilder.string().optional().build();
             this.valueSchema = SchemaBuilder.struct()
                     .field("jobId", Schema.STRING_SCHEMA)
+                    .field("id", Schema.STRING_SCHEMA)
                     .field("traceId", Schema.STRING_SCHEMA)
                     .field("type", Schema.STRING_SCHEMA)
                     .field("data", Schema.STRING_SCHEMA).build();
