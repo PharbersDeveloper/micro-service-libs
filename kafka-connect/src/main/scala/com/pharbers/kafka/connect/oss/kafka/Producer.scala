@@ -18,7 +18,7 @@ import org.apache.kafka.clients.producer.RecordMetadata
   * @note 一些值得注意的地方
   */
 private[kafka] class Producer {
-    val TOPIC = "oss_msg"
+    var TOPIC = "oss_msg"
 
     def pushErr(msg: TypeErrorMsg): Unit = {
         val pkp = new PharbersKafkaProducer[String, EventMsg]
@@ -51,5 +51,9 @@ private[kafka] class Producer {
 object Producer {
     private val ins = new Producer
     def getIns: Producer = ins
+
+    def withTopic(topic: String): Unit ={
+        ins.TOPIC = topic
+    }
 }
 

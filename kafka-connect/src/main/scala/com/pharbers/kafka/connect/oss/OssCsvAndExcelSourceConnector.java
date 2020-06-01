@@ -1,5 +1,6 @@
 package com.pharbers.kafka.connect.oss;
 
+import com.pharbers.kafka.connect.oss.kafka.Producer;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
@@ -90,6 +91,7 @@ public class OssCsvAndExcelSourceConnector extends SourceConnector {
         titles = parsedConfig.getList(TITLES_CONFIG);
         batchSize = parsedConfig.getInt(TASK_BATCH_SIZE_CONFIG);
         statusPushTopic = parsedConfig.getString(STATUS_PUSH_TOPIC);
+        Producer.withTopic(statusPushTopic);
     }
 
     @Override

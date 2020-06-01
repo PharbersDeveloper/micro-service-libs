@@ -15,7 +15,6 @@ import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderForMaxDeliveryData;
 import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderV2;
 import com.pharbers.kafka.connect.oss.readerV2.ReaderV2;
 import com.pharbers.kafka.schema.OssTask;
-import com.pharbers.kafka.schema.PhErrorMsg;
 import org.apache.poi.ooxml.POIXMLException;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
