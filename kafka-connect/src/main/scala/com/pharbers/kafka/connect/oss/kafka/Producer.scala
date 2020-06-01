@@ -2,7 +2,7 @@ package com.pharbers.kafka.connect.oss.kafka
 
 import java.util.concurrent.{ExecutionException, Future, TimeUnit, TimeoutException}
 
-import com.pharbers.kafka.connect.oss.model.BloodMsg
+import com.pharbers.kafka.connect.oss.model.{BloodMsg, TypeErrorMsg}
 import com.pharbers.kafka.connect.utils.JsonUtil
 import com.pharbers.kafka.producer.PharbersKafkaProducer
 import com.pharbers.kafka.schema.{EventMsg, PhErrorMsg}
@@ -18,11 +18,13 @@ import org.apache.kafka.clients.producer.RecordMetadata
   * @note 一些值得注意的地方
   */
 private[kafka] class Producer {
+    val TOPIC = "oss_msg"
 
-    def pushErr(msg: PhErrorMsg): Unit = {
-        val pkp = new PharbersKafkaProducer[String, PhErrorMsg]
-        val topic = "pharbers_error"
-        val fu = pkp.produce(topic, msg.getErrorCode.toString, msg)
+    def pushErr(msg: TypeErrorMsg): Unit = {
+        val pkp = new PharbersKafkaProducer[String, EventMsg]
+        val msgType = "parsingError"
+        val event = new EventMsg(msg.getJobId, msg.getTraceId, msgType, JsonUtil.MAPPER.writeValueAsString(msg))
+        val fu = pkp.produce(TOPIC,"", event)
         try
             println(fu.get(10, TimeUnit.SECONDS))
         catch {
@@ -34,9 +36,8 @@ private[kafka] class Producer {
 
     def pushStatus(msg: BloodMsg, traceId: String): Unit ={
         val pkp = new PharbersKafkaProducer[String, EventMsg]
-        val topic = "oss_msg"
         val event = new EventMsg(msg.getJobId, traceId, "SandBoxDataSet", JsonUtil.MAPPER.writeValueAsString(msg))
-        val fu = pkp.produce(topic, "", event)
+        val fu = pkp.produce(TOPIC, "", event)
         try
             println(fu.get(10, TimeUnit.SECONDS))
         catch {

@@ -9,6 +9,7 @@ import com.pharbers.kafka.connect.oss.OssCsvAndExcelSourceConnector;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import com.pharbers.kafka.connect.oss.kafka.Producer;
 import com.pharbers.kafka.connect.oss.model.BloodMsg;
+import com.pharbers.kafka.connect.oss.model.TypeErrorMsg;
 import com.pharbers.kafka.connect.oss.readerV2.CsvReaderV2;
 import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderForMaxDeliveryData;
 import com.pharbers.kafka.connect.oss.readerV2.ExcelReaderV2;
@@ -85,10 +86,8 @@ public class RowDataProducer implements Runnable {
                 readOss(task);
             } catch (POIXMLException e) {
                 log.info("poi异常", e);
-                Producer.getIns().pushErr(new PhErrorMsg(
-                        task.getJobId(), task.getTraceId(),
-                        "", "kafka-connector",
-                        "ooxml_exception", e.getMessage(), task.getAssetId()));
+
+                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getJobId().toString(), e.getMessage()));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
@@ -165,10 +164,7 @@ public class RowDataProducer implements Runnable {
                 break;
             default:
                 log.error("不支持的类型" + fileType);
-                Producer.getIns().pushErr(new PhErrorMsg(
-                        task.getJobId(), task.getTraceId(),
-                        "", "kafka-connector",
-                        "type_exception", fileType, task.getAssetId()));
+                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getJobId().toString(), fileType));
                 throw new Exception("不支持的类型" + fileType);
         }
         return reader;
