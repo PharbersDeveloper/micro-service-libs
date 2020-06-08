@@ -2,6 +2,7 @@ package com.pharbers.kafka.connect.oss.readerV2;
 
 import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.concurrent.RowData;
+import com.pharbers.kafka.connect.oss.exception.TaskConfigException;
 import com.pharbers.kafka.schema.OssTask;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -34,41 +35,43 @@ public class ExcelReaderV2 implements ReaderV2 {
     protected final String DATA_TYPE = "SandBox";
     protected final String LENGTH_TYPE = "SandBox-Length";
 
-    public ExcelReaderV2(String jobIdPrefix, OssTask task){
+    public ExcelReaderV2(String jobIdPrefix, OssTask task) {
         this.jobIdPrefix = jobIdPrefix;
         this.task = task;
         metaDate.put("task", task);
     }
+
     @Override
-    public void read(BlockingQueue<RowData> seq) throws InterruptedException {
-        Iterator<Sheet> sheets = reader.sheetIterator();
-        int sheetIndex = 0;
-        while (sheets.hasNext()){
-            Sheet sheet = sheets.next();
-            String jobId = jobIdPrefix + sheetIndex;
-            metaDate.put(jobId, sheet.getSheetName());
-            Iterator<Row> rows =  sheet.rowIterator();
-            List<Row> cacheList = new ArrayList<>();
-            for (int i = 0; i < TITLE_MAX_INDEX; i ++){
-                if(rows.hasNext()){
-                    cacheList.add(rows.next());
-                }else {
-                    break;
-                }
-            }
-            List<Row> titleBeginList;
-            try {
-                titleBeginList = getBeginList(cacheList, seq, jobId);
-            } catch (Exception e) {
-                e.printStackTrace();
-                continue;
-            }
-            seq.put(new RowData(LABELS_TYPE, new String[]{sheet.getSheetName()}, metaDate, jobId, task.getTraceId().toString()));
-            Long cacheLength = putRow(seq, titleBeginList.iterator(), jobId, 0);
-            Long length = putRow(seq, rows, jobId, cacheLength);
-            seq.put(new RowData(LENGTH_TYPE, new String[]{length.toString()}, metaDate, jobId, task.getTraceId().toString()));
-            sheetIndex ++;
+    public void read(BlockingQueue<RowData> seq) throws InterruptedException, IOException, TaskConfigException {
+//        Iterator<Sheet> sheets = reader.sheetIterator();
+//        int sheetIndex = 0;
+        String sheetName = task.getSheetName().toString();
+        Sheet sheet = reader.getSheet(sheetName);
+        if (sheet == null) {
+            reader.close();
+            throw new TaskConfigException("can not found sheet:" + sheetName);
         }
+
+
+//            Sheet sheet = sheets.next();
+//            String jobId = jobIdPrefix + sheetIndex;
+        String jobId = jobIdPrefix;
+        metaDate.put(jobId, sheet.getSheetName());
+        Iterator<Row> rows = sheet.rowIterator();
+        List<Row> cacheList = new ArrayList<>();
+        for (int i = 0; i < TITLE_MAX_INDEX; i++) {
+            if (rows.hasNext()) {
+                cacheList.add(rows.next());
+            } else {
+                break;
+            }
+        }
+        List<Row> titleBeginList;
+        titleBeginList = getBeginList(cacheList, seq, jobId);
+        seq.put(new RowData(LABELS_TYPE, new String[]{sheet.getSheetName()}, metaDate, jobId, task.getTraceId().toString()));
+        Long cacheLength = putRow(seq, titleBeginList.iterator(), jobId, 0);
+        Long length = putRow(seq, rows, jobId, cacheLength);
+        seq.put(new RowData(LENGTH_TYPE, new String[]{length.toString()}, metaDate, jobId, task.getTraceId().toString()));
         close();
     }
 
@@ -85,7 +88,7 @@ public class ExcelReaderV2 implements ReaderV2 {
     @Override
     public void close() {
         try {
-            if(null != reader){
+            if (null != reader) {
                 reader.close();
             }
         } catch (IOException e) {
@@ -93,18 +96,18 @@ public class ExcelReaderV2 implements ReaderV2 {
         }
     }
 
-    protected List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
+    protected List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
-        for(int i = 0; i < cacheList.size(); i++){
+        for (int i = 0; i < cacheList.size(); i++) {
             List<String> values = new ArrayList<>();
             cacheList.get(i).cellIterator().forEachRemaining(cell -> {
                 String value = cell.getStringCellValue();
-                if(!"".equals(value)){
+                if (!"".equals(value)) {
                     values.add(value);
                 }
             });
-            if(values.size() > titleValues.size()){
+            if (values.size() > titleValues.size()) {
                 titleValues = values;
                 titleIndex = i;
             }
@@ -117,7 +120,7 @@ public class ExcelReaderV2 implements ReaderV2 {
 
     private Long putRow(BlockingQueue<RowData> seq, Iterator<Row> rows, String jobId, long beginLength) throws InterruptedException {
         long length = beginLength;
-        while (rows.hasNext()){
+        while (rows.hasNext()) {
             Row row = rows.next();
             List<String> cellValues = new ArrayList<>();
             row.cellIterator().forEachRemaining(x -> {
@@ -130,11 +133,11 @@ public class ExcelReaderV2 implements ReaderV2 {
                 cellValues.add(value);
 
             });
-            if(cellValues.stream().allMatch(""::equals)){
+            if (cellValues.stream().allMatch(""::equals)) {
                 continue;
             }
             seq.put(new RowData(DATA_TYPE, cellValues.toArray(new String[0]), metaDate, jobId, task.getTraceId().toString()));
-            length ++;
+            length++;
         }
         return length;
     }
