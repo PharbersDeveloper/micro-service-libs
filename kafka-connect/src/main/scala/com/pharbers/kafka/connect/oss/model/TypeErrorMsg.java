@@ -11,12 +11,12 @@ package com.pharbers.kafka.connect.oss.model;
  */
 public class TypeErrorMsg {
     private String traceId;
-    private String jobId;
+    private String assetId;
     private String type;
 
-    public TypeErrorMsg(String traceId, String jobId, String type) {
+    public TypeErrorMsg(String traceId, String assetId, String type) {
         this.traceId = traceId;
-        this.jobId = jobId;
+        this.assetId = assetId;
         this.type = type;
     }
 
@@ -28,12 +28,12 @@ public class TypeErrorMsg {
         this.traceId = traceId;
     }
 
-    public String getJobId() {
-        return jobId;
+    public String getAssetId() {
+        return assetId;
     }
 
-    public void setJobId(String jobId) {
-        this.jobId = jobId;
+    public void setAssetId(String assetId) {
+        this.assetId = assetId;
     }
 
     public String getType() {

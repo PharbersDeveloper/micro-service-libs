@@ -23,7 +23,7 @@ private[kafka] class Producer {
     def pushErr(msg: TypeErrorMsg): Unit = {
         val pkp = new PharbersKafkaProducer[String, EventMsg]
         val msgType = "parsingError"
-        val event = new EventMsg(msg.getJobId, msg.getTraceId, msgType, JsonUtil.MAPPER.writeValueAsString(msg))
+        val event = new EventMsg(msg.getAssetId, msg.getTraceId, msgType, JsonUtil.MAPPER.writeValueAsString(msg))
         val fu = pkp.produce(TOPIC,"", event)
         try
             println(fu.get(10, TimeUnit.SECONDS))

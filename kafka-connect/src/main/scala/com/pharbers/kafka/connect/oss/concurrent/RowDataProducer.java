@@ -1,10 +1,7 @@
 package com.pharbers.kafka.connect.oss.concurrent;
 
 import com.aliyun.oss.ClientException;
-import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.OSSObject;
 import com.pharbers.kafka.connect.oss.OssCsvAndExcelSourceConnector;
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder;
 import com.pharbers.kafka.connect.oss.kafka.Producer;
@@ -19,6 +16,11 @@ import org.apache.poi.ooxml.POIXMLException;
 import org.mozilla.universalchardet.UniversalDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.SystemPropertyCredentialsProvider;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +41,7 @@ public class RowDataProducer implements Runnable {
     private ConsumerBuilder<String, OssTask> kafkaConsumerBuffer;
     private LinkedBlockingQueue<RowData> plate;
     private Map<String, String> props;
-    private OSS client;
+    private S3Client  client;
     private Boolean isRun;
 
     public RowDataProducer(ConsumerBuilder<String, OssTask> kafkaConsumerBuffer,
@@ -51,7 +53,11 @@ public class RowDataProducer implements Runnable {
         String endpoint = props.get(OssCsvAndExcelSourceConnector.ENDPOINT_CONFIG);
         String accessKeyId = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_ID_CONFIG);
         String accessKeySecret = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_SECRET_CONFIG);
-        client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        System.setProperty("aws.accessKeyId", accessKeyId);
+        System.setProperty("aws.secretAccessKey", accessKeySecret);
+        client = S3Client.builder().region(Region.of(endpoint)).credentialsProvider(SystemPropertyCredentialsProvider.create()).build();
+
+//        client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
     }
 
     @Override
@@ -66,7 +72,7 @@ public class RowDataProducer implements Runnable {
                 }
             }
         } finally {
-            client.shutdown();
+            client.close();
         }
         isRun = false;
     }
@@ -86,7 +92,7 @@ public class RowDataProducer implements Runnable {
             } catch (POIXMLException e) {
                 log.info("poi异常", e);
 
-                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getJobId().toString(), e.getMessage()));
+                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getAssetId().toString(), e.getMessage()));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
@@ -102,22 +108,21 @@ public class RowDataProducer implements Runnable {
     }
 
     protected void readOss(OssTask task) throws Exception {
-        OSSObject object = getOSSObject(task);
-        String format = getFormat(object.getObjectContent(), task.getFileType().toString());
-        object.forcedClose();
-        object = getOSSObject(task);
-        ReaderV2 reader = buildReader(task.getFileType().toString(), task, object.getObjectContent(), format);
+        InputStream stream = getInputStream(task);
+        String format = getFormat(stream, task.getFileType().toString());
+        stream.close();
+        stream = getInputStream(task);
+        ReaderV2 reader = buildReader(task.getFileType().toString(), task, stream, format);
         reader.read(plate);
     }
 
-    protected OSSObject getOSSObject(OssTask task) throws OSSException, ClientException {
+    protected InputStream getInputStream(OssTask task) throws OSSException, ClientException {
         String ossKey = task.getOssKey().toString();
         String traceId = task.getTraceId().toString();
         String fileType = task.getFileType().toString();
         String bucketName = props.get(OssCsvAndExcelSourceConnector.BUCKET_NAME_CONFIG);
         log.info("ossKey:" + ossKey + " jobID:" + task.getJobId().toString() + " ," + " traceID:" + traceId + " type:" + fileType);
-        OSSObject object = client.getObject(bucketName, ossKey);
-        return object;
+        return client.getObject(GetObjectRequest.builder().bucket(bucketName).key(ossKey).build(), ResponseTransformer.toInputStream());
     }
 
     protected String getFormat(InputStream stream, String fileType) {
@@ -163,7 +168,7 @@ public class RowDataProducer implements Runnable {
                 break;
             default:
                 log.error("不支持的类型" + fileType);
-                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getJobId().toString(), fileType));
+                Producer.getIns().pushErr(new TypeErrorMsg(task.getTraceId().toString(), task.getAssetId().toString(), fileType));
                 throw new Exception("不支持的类型" + fileType);
         }
         return reader;

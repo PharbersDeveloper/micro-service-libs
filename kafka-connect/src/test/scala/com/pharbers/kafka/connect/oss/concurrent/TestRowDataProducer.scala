@@ -2,12 +2,15 @@ package com.pharbers.kafka.connect.oss.concurrent
 
 import java.io._
 import java.util
+import java.util.Scanner
 import java.util.concurrent.{LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
 
 import com.pharbers.kafka.connect.oss.kafka.ConsumerBuilder
 import com.pharbers.kafka.connect.oss.readerV2.{CsvReaderV2, ExcelReaderForMaxDeliveryData, ExcelReaderV2}
+import com.pharbers.kafka.connect.utils.JsonUtil
 import com.pharbers.kafka.schema.OssTask
 import org.scalatest.FunSuite
+import org.specs2.reflect.ClassesOf
 
 import collection.JavaConverters._
 
@@ -22,44 +25,46 @@ import collection.JavaConverters._
   */
 class TestRowDataProducer extends FunSuite{
     val config: Map[String, String] = Map(
-        "endpoint" -> "oss-cn-beijing.aliyuncs.com",
-        "accessKeyId" -> sys.env("OSS_ACCESS_KEY_ID"),
-        "accessKeySecret" -> sys.env("OSS_ACCESS_KEY_SECRET"),
-        "bucketName" -> "pharbers-sandbox"
+        "endpoint" -> "cn-northwest-1",
+        "accessKeyId" -> sys.env("S3_ACCESS_KEY"),
+        "accessKeySecret" -> sys.env("S3_SECRET_KEY"),
+        "bucketName" -> "ph-stream"
     )
 
     val threadNum = 8
 
     test("test close Stream"){
-        val product = new RowDataProducer(null, null, config.asJava)
-        val task = new OssTask("test", "jobId", "traceId", "29122-4ad8-4b10-a528-2be2c/1590202804983",
-            "fileType", "test", "", "", 0L,
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence](),
-            new util.ArrayList[CharSequence]())
-        val ossObject = product.getOSSObject(task)
-        val stream = ossObject.getObjectContent
-        val file = new File("./down.xlsx")
-        file.createNewFile()
-        val fos = new FileOutputStream(file)
-        val bytes = new Array[Byte](1024)
-        var read = stream.read(bytes)
-        while (read != -1) {
-            fos.write(bytes, 0, read)
-            read = stream.read(bytes)
-        }
-//        val read = new BufferedReader(new InputStreamReader(stream))
-//        println(read.readLine())
-//        read.close()
-        println("close stream")
-        ossObject.forcedClose()
-        println("close read")
-//        read.close()
-        println("end")
-        file.delete()
+        val list = JsonUtil.MAPPER.readValue(new FileInputStream(new File("C:\\Users\\EDZ\\Desktop\\oss.json")), classOf[util.List[util.Map[String, String]]])
+        list.asScala.foreach(x => {
+            val osskey = x.get("url")
+            val name = x.get("name")
+            val jobId = x.get("jobId")
+            val product = new RowDataProducer(null, null, config.asJava)
+            val task = new OssTask("test", "jobId", "traceId", osskey,
+                "fileType", "test", "", "", 0L,
+                new util.ArrayList[CharSequence](),
+                new util.ArrayList[CharSequence](),
+                new util.ArrayList[CharSequence](),
+                new util.ArrayList[CharSequence](),
+                new util.ArrayList[CharSequence](),
+                new util.ArrayList[CharSequence]())
+            val stream =  product.getInputStream(task)
+            val file = new File(s"./excels/${jobId}_$name.xlsx")
+            file.createNewFile()
+            val fos = new FileOutputStream(file)
+            val bytes = new Array[Byte](1024)
+            var read = stream.read(bytes)
+            while (read != -1) {
+                fos.write(bytes, 0, read)
+                read = stream.read(bytes)
+            }
+            //        val read = new BufferedReader(new InputStreamReader(stream))
+            //        println(read.readLine())
+            //        read.close()
+            println("close stream")
+            stream.close()
+            println("end")
+        })
     }
 
     test("test csv format"){
