@@ -4,6 +4,7 @@ import com.monitorjbl.xlsx.StreamingReader;
 import com.pharbers.kafka.connect.oss.concurrent.RowData;
 import com.pharbers.kafka.connect.oss.exception.TaskConfigException;
 import com.pharbers.kafka.schema.OssTask;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -42,7 +43,7 @@ public class ExcelReaderV2 implements ReaderV2 {
     }
 
     @Override
-    public void read(BlockingQueue<RowData> seq) throws InterruptedException, IOException, TaskConfigException {
+    public void read(BlockingQueue<RowData> seq) throws Exception {
 //        Iterator<Sheet> sheets = reader.sheetIterator();
 //        int sheetIndex = 0;
         String sheetName = task.getSheetName().toString();
@@ -96,7 +97,7 @@ public class ExcelReaderV2 implements ReaderV2 {
         }
     }
 
-    protected List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws InterruptedException {
+    protected List<Row> getBeginList(List<Row> cacheList, BlockingQueue<RowData> seq, String jobId) throws Exception {
         List<String> titleValues = new ArrayList<>();
         int titleIndex = 0;
         for (int i = 0; i < cacheList.size(); i++) {
@@ -105,8 +106,17 @@ public class ExcelReaderV2 implements ReaderV2 {
                 String value = cell.getStringCellValue();
                 if (!"".equals(value)) {
                     values.add(value);
+                } else {
+                    values.add("null");
                 }
             });
+            for(int j = values.size() - 1; j >= 0; j --){
+                if("null".equals(values.get(j))){
+                    values.remove(j);
+                } else {
+                    break;
+                }
+            }
             if (values.size() > titleValues.size()) {
                 titleValues = values;
                 titleIndex = i;
@@ -123,16 +133,31 @@ public class ExcelReaderV2 implements ReaderV2 {
         while (rows.hasNext()) {
             Row row = rows.next();
             List<String> cellValues = new ArrayList<>();
-            row.cellIterator().forEachRemaining(x -> {
+            for(int i = 0; i < row.getLastCellNum(); i++){
+                Cell cell = row.getCell(i);
                 String value;
-                if ("NUMERIC".equals(x.getCellType().name())) {
-                    value = Double.toString(x.getNumericCellValue());
+                if(cell == null){
+                    value = "";
                 } else {
-                    value = x.getStringCellValue();
+                    if ("NUMERIC".equals(cell.getCellType().name())) {
+                        value = Double.toString(cell.getNumericCellValue());
+                    } else {
+                        value = cell.getStringCellValue();
+                    }
                 }
                 cellValues.add(value);
-
-            });
+            }
+            //row.cellIterator()会跳过空cell
+//            row.cellIterator().forEachRemaining(x -> {
+//                String value;
+//                if ("NUMERIC".equals(x.getCellType().name())) {
+//                    value = Double.toString(x.getNumericCellValue());
+//                } else {
+//                    value = x.getStringCellValue();
+//                }
+//                cellValues.add(value);
+//
+//            });
             if (cellValues.stream().allMatch(""::equals)) {
                 continue;
             }

@@ -40,8 +40,9 @@ public class RowDataProducer implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(RowDataProducer.class);
     private ConsumerBuilder<String, OssTask> kafkaConsumerBuffer;
     private LinkedBlockingQueue<RowData> plate;
+    private String endpoint;
     private Map<String, String> props;
-    private S3Client  client;
+    private S3Client client;
     private Boolean isRun;
 
     public RowDataProducer(ConsumerBuilder<String, OssTask> kafkaConsumerBuffer,
@@ -50,12 +51,11 @@ public class RowDataProducer implements Runnable {
         this.kafkaConsumerBuffer = kafkaConsumerBuffer;
         this.plate = plate;
         this.props = props;
-        String endpoint = props.get(OssCsvAndExcelSourceConnector.ENDPOINT_CONFIG);
+        endpoint = props.get(OssCsvAndExcelSourceConnector.ENDPOINT_CONFIG);
         String accessKeyId = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_ID_CONFIG);
         String accessKeySecret = props.get(OssCsvAndExcelSourceConnector.ACCESS_KEY_SECRET_CONFIG);
         System.setProperty("aws.accessKeyId", accessKeyId);
         System.setProperty("aws.secretAccessKey", accessKeySecret);
-        client = S3Client.builder().region(Region.of(endpoint)).credentialsProvider(SystemPropertyCredentialsProvider.create()).build();
 
 //        client = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
     }
@@ -63,16 +63,15 @@ public class RowDataProducer implements Runnable {
     @Override
     public void run() {
         isRun = true;
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    runTask();
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
+        while (!Thread.currentThread().isInterrupted()) {
+            client = S3Client.builder().region(Region.of(endpoint)).credentialsProvider(SystemPropertyCredentialsProvider.create()).build();
+            try {
+                runTask();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            } finally {
+                client.close();
             }
-        } finally {
-            client.close();
         }
         isRun = false;
     }
@@ -98,9 +97,8 @@ public class RowDataProducer implements Runnable {
             }
         }
         log.info("等待kafka任务," + Thread.currentThread().getName());
-        System.out.println("等待kafka任务," + Thread.currentThread().getName());
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1000 * 10);
         } catch (InterruptedException e) {
             log.info("Interrupted");
             Thread.currentThread().interrupt();
@@ -159,7 +157,7 @@ public class RowDataProducer implements Runnable {
                 reader.init(stream, format);
                 break;
             case "xlsx":
-                if(task.getProviders().contains(maxDeliveryTag)){
+                if (task.getProviders().contains(maxDeliveryTag)) {
                     reader = new ExcelReaderForMaxDeliveryData(UUID.randomUUID().toString(), task);
                 } else {
                     reader = new ExcelReaderV2(UUID.randomUUID().toString(), task);

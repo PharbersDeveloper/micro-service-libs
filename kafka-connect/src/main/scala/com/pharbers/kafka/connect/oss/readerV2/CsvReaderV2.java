@@ -112,9 +112,17 @@ public class CsvReaderV2 implements ReaderV2 {
             for(String cell : cacheList.get(i).split(regex)){
                 if(!"".equals(cell)){
                     values.add(cell);
+                } else {
+                    values.add("null");
                 }
             }
-
+            for(int j = values.size() - 1; j >= 0; j --){
+                if("null".equals(values.get(j))){
+                    values.remove(j);
+                } else {
+                    break;
+                }
+            }
             if(values.size() > titleValues.size()){
                 titleValues = values;
                 titleIndex = i;
