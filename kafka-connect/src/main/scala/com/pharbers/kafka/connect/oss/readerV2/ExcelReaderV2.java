@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述
@@ -122,6 +123,8 @@ public class ExcelReaderV2 implements ReaderV2 {
                 titleIndex = i;
             }
         }
+        String regex = "[ ,;{}()\\n\\t=]";
+        titleValues = titleValues.stream().map(x -> x.replaceAll(regex, "_")).collect(Collectors.toList());
         String[] schema = titleValues.toArray(new String[0]);
         seq.put(new RowData(TITLE_TYPE, schema, metaDate, jobId, task.getTraceId().toString()));
         return cacheList.subList(titleIndex + 1, cacheList.size());
