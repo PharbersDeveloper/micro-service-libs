@@ -103,14 +103,20 @@ public class ExcelReaderV2 implements ReaderV2 {
         int titleIndex = 0;
         for (int i = 0; i < cacheList.size(); i++) {
             List<String> values = new ArrayList<>();
-            cacheList.get(i).cellIterator().forEachRemaining(cell -> {
-                String value = cell.getStringCellValue();
-                if (!"".equals(value)) {
-                    values.add(value);
-                } else {
+            for(int j = 0; j <  cacheList.get(i).getLastCellNum(); j++){
+                Cell cell = cacheList.get(i).getCell(j);
+                if(null == cell){
                     values.add("null");
+                } else{
+                    String value = cell.getStringCellValue();
+                    if (!"".equals(value)) {
+                        values.add(value);
+                    } else {
+                        values.add("null");
+                    }
                 }
-            });
+            }
+
             for(int j = values.size() - 1; j >= 0; j --){
                 if("null".equals(values.get(j))){
                     values.remove(j);
