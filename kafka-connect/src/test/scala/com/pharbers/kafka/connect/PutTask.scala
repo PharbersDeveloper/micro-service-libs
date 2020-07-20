@@ -79,13 +79,13 @@ object PutTask extends App {
 object PushTest extends App{
     val pkp = new PharbersKafkaProducer[String, OssTask]
     var count = 0
-    while (true){
-        val task = new OssTask("5e79e004d589564646ace709",
+//    while (true){
+        val task = new OssTask("5eeae2c67dda31c9aa2cc003",
             "1111111111111112",
             "1111111111111112",
-            "5c2e3756-2363-4d28-97e2-cdc5b20c82ad/1574249019807",
-            "xlsx",
-            "2017年1月辉瑞头孢孟多产品数据.xlsx", "",
+            "CPA/Pfizer/2011-2015 CPA Data.csv",
+            "csv",
+            "2011-2015 CPA Data.csv", "",
             "owner",
             10000L,
             new util.ArrayList[CharSequence](),
@@ -100,6 +100,6 @@ object PushTest extends App{
         count += 1
         println(count)
         Thread.sleep(1000 * 3)
-    }
+//    }
 
 }
