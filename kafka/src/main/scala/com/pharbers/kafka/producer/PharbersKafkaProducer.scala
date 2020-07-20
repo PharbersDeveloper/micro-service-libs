@@ -7,7 +7,6 @@ import java.util.concurrent.Future
 import com.pharbers.kafka.common.kafka_config_obj
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import org.apache.kafka.clients.producer._
-
 import scala.tools.jline_embedded.internal.Log
 
 /**
@@ -32,13 +31,14 @@ class PharbersKafkaProducer[K, V] {
     config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafka_config_obj.keyDefaultSerializer)
     config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafka_config_obj.valueDefaultSerializer)
     config.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, kafka_config_obj.schemaRegistryUrl)
-    config.put("security.protocol", kafka_config_obj.securityProtocol)
-    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
-    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
-    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
-    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
-    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
+//    config.put("security.protocol", kafka_config_obj.securityProtocol)
+//    config.put("ssl.endpoint.identification.algorithm", kafka_config_obj.sslAlgorithm)
+//    config.put("ssl.truststore.location", kafka_config_obj.sslTruststoreLocation)
+//    config.put("ssl.truststore.password", kafka_config_obj.sslTruststorePassword)
+//    config.put("ssl.keystore.location", kafka_config_obj.sslKeystoreLocation)
+//    config.put("ssl.keystore.password", kafka_config_obj.sslKeystorePassword)
     val producer = new KafkaProducer[K, V](config)
+
 
     def produce(topic: String, key: K, value: V): Future[RecordMetadata] = {
         val record: ProducerRecord[K, V] = new ProducerRecord[K, V](topic, key, value)

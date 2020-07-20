@@ -4,6 +4,7 @@ import java.time.Duration
 
 import com.pharbers.kafka.consumer.PharbersKafkaConsumer
 import com.pharbers.kafka.schema.{OssTask, RecordDemo}
+import com.pharbers.util.log.PhLogable
 import io.confluent.ksql.avro_schemas.KsqlDataSourceSchema
 import kafka.cluster.Partition
 import org.apache.avro.generic.GenericRecord
@@ -17,7 +18,7 @@ import org.scalatest.FunSuite
   * @ date 19-6-11
   * @ Description: TODO
   */
-class PharbersConsumerTests extends FunSuite {
+class PharbersConsumerTests extends FunSuite with PhLogable{
 
     test("PharbersKafkaConsumer") {
 //        val pkc = new PharbersKafkaConsumer[String, Array[Byte]](kafka_config_obj.topics.toList, 1000, Int.MaxValue)
@@ -53,6 +54,12 @@ class PharbersConsumerTests extends FunSuite {
         import scala.collection.JavaConverters._
         val consumer = new PharbersKafkaConsumer[String, OssTask](List("oss_task")).getConsumer
         consumer.subscribe(List("oss_task").asJava)
+        val consumer2 = new PharbersKafkaConsumer[String, OssTask](List("oss_task2")).getConsumer
+        val consumer3 = new PharbersKafkaConsumer[String, OssTask](List("oss_task3")).getConsumer
+        val consumer4 = new PharbersKafkaConsumer[String, OssTask](List("oss_task4")).getConsumer
+        consumer2.subscribe(List("oss_task").asJava)
+        consumer3.subscribe(List("oss_task").asJava)
+        consumer4.subscribe(List("oss_task").asJava)
         while (true){
             val end = consumer.endOffsets(List(new TopicPartition("oss_source_1", 0)).asJava, Duration.ofSeconds(10))
             println(end)

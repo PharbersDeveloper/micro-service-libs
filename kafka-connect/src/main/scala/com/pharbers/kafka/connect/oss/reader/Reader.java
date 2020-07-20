@@ -17,7 +17,7 @@ import java.util.Map;
  * @since 2019/10/28 18:28
  */
 public interface Reader {
-    List<SourceRecord> read();
+    List<SourceRecord> read() throws Exception;
     void init(InputStream stream, OssTask task, Map<String, Object> streamOffset) throws Exception;
     boolean isEnd();
     void close();

@@ -1,6 +1,6 @@
 <pharbers-modules>
     <kafka-config>
-        <broker value="59.110.31.50:9092" />
+        <broker value="broker-svc.message:9092" />
         <group value="pharbersConnector" />
         <topics value="test" />
         <acks value="all" />
@@ -8,7 +8,7 @@
         <keyDefaultDeserializer value="org.apache.kafka.common.serialization.StringDeserializer" />
         <valueDefaultSerializer value="io.confluent.kafka.serializers.KafkaAvroSerializer" />
         <valueDefaultDeserializer value="io.confluent.kafka.serializers.KafkaAvroDeserializer" />
-        <schemaRegistryUrl value="http://123.56.179.133:8081" />
+        <schemaRegistryUrl value="http://schema.message:8081" />
         <specificAvroReader value="true" />
         <securityProtocol value="SSL" />
         <sslAlgorithm value=" " />

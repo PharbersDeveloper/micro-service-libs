@@ -10,17 +10,18 @@ import org.apache.avro.specific.SpecificData;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class OssTask extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 6805112854718453974L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OssTask\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"assetId\",\"type\":\"string\"},{\"name\":\"jobId\",\"type\":\"string\"},{\"name\":\"traceId\",\"type\":\"string\"},{\"name\":\"ossKey\",\"type\":\"string\"},{\"name\":\"titleIndex\",\"type\":{\"type\":\"array\",\"items\":\"int\"}},{\"name\":\"fileType\",\"type\":\"string\"},{\"name\":\"fileName\",\"type\":\"string\"},{\"name\":\"sheetName\",\"type\":\"string\"},{\"name\":\"labels\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"dataCover\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"geoCover\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"markets\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"molecules\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"providers\",\"type\":{\"type\":\"array\",\"items\":\"string\"}}]}");
+  private static final long serialVersionUID = 857311494495430588L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OssTask\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"assetId\",\"type\":\"string\"},{\"name\":\"jobId\",\"type\":\"string\"},{\"name\":\"traceId\",\"type\":\"string\"},{\"name\":\"ossKey\",\"type\":\"string\"},{\"name\":\"fileType\",\"type\":\"string\"},{\"name\":\"fileName\",\"type\":\"string\"},{\"name\":\"sheetName\",\"type\":\"string\"},{\"name\":\"owner\",\"type\":\"string\"},{\"name\":\"createTime\",\"type\":\"long\"},{\"name\":\"labels\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"dataCover\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"geoCover\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"markets\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"molecules\",\"type\":{\"type\":\"array\",\"items\":\"string\"}},{\"name\":\"providers\",\"type\":{\"type\":\"array\",\"items\":\"string\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence assetId;
   @Deprecated public java.lang.CharSequence jobId;
   @Deprecated public java.lang.CharSequence traceId;
   @Deprecated public java.lang.CharSequence ossKey;
-  @Deprecated public java.util.List<java.lang.Integer> titleIndex;
   @Deprecated public java.lang.CharSequence fileType;
   @Deprecated public java.lang.CharSequence fileName;
   @Deprecated public java.lang.CharSequence sheetName;
+  @Deprecated public java.lang.CharSequence owner;
+  @Deprecated public long createTime;
   @Deprecated public java.util.List<java.lang.CharSequence> labels;
   @Deprecated public java.util.List<java.lang.CharSequence> dataCover;
   @Deprecated public java.util.List<java.lang.CharSequence> geoCover;
@@ -41,10 +42,11 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param jobId The new value for jobId
    * @param traceId The new value for traceId
    * @param ossKey The new value for ossKey
-   * @param titleIndex The new value for titleIndex
    * @param fileType The new value for fileType
    * @param fileName The new value for fileName
    * @param sheetName The new value for sheetName
+   * @param owner The new value for owner
+   * @param createTime The new value for createTime
    * @param labels The new value for labels
    * @param dataCover The new value for dataCover
    * @param geoCover The new value for geoCover
@@ -52,15 +54,16 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
    * @param molecules The new value for molecules
    * @param providers The new value for providers
    */
-  public OssTask(java.lang.CharSequence assetId, java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence ossKey, java.util.List<java.lang.Integer> titleIndex, java.lang.CharSequence fileType, java.lang.CharSequence fileName, java.lang.CharSequence sheetName, java.util.List<java.lang.CharSequence> labels, java.util.List<java.lang.CharSequence> dataCover, java.util.List<java.lang.CharSequence> geoCover, java.util.List<java.lang.CharSequence> markets, java.util.List<java.lang.CharSequence> molecules, java.util.List<java.lang.CharSequence> providers) {
+  public OssTask(java.lang.CharSequence assetId, java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence ossKey, java.lang.CharSequence fileType, java.lang.CharSequence fileName, java.lang.CharSequence sheetName, java.lang.CharSequence owner, java.lang.Long createTime, java.util.List<java.lang.CharSequence> labels, java.util.List<java.lang.CharSequence> dataCover, java.util.List<java.lang.CharSequence> geoCover, java.util.List<java.lang.CharSequence> markets, java.util.List<java.lang.CharSequence> molecules, java.util.List<java.lang.CharSequence> providers) {
     this.assetId = assetId;
     this.jobId = jobId;
     this.traceId = traceId;
     this.ossKey = ossKey;
-    this.titleIndex = titleIndex;
     this.fileType = fileType;
     this.fileName = fileName;
     this.sheetName = sheetName;
+    this.owner = owner;
+    this.createTime = createTime;
     this.labels = labels;
     this.dataCover = dataCover;
     this.geoCover = geoCover;
@@ -77,16 +80,17 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     case 1: return jobId;
     case 2: return traceId;
     case 3: return ossKey;
-    case 4: return titleIndex;
-    case 5: return fileType;
-    case 6: return fileName;
-    case 7: return sheetName;
-    case 8: return labels;
-    case 9: return dataCover;
-    case 10: return geoCover;
-    case 11: return markets;
-    case 12: return molecules;
-    case 13: return providers;
+    case 4: return fileType;
+    case 5: return fileName;
+    case 6: return sheetName;
+    case 7: return owner;
+    case 8: return createTime;
+    case 9: return labels;
+    case 10: return dataCover;
+    case 11: return geoCover;
+    case 12: return markets;
+    case 13: return molecules;
+    case 14: return providers;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -99,16 +103,17 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     case 1: jobId = (java.lang.CharSequence)value$; break;
     case 2: traceId = (java.lang.CharSequence)value$; break;
     case 3: ossKey = (java.lang.CharSequence)value$; break;
-    case 4: titleIndex = (java.util.List<java.lang.Integer>)value$; break;
-    case 5: fileType = (java.lang.CharSequence)value$; break;
-    case 6: fileName = (java.lang.CharSequence)value$; break;
-    case 7: sheetName = (java.lang.CharSequence)value$; break;
-    case 8: labels = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 9: dataCover = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 10: geoCover = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 11: markets = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 12: molecules = (java.util.List<java.lang.CharSequence>)value$; break;
-    case 13: providers = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 4: fileType = (java.lang.CharSequence)value$; break;
+    case 5: fileName = (java.lang.CharSequence)value$; break;
+    case 6: sheetName = (java.lang.CharSequence)value$; break;
+    case 7: owner = (java.lang.CharSequence)value$; break;
+    case 8: createTime = (java.lang.Long)value$; break;
+    case 9: labels = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 10: dataCover = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 11: geoCover = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 12: markets = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 13: molecules = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 14: providers = (java.util.List<java.lang.CharSequence>)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -178,22 +183,6 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
   }
 
   /**
-   * Gets the value of the 'titleIndex' field.
-   * @return The value of the 'titleIndex' field.
-   */
-  public java.util.List<java.lang.Integer> getTitleIndex() {
-    return titleIndex;
-  }
-
-  /**
-   * Sets the value of the 'titleIndex' field.
-   * @param value the value to set.
-   */
-  public void setTitleIndex(java.util.List<java.lang.Integer> value) {
-    this.titleIndex = value;
-  }
-
-  /**
    * Gets the value of the 'fileType' field.
    * @return The value of the 'fileType' field.
    */
@@ -239,6 +228,38 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
    */
   public void setSheetName(java.lang.CharSequence value) {
     this.sheetName = value;
+  }
+
+  /**
+   * Gets the value of the 'owner' field.
+   * @return The value of the 'owner' field.
+   */
+  public java.lang.CharSequence getOwner() {
+    return owner;
+  }
+
+  /**
+   * Sets the value of the 'owner' field.
+   * @param value the value to set.
+   */
+  public void setOwner(java.lang.CharSequence value) {
+    this.owner = value;
+  }
+
+  /**
+   * Gets the value of the 'createTime' field.
+   * @return The value of the 'createTime' field.
+   */
+  public java.lang.Long getCreateTime() {
+    return createTime;
+  }
+
+  /**
+   * Sets the value of the 'createTime' field.
+   * @param value the value to set.
+   */
+  public void setCreateTime(java.lang.Long value) {
+    this.createTime = value;
   }
 
   /**
@@ -373,10 +394,11 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     private java.lang.CharSequence jobId;
     private java.lang.CharSequence traceId;
     private java.lang.CharSequence ossKey;
-    private java.util.List<java.lang.Integer> titleIndex;
     private java.lang.CharSequence fileType;
     private java.lang.CharSequence fileName;
     private java.lang.CharSequence sheetName;
+    private java.lang.CharSequence owner;
+    private long createTime;
     private java.util.List<java.lang.CharSequence> labels;
     private java.util.List<java.lang.CharSequence> dataCover;
     private java.util.List<java.lang.CharSequence> geoCover;
@@ -411,45 +433,49 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
         this.ossKey = data().deepCopy(fields()[3].schema(), other.ossKey);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.titleIndex)) {
-        this.titleIndex = data().deepCopy(fields()[4].schema(), other.titleIndex);
+      if (isValidValue(fields()[4], other.fileType)) {
+        this.fileType = data().deepCopy(fields()[4].schema(), other.fileType);
         fieldSetFlags()[4] = true;
       }
-      if (isValidValue(fields()[5], other.fileType)) {
-        this.fileType = data().deepCopy(fields()[5].schema(), other.fileType);
+      if (isValidValue(fields()[5], other.fileName)) {
+        this.fileName = data().deepCopy(fields()[5].schema(), other.fileName);
         fieldSetFlags()[5] = true;
       }
-      if (isValidValue(fields()[6], other.fileName)) {
-        this.fileName = data().deepCopy(fields()[6].schema(), other.fileName);
+      if (isValidValue(fields()[6], other.sheetName)) {
+        this.sheetName = data().deepCopy(fields()[6].schema(), other.sheetName);
         fieldSetFlags()[6] = true;
       }
-      if (isValidValue(fields()[7], other.sheetName)) {
-        this.sheetName = data().deepCopy(fields()[7].schema(), other.sheetName);
+      if (isValidValue(fields()[7], other.owner)) {
+        this.owner = data().deepCopy(fields()[7].schema(), other.owner);
         fieldSetFlags()[7] = true;
       }
-      if (isValidValue(fields()[8], other.labels)) {
-        this.labels = data().deepCopy(fields()[8].schema(), other.labels);
+      if (isValidValue(fields()[8], other.createTime)) {
+        this.createTime = data().deepCopy(fields()[8].schema(), other.createTime);
         fieldSetFlags()[8] = true;
       }
-      if (isValidValue(fields()[9], other.dataCover)) {
-        this.dataCover = data().deepCopy(fields()[9].schema(), other.dataCover);
+      if (isValidValue(fields()[9], other.labels)) {
+        this.labels = data().deepCopy(fields()[9].schema(), other.labels);
         fieldSetFlags()[9] = true;
       }
-      if (isValidValue(fields()[10], other.geoCover)) {
-        this.geoCover = data().deepCopy(fields()[10].schema(), other.geoCover);
+      if (isValidValue(fields()[10], other.dataCover)) {
+        this.dataCover = data().deepCopy(fields()[10].schema(), other.dataCover);
         fieldSetFlags()[10] = true;
       }
-      if (isValidValue(fields()[11], other.markets)) {
-        this.markets = data().deepCopy(fields()[11].schema(), other.markets);
+      if (isValidValue(fields()[11], other.geoCover)) {
+        this.geoCover = data().deepCopy(fields()[11].schema(), other.geoCover);
         fieldSetFlags()[11] = true;
       }
-      if (isValidValue(fields()[12], other.molecules)) {
-        this.molecules = data().deepCopy(fields()[12].schema(), other.molecules);
+      if (isValidValue(fields()[12], other.markets)) {
+        this.markets = data().deepCopy(fields()[12].schema(), other.markets);
         fieldSetFlags()[12] = true;
       }
-      if (isValidValue(fields()[13], other.providers)) {
-        this.providers = data().deepCopy(fields()[13].schema(), other.providers);
+      if (isValidValue(fields()[13], other.molecules)) {
+        this.molecules = data().deepCopy(fields()[13].schema(), other.molecules);
         fieldSetFlags()[13] = true;
+      }
+      if (isValidValue(fields()[14], other.providers)) {
+        this.providers = data().deepCopy(fields()[14].schema(), other.providers);
+        fieldSetFlags()[14] = true;
       }
     }
 
@@ -475,45 +501,49 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
         this.ossKey = data().deepCopy(fields()[3].schema(), other.ossKey);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.titleIndex)) {
-        this.titleIndex = data().deepCopy(fields()[4].schema(), other.titleIndex);
+      if (isValidValue(fields()[4], other.fileType)) {
+        this.fileType = data().deepCopy(fields()[4].schema(), other.fileType);
         fieldSetFlags()[4] = true;
       }
-      if (isValidValue(fields()[5], other.fileType)) {
-        this.fileType = data().deepCopy(fields()[5].schema(), other.fileType);
+      if (isValidValue(fields()[5], other.fileName)) {
+        this.fileName = data().deepCopy(fields()[5].schema(), other.fileName);
         fieldSetFlags()[5] = true;
       }
-      if (isValidValue(fields()[6], other.fileName)) {
-        this.fileName = data().deepCopy(fields()[6].schema(), other.fileName);
+      if (isValidValue(fields()[6], other.sheetName)) {
+        this.sheetName = data().deepCopy(fields()[6].schema(), other.sheetName);
         fieldSetFlags()[6] = true;
       }
-      if (isValidValue(fields()[7], other.sheetName)) {
-        this.sheetName = data().deepCopy(fields()[7].schema(), other.sheetName);
+      if (isValidValue(fields()[7], other.owner)) {
+        this.owner = data().deepCopy(fields()[7].schema(), other.owner);
         fieldSetFlags()[7] = true;
       }
-      if (isValidValue(fields()[8], other.labels)) {
-        this.labels = data().deepCopy(fields()[8].schema(), other.labels);
+      if (isValidValue(fields()[8], other.createTime)) {
+        this.createTime = data().deepCopy(fields()[8].schema(), other.createTime);
         fieldSetFlags()[8] = true;
       }
-      if (isValidValue(fields()[9], other.dataCover)) {
-        this.dataCover = data().deepCopy(fields()[9].schema(), other.dataCover);
+      if (isValidValue(fields()[9], other.labels)) {
+        this.labels = data().deepCopy(fields()[9].schema(), other.labels);
         fieldSetFlags()[9] = true;
       }
-      if (isValidValue(fields()[10], other.geoCover)) {
-        this.geoCover = data().deepCopy(fields()[10].schema(), other.geoCover);
+      if (isValidValue(fields()[10], other.dataCover)) {
+        this.dataCover = data().deepCopy(fields()[10].schema(), other.dataCover);
         fieldSetFlags()[10] = true;
       }
-      if (isValidValue(fields()[11], other.markets)) {
-        this.markets = data().deepCopy(fields()[11].schema(), other.markets);
+      if (isValidValue(fields()[11], other.geoCover)) {
+        this.geoCover = data().deepCopy(fields()[11].schema(), other.geoCover);
         fieldSetFlags()[11] = true;
       }
-      if (isValidValue(fields()[12], other.molecules)) {
-        this.molecules = data().deepCopy(fields()[12].schema(), other.molecules);
+      if (isValidValue(fields()[12], other.markets)) {
+        this.markets = data().deepCopy(fields()[12].schema(), other.markets);
         fieldSetFlags()[12] = true;
       }
-      if (isValidValue(fields()[13], other.providers)) {
-        this.providers = data().deepCopy(fields()[13].schema(), other.providers);
+      if (isValidValue(fields()[13], other.molecules)) {
+        this.molecules = data().deepCopy(fields()[13].schema(), other.molecules);
         fieldSetFlags()[13] = true;
+      }
+      if (isValidValue(fields()[14], other.providers)) {
+        this.providers = data().deepCopy(fields()[14].schema(), other.providers);
+        fieldSetFlags()[14] = true;
       }
     }
 
@@ -674,45 +704,6 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
     }
 
     /**
-      * Gets the value of the 'titleIndex' field.
-      * @return The value.
-      */
-    public java.util.List<java.lang.Integer> getTitleIndex() {
-      return titleIndex;
-    }
-
-    /**
-      * Sets the value of the 'titleIndex' field.
-      * @param value The value of 'titleIndex'.
-      * @return This builder.
-      */
-    public com.pharbers.kafka.schema.OssTask.Builder setTitleIndex(java.util.List<java.lang.Integer> value) {
-      validate(fields()[4], value);
-      this.titleIndex = value;
-      fieldSetFlags()[4] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'titleIndex' field has been set.
-      * @return True if the 'titleIndex' field has been set, false otherwise.
-      */
-    public boolean hasTitleIndex() {
-      return fieldSetFlags()[4];
-    }
-
-
-    /**
-      * Clears the value of the 'titleIndex' field.
-      * @return This builder.
-      */
-    public com.pharbers.kafka.schema.OssTask.Builder clearTitleIndex() {
-      titleIndex = null;
-      fieldSetFlags()[4] = false;
-      return this;
-    }
-
-    /**
       * Gets the value of the 'fileType' field.
       * @return The value.
       */
@@ -726,9 +717,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setFileType(java.lang.CharSequence value) {
-      validate(fields()[5], value);
+      validate(fields()[4], value);
       this.fileType = value;
-      fieldSetFlags()[5] = true;
+      fieldSetFlags()[4] = true;
       return this;
     }
 
@@ -737,7 +728,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'fileType' field has been set, false otherwise.
       */
     public boolean hasFileType() {
-      return fieldSetFlags()[5];
+      return fieldSetFlags()[4];
     }
 
 
@@ -747,7 +738,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearFileType() {
       fileType = null;
-      fieldSetFlags()[5] = false;
+      fieldSetFlags()[4] = false;
       return this;
     }
 
@@ -765,9 +756,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setFileName(java.lang.CharSequence value) {
-      validate(fields()[6], value);
+      validate(fields()[5], value);
       this.fileName = value;
-      fieldSetFlags()[6] = true;
+      fieldSetFlags()[5] = true;
       return this;
     }
 
@@ -776,7 +767,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'fileName' field has been set, false otherwise.
       */
     public boolean hasFileName() {
-      return fieldSetFlags()[6];
+      return fieldSetFlags()[5];
     }
 
 
@@ -786,7 +777,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearFileName() {
       fileName = null;
-      fieldSetFlags()[6] = false;
+      fieldSetFlags()[5] = false;
       return this;
     }
 
@@ -804,9 +795,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setSheetName(java.lang.CharSequence value) {
-      validate(fields()[7], value);
+      validate(fields()[6], value);
       this.sheetName = value;
-      fieldSetFlags()[7] = true;
+      fieldSetFlags()[6] = true;
       return this;
     }
 
@@ -815,7 +806,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'sheetName' field has been set, false otherwise.
       */
     public boolean hasSheetName() {
-      return fieldSetFlags()[7];
+      return fieldSetFlags()[6];
     }
 
 
@@ -825,7 +816,84 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearSheetName() {
       sheetName = null;
+      fieldSetFlags()[6] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'owner' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getOwner() {
+      return owner;
+    }
+
+    /**
+      * Sets the value of the 'owner' field.
+      * @param value The value of 'owner'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder setOwner(java.lang.CharSequence value) {
+      validate(fields()[7], value);
+      this.owner = value;
+      fieldSetFlags()[7] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'owner' field has been set.
+      * @return True if the 'owner' field has been set, false otherwise.
+      */
+    public boolean hasOwner() {
+      return fieldSetFlags()[7];
+    }
+
+
+    /**
+      * Clears the value of the 'owner' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder clearOwner() {
+      owner = null;
       fieldSetFlags()[7] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'createTime' field.
+      * @return The value.
+      */
+    public java.lang.Long getCreateTime() {
+      return createTime;
+    }
+
+    /**
+      * Sets the value of the 'createTime' field.
+      * @param value The value of 'createTime'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder setCreateTime(long value) {
+      validate(fields()[8], value);
+      this.createTime = value;
+      fieldSetFlags()[8] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'createTime' field has been set.
+      * @return True if the 'createTime' field has been set, false otherwise.
+      */
+    public boolean hasCreateTime() {
+      return fieldSetFlags()[8];
+    }
+
+
+    /**
+      * Clears the value of the 'createTime' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.OssTask.Builder clearCreateTime() {
+      fieldSetFlags()[8] = false;
       return this;
     }
 
@@ -843,9 +911,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setLabels(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[8], value);
+      validate(fields()[9], value);
       this.labels = value;
-      fieldSetFlags()[8] = true;
+      fieldSetFlags()[9] = true;
       return this;
     }
 
@@ -854,7 +922,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'labels' field has been set, false otherwise.
       */
     public boolean hasLabels() {
-      return fieldSetFlags()[8];
+      return fieldSetFlags()[9];
     }
 
 
@@ -864,7 +932,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearLabels() {
       labels = null;
-      fieldSetFlags()[8] = false;
+      fieldSetFlags()[9] = false;
       return this;
     }
 
@@ -882,9 +950,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setDataCover(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[9], value);
+      validate(fields()[10], value);
       this.dataCover = value;
-      fieldSetFlags()[9] = true;
+      fieldSetFlags()[10] = true;
       return this;
     }
 
@@ -893,7 +961,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'dataCover' field has been set, false otherwise.
       */
     public boolean hasDataCover() {
-      return fieldSetFlags()[9];
+      return fieldSetFlags()[10];
     }
 
 
@@ -903,7 +971,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearDataCover() {
       dataCover = null;
-      fieldSetFlags()[9] = false;
+      fieldSetFlags()[10] = false;
       return this;
     }
 
@@ -921,9 +989,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setGeoCover(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[10], value);
+      validate(fields()[11], value);
       this.geoCover = value;
-      fieldSetFlags()[10] = true;
+      fieldSetFlags()[11] = true;
       return this;
     }
 
@@ -932,7 +1000,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'geoCover' field has been set, false otherwise.
       */
     public boolean hasGeoCover() {
-      return fieldSetFlags()[10];
+      return fieldSetFlags()[11];
     }
 
 
@@ -942,7 +1010,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearGeoCover() {
       geoCover = null;
-      fieldSetFlags()[10] = false;
+      fieldSetFlags()[11] = false;
       return this;
     }
 
@@ -960,9 +1028,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setMarkets(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[11], value);
+      validate(fields()[12], value);
       this.markets = value;
-      fieldSetFlags()[11] = true;
+      fieldSetFlags()[12] = true;
       return this;
     }
 
@@ -971,7 +1039,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'markets' field has been set, false otherwise.
       */
     public boolean hasMarkets() {
-      return fieldSetFlags()[11];
+      return fieldSetFlags()[12];
     }
 
 
@@ -981,7 +1049,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearMarkets() {
       markets = null;
-      fieldSetFlags()[11] = false;
+      fieldSetFlags()[12] = false;
       return this;
     }
 
@@ -999,9 +1067,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setMolecules(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[12], value);
+      validate(fields()[13], value);
       this.molecules = value;
-      fieldSetFlags()[12] = true;
+      fieldSetFlags()[13] = true;
       return this;
     }
 
@@ -1010,7 +1078,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'molecules' field has been set, false otherwise.
       */
     public boolean hasMolecules() {
-      return fieldSetFlags()[12];
+      return fieldSetFlags()[13];
     }
 
 
@@ -1020,7 +1088,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearMolecules() {
       molecules = null;
-      fieldSetFlags()[12] = false;
+      fieldSetFlags()[13] = false;
       return this;
     }
 
@@ -1038,9 +1106,9 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return This builder.
       */
     public com.pharbers.kafka.schema.OssTask.Builder setProviders(java.util.List<java.lang.CharSequence> value) {
-      validate(fields()[13], value);
+      validate(fields()[14], value);
       this.providers = value;
-      fieldSetFlags()[13] = true;
+      fieldSetFlags()[14] = true;
       return this;
     }
 
@@ -1049,7 +1117,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       * @return True if the 'providers' field has been set, false otherwise.
       */
     public boolean hasProviders() {
-      return fieldSetFlags()[13];
+      return fieldSetFlags()[14];
     }
 
 
@@ -1059,7 +1127,7 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
       */
     public com.pharbers.kafka.schema.OssTask.Builder clearProviders() {
       providers = null;
-      fieldSetFlags()[13] = false;
+      fieldSetFlags()[14] = false;
       return this;
     }
 
@@ -1071,16 +1139,17 @@ public class OssTask extends org.apache.avro.specific.SpecificRecordBase impleme
         record.jobId = fieldSetFlags()[1] ? this.jobId : (java.lang.CharSequence) defaultValue(fields()[1]);
         record.traceId = fieldSetFlags()[2] ? this.traceId : (java.lang.CharSequence) defaultValue(fields()[2]);
         record.ossKey = fieldSetFlags()[3] ? this.ossKey : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.titleIndex = fieldSetFlags()[4] ? this.titleIndex : (java.util.List<java.lang.Integer>) defaultValue(fields()[4]);
-        record.fileType = fieldSetFlags()[5] ? this.fileType : (java.lang.CharSequence) defaultValue(fields()[5]);
-        record.fileName = fieldSetFlags()[6] ? this.fileName : (java.lang.CharSequence) defaultValue(fields()[6]);
-        record.sheetName = fieldSetFlags()[7] ? this.sheetName : (java.lang.CharSequence) defaultValue(fields()[7]);
-        record.labels = fieldSetFlags()[8] ? this.labels : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[8]);
-        record.dataCover = fieldSetFlags()[9] ? this.dataCover : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[9]);
-        record.geoCover = fieldSetFlags()[10] ? this.geoCover : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[10]);
-        record.markets = fieldSetFlags()[11] ? this.markets : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[11]);
-        record.molecules = fieldSetFlags()[12] ? this.molecules : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[12]);
-        record.providers = fieldSetFlags()[13] ? this.providers : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[13]);
+        record.fileType = fieldSetFlags()[4] ? this.fileType : (java.lang.CharSequence) defaultValue(fields()[4]);
+        record.fileName = fieldSetFlags()[5] ? this.fileName : (java.lang.CharSequence) defaultValue(fields()[5]);
+        record.sheetName = fieldSetFlags()[6] ? this.sheetName : (java.lang.CharSequence) defaultValue(fields()[6]);
+        record.owner = fieldSetFlags()[7] ? this.owner : (java.lang.CharSequence) defaultValue(fields()[7]);
+        record.createTime = fieldSetFlags()[8] ? this.createTime : (java.lang.Long) defaultValue(fields()[8]);
+        record.labels = fieldSetFlags()[9] ? this.labels : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[9]);
+        record.dataCover = fieldSetFlags()[10] ? this.dataCover : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[10]);
+        record.geoCover = fieldSetFlags()[11] ? this.geoCover : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[11]);
+        record.markets = fieldSetFlags()[12] ? this.markets : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[12]);
+        record.molecules = fieldSetFlags()[13] ? this.molecules : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[13]);
+        record.providers = fieldSetFlags()[14] ? this.providers : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[14]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

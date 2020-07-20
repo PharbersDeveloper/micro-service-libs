@@ -30,7 +30,7 @@ public class OffsetHandler {
     }
 
     public Map<String, String> offsetValueCoding(){
-        Map<String, String> res = new HashMap<>();
+        Map<String, String> res = new HashMap<>(streamOffset.size());
         for (Map.Entry<String, Long> kv : streamOffset.entrySet()){
             res.put(kv.getKey(), kv.getValue().toString());
         }

@@ -20,13 +20,6 @@
       "type": "string"
     },
     {
-      "name": "titleIndex",
-      "type": {
-        "items": "int",
-        "type": "array"
-       }
-    },
-    {
         "name": "fileType",
         "type": "string"
     },
@@ -37,6 +30,14 @@
     {
       "name": "sheetName",
       "type": "string"
+    },
+    {
+        "name": "owner",
+        "type": "string"
+    },
+    {
+        "name": "createTime",
+        "type": "long"
     },
     {
       "name": "labels",

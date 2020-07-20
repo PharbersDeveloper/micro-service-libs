@@ -38,6 +38,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.pharbers</groupId>
+            <artifactId>logs</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka_${scalaBinaryVersion}</artifactId>
             <version>${kafka.version}</version>

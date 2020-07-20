@@ -35,6 +35,17 @@
                 </repository>
 
             </repositories>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>software.amazon.awssdk</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>2.13.31</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
 
             <dependencies>
                 <dependency>
@@ -56,11 +67,21 @@
                     <version>${confluent.version}</version>
                     <scope>provided</scope>
                 </dependency>
-
+                <!--oss-->
                 <dependency>
                     <groupId>com.aliyun.oss</groupId>
                     <artifactId>aliyun-sdk-oss</artifactId>
                     <version>3.5.0</version>
+                </dependency>
+                <!--aws-->
+                <dependency>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>s3</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                    <version>4.4.11</version>
                 </dependency>
                 <!--excel流式读取库-->
                 <dependency>
@@ -91,6 +112,24 @@
                     <artifactId>commons-compress</artifactId>
                     <version>1.18</version>
                 </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                    <version>2.10.4</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                    <version>2.10.4</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                    <version>2.10.4</version>
+                </dependency>
                 <!--kafka-->
                 <dependency>
                     <groupId>com.pharbers</groupId>
@@ -102,6 +141,13 @@
                     <groupId>com.pharbers</groupId>
                     <artifactId>logs</artifactId>
                     <version>1.0</version>
+                </dependency>
+
+                <!--google 编码判断-->
+                <dependency>
+                    <groupId>com.github.albfernandez</groupId>
+                    <artifactId>juniversalchardet</artifactId>
+                    <version>2.3.0</version>
                 </dependency>
             </dependencies>
 

@@ -20,12 +20,16 @@
       "type": "string"
     },
     {
-      "name": "errorNode",
+      "name": "errorCode",
       "type": "string"
     },
     {
       "name": "errorMsg",
       "type": "string"
+    },
+    {
+       "name": "config",
+       "type": "string"
     }
   ]
 }

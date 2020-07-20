@@ -4,3 +4,5 @@
 *.cache
 *.class
 target/
+*/*.jks
+*.log

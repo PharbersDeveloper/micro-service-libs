@@ -10,15 +10,16 @@ import org.apache.avro.specific.SpecificData;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 1819318210299822718L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PhErrorMsg\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"jobId\",\"type\":\"string\"},{\"name\":\"traceId\",\"type\":\"string\"},{\"name\":\"runId\",\"type\":\"string\"},{\"name\":\"productName\",\"type\":\"string\"},{\"name\":\"errorNode\",\"type\":\"string\"},{\"name\":\"errorMsg\",\"type\":\"string\"}]}");
+  private static final long serialVersionUID = -7781353911988409759L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PhErrorMsg\",\"namespace\":\"com.pharbers.kafka.schema\",\"fields\":[{\"name\":\"jobId\",\"type\":\"string\"},{\"name\":\"traceId\",\"type\":\"string\"},{\"name\":\"runId\",\"type\":\"string\"},{\"name\":\"productName\",\"type\":\"string\"},{\"name\":\"errorCode\",\"type\":\"string\"},{\"name\":\"errorMsg\",\"type\":\"string\"},{\"name\":\"config\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence jobId;
   @Deprecated public java.lang.CharSequence traceId;
   @Deprecated public java.lang.CharSequence runId;
   @Deprecated public java.lang.CharSequence productName;
-  @Deprecated public java.lang.CharSequence errorNode;
+  @Deprecated public java.lang.CharSequence errorCode;
   @Deprecated public java.lang.CharSequence errorMsg;
+  @Deprecated public java.lang.CharSequence config;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -33,16 +34,18 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
    * @param traceId The new value for traceId
    * @param runId The new value for runId
    * @param productName The new value for productName
-   * @param errorNode The new value for errorNode
+   * @param errorCode The new value for errorCode
    * @param errorMsg The new value for errorMsg
+   * @param config The new value for config
    */
-  public PhErrorMsg(java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence runId, java.lang.CharSequence productName, java.lang.CharSequence errorNode, java.lang.CharSequence errorMsg) {
+  public PhErrorMsg(java.lang.CharSequence jobId, java.lang.CharSequence traceId, java.lang.CharSequence runId, java.lang.CharSequence productName, java.lang.CharSequence errorCode, java.lang.CharSequence errorMsg, java.lang.CharSequence config) {
     this.jobId = jobId;
     this.traceId = traceId;
     this.runId = runId;
     this.productName = productName;
-    this.errorNode = errorNode;
+    this.errorCode = errorCode;
     this.errorMsg = errorMsg;
+    this.config = config;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -53,8 +56,9 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
     case 1: return traceId;
     case 2: return runId;
     case 3: return productName;
-    case 4: return errorNode;
+    case 4: return errorCode;
     case 5: return errorMsg;
+    case 6: return config;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -67,8 +71,9 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
     case 1: traceId = (java.lang.CharSequence)value$; break;
     case 2: runId = (java.lang.CharSequence)value$; break;
     case 3: productName = (java.lang.CharSequence)value$; break;
-    case 4: errorNode = (java.lang.CharSequence)value$; break;
+    case 4: errorCode = (java.lang.CharSequence)value$; break;
     case 5: errorMsg = (java.lang.CharSequence)value$; break;
+    case 6: config = (java.lang.CharSequence)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -138,19 +143,19 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
   }
 
   /**
-   * Gets the value of the 'errorNode' field.
-   * @return The value of the 'errorNode' field.
+   * Gets the value of the 'errorCode' field.
+   * @return The value of the 'errorCode' field.
    */
-  public java.lang.CharSequence getErrorNode() {
-    return errorNode;
+  public java.lang.CharSequence getErrorCode() {
+    return errorCode;
   }
 
   /**
-   * Sets the value of the 'errorNode' field.
+   * Sets the value of the 'errorCode' field.
    * @param value the value to set.
    */
-  public void setErrorNode(java.lang.CharSequence value) {
-    this.errorNode = value;
+  public void setErrorCode(java.lang.CharSequence value) {
+    this.errorCode = value;
   }
 
   /**
@@ -167,6 +172,22 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
    */
   public void setErrorMsg(java.lang.CharSequence value) {
     this.errorMsg = value;
+  }
+
+  /**
+   * Gets the value of the 'config' field.
+   * @return The value of the 'config' field.
+   */
+  public java.lang.CharSequence getConfig() {
+    return config;
+  }
+
+  /**
+   * Sets the value of the 'config' field.
+   * @param value the value to set.
+   */
+  public void setConfig(java.lang.CharSequence value) {
+    this.config = value;
   }
 
   /**
@@ -205,8 +226,9 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
     private java.lang.CharSequence traceId;
     private java.lang.CharSequence runId;
     private java.lang.CharSequence productName;
-    private java.lang.CharSequence errorNode;
+    private java.lang.CharSequence errorCode;
     private java.lang.CharSequence errorMsg;
+    private java.lang.CharSequence config;
 
     /** Creates a new Builder */
     private Builder() {
@@ -235,13 +257,17 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
         this.productName = data().deepCopy(fields()[3].schema(), other.productName);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.errorNode)) {
-        this.errorNode = data().deepCopy(fields()[4].schema(), other.errorNode);
+      if (isValidValue(fields()[4], other.errorCode)) {
+        this.errorCode = data().deepCopy(fields()[4].schema(), other.errorCode);
         fieldSetFlags()[4] = true;
       }
       if (isValidValue(fields()[5], other.errorMsg)) {
         this.errorMsg = data().deepCopy(fields()[5].schema(), other.errorMsg);
         fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.config)) {
+        this.config = data().deepCopy(fields()[6].schema(), other.config);
+        fieldSetFlags()[6] = true;
       }
     }
 
@@ -267,13 +293,17 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
         this.productName = data().deepCopy(fields()[3].schema(), other.productName);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.errorNode)) {
-        this.errorNode = data().deepCopy(fields()[4].schema(), other.errorNode);
+      if (isValidValue(fields()[4], other.errorCode)) {
+        this.errorCode = data().deepCopy(fields()[4].schema(), other.errorCode);
         fieldSetFlags()[4] = true;
       }
       if (isValidValue(fields()[5], other.errorMsg)) {
         this.errorMsg = data().deepCopy(fields()[5].schema(), other.errorMsg);
         fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.config)) {
+        this.config = data().deepCopy(fields()[6].schema(), other.config);
+        fieldSetFlags()[6] = true;
       }
     }
 
@@ -434,40 +464,40 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
     }
 
     /**
-      * Gets the value of the 'errorNode' field.
+      * Gets the value of the 'errorCode' field.
       * @return The value.
       */
-    public java.lang.CharSequence getErrorNode() {
-      return errorNode;
+    public java.lang.CharSequence getErrorCode() {
+      return errorCode;
     }
 
     /**
-      * Sets the value of the 'errorNode' field.
-      * @param value The value of 'errorNode'.
+      * Sets the value of the 'errorCode' field.
+      * @param value The value of 'errorCode'.
       * @return This builder.
       */
-    public com.pharbers.kafka.schema.PhErrorMsg.Builder setErrorNode(java.lang.CharSequence value) {
+    public com.pharbers.kafka.schema.PhErrorMsg.Builder setErrorCode(java.lang.CharSequence value) {
       validate(fields()[4], value);
-      this.errorNode = value;
+      this.errorCode = value;
       fieldSetFlags()[4] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'errorNode' field has been set.
-      * @return True if the 'errorNode' field has been set, false otherwise.
+      * Checks whether the 'errorCode' field has been set.
+      * @return True if the 'errorCode' field has been set, false otherwise.
       */
-    public boolean hasErrorNode() {
+    public boolean hasErrorCode() {
       return fieldSetFlags()[4];
     }
 
 
     /**
-      * Clears the value of the 'errorNode' field.
+      * Clears the value of the 'errorCode' field.
       * @return This builder.
       */
-    public com.pharbers.kafka.schema.PhErrorMsg.Builder clearErrorNode() {
-      errorNode = null;
+    public com.pharbers.kafka.schema.PhErrorMsg.Builder clearErrorCode() {
+      errorCode = null;
       fieldSetFlags()[4] = false;
       return this;
     }
@@ -511,6 +541,45 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
       return this;
     }
 
+    /**
+      * Gets the value of the 'config' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getConfig() {
+      return config;
+    }
+
+    /**
+      * Sets the value of the 'config' field.
+      * @param value The value of 'config'.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.PhErrorMsg.Builder setConfig(java.lang.CharSequence value) {
+      validate(fields()[6], value);
+      this.config = value;
+      fieldSetFlags()[6] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'config' field has been set.
+      * @return True if the 'config' field has been set, false otherwise.
+      */
+    public boolean hasConfig() {
+      return fieldSetFlags()[6];
+    }
+
+
+    /**
+      * Clears the value of the 'config' field.
+      * @return This builder.
+      */
+    public com.pharbers.kafka.schema.PhErrorMsg.Builder clearConfig() {
+      config = null;
+      fieldSetFlags()[6] = false;
+      return this;
+    }
+
     @Override
     public PhErrorMsg build() {
       try {
@@ -519,8 +588,9 @@ public class PhErrorMsg extends org.apache.avro.specific.SpecificRecordBase impl
         record.traceId = fieldSetFlags()[1] ? this.traceId : (java.lang.CharSequence) defaultValue(fields()[1]);
         record.runId = fieldSetFlags()[2] ? this.runId : (java.lang.CharSequence) defaultValue(fields()[2]);
         record.productName = fieldSetFlags()[3] ? this.productName : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.errorNode = fieldSetFlags()[4] ? this.errorNode : (java.lang.CharSequence) defaultValue(fields()[4]);
+        record.errorCode = fieldSetFlags()[4] ? this.errorCode : (java.lang.CharSequence) defaultValue(fields()[4]);
         record.errorMsg = fieldSetFlags()[5] ? this.errorMsg : (java.lang.CharSequence) defaultValue(fields()[5]);
+        record.config = fieldSetFlags()[6] ? this.config : (java.lang.CharSequence) defaultValue(fields()[6]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
