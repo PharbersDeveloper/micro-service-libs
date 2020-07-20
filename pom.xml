@@ -48,7 +48,7 @@
             </activation>
 
             <properties>
-                <scalaVersion>2.11.8</scalaVersion>
+                <scalaVersion>2.13.3</scalaVersion>
                 <scalaBinaryVersion>2.11</scalaBinaryVersion>
             </properties>
 
